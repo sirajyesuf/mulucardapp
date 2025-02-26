@@ -6,7 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use Illuminate\Support\Facades\URL;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -20,7 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        // 'password',
     ];
 
     /**
@@ -42,7 +42,17 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            // 'password' => 'hashed',
         ];
+    }
+
+    public function generateLoginUrl():string {
+        return URL::temporarySignedRoute(
+                    'magic.verify',
+                    now()->addMinutes(30),
+                    // Expires in 30 minutes
+                    ['user' => $this->id]
+                );
+
     }
 }
