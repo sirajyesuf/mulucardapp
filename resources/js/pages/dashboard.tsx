@@ -57,6 +57,8 @@ export default function Dashboard() {
                             last_name={card.last_name}
                             organization={card.organization}
                             job_title={card.job_title}
+                            email={card.email}
+                            phone={card.phone}
                             banner_color={card.banner_color}
                             links={card.social_links}
                         />

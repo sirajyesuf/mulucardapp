@@ -7,6 +7,8 @@ type MuluCardProps = {
     last_name: string;
     organization: string;
     job_title: string;
+    phone: string;
+    email: string;
     banner_color: string;
     links: {
         name: string;
@@ -15,7 +17,18 @@ type MuluCardProps = {
     }[];
 };
 
-export default function MuluCard({ previewUrl, previewLogo, banner_color, links, first_name, last_name, organization, job_title }: MuluCardProps) {
+export default function MuluCard({
+    previewUrl,
+    previewLogo,
+    banner_color,
+    links,
+    first_name,
+    last_name,
+    organization,
+    job_title,
+    phone,
+    email,
+}: MuluCardProps) {
     console.log(links);
     return (
         <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
@@ -35,7 +48,7 @@ export default function MuluCard({ previewUrl, previewLogo, banner_color, links,
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="border-none bg-gray-50 p-2">
+            <CardContent className="flex flex-col gap-4 border-none bg-gray-50 p-2">
                 <div className="mb-8 flex flex-col items-center border-none">
                     <div className="font-norma flex flex-row space-x-4 text-2xl capitalize">
                         <p>{first_name}</p>
@@ -63,6 +76,32 @@ export default function MuluCard({ previewUrl, previewLogo, banner_color, links,
                             )
                         );
                     })}
+                </div>
+                <div className="flex w-full flex-col gap-4 border-none p-2 text-center font-bold text-white capitalize">
+                    <div
+                        className="rounded-4xl border-none p-2"
+                        style={{
+                            backgroundColor: banner_color,
+                        }}
+                    >
+                        <a href={`tel:${phone}`}>call me</a>
+                    </div>
+                    <div
+                        className="rounded-4xl border-2 p-2"
+                        style={{
+                            backgroundColor: banner_color,
+                        }}
+                    >
+                        <a href={`mailto:${email}`}>email me</a>
+                    </div>
+                    <div
+                        className="rounded-4xl border-none p-2"
+                        style={{
+                            backgroundColor: banner_color,
+                        }}
+                    >
+                        visit website
+                    </div>
                 </div>
             </CardContent>
         </Card>

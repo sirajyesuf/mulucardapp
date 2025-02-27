@@ -20,6 +20,8 @@ interface CardForm {
     last_name: string;
     organization: string;
     job_title: string;
+    email: string;
+    phone: string;
     banner_color: string;
     links: {
         name: string;
@@ -51,6 +53,8 @@ export default function CreateCard() {
         last_name: '',
         organization: '',
         job_title: '',
+        phone: '',
+        email: '',
         banner_color: colors[0],
         links: [
             { name: 'website', url: '', placeholder: 'https://example.com' },
@@ -109,6 +113,8 @@ export default function CreateCard() {
                             last_name={data.last_name}
                             organization={data.organization}
                             job_title={data.job_title}
+                            phone={data.phone}
+                            email={data.email}
                             banner_color={data.banner_color}
                             links={data.links}
                         />
@@ -203,6 +209,32 @@ export default function CreateCard() {
                                             />
 
                                             <InputError message={errors.job_title} className="mt-2" />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <Label htmlFor="phone">Phone</Label>
+                                            <Input
+                                                id="phone"
+                                                type="tel"
+                                                value={data.phone}
+                                                onChange={(e) => setData('phone', e.target.value)}
+                                                disabled={processing}
+                                            />
+
+                                            <InputError message={errors.phone} className="mt-2" />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <Label htmlFor="email">Email</Label>
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                value={data.email}
+                                                onChange={(e) => setData('email', e.target.value)}
+                                                disabled={processing}
+                                            />
+
+                                            <InputError message={errors.email} className="mt-2" />
                                         </div>
                                     </CardContent>
                                 </Card>

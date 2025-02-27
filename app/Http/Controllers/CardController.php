@@ -34,6 +34,8 @@ class CardController extends Controller
             'organization' => $request->organization,
             'user_id' => auth()->id(),
             'banner_color' => $request->banner_color,
+            'email' => $request->email,
+            'phone' => $request->phone
         ]);
 
         // Store each link in the social_links table
