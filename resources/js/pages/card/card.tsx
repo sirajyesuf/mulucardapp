@@ -59,15 +59,18 @@ export default function MuluCard({
                 </div>
 
                 <div className="flex flex-row flex-wrap items-start justify-center gap-2 border-none">
-                    {links.map((link, index) => (
-                        <div key={index} className="flex flex-row flex-wrap items-center gap-2 rounded-lg border-none p-0">
-                            <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
-                                <a href="#" className="text-xl font-bold text-black">
-                                    <link.Icon size={20} color="white" />
-                                </a>
-                            </div>
-                        </div>
-                    ))}
+                    {links.map(
+                        (link, index) =>
+                            link.value && ( // Only render if link.value is not empty
+                                <div key={index} className="flex flex-row flex-wrap items-center gap-2 rounded-lg border-none p-0">
+                                    <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
+                                        <a href="#" className="text-xl font-bold text-black">
+                                            <link.Icon size={20} color="white" />
+                                        </a>
+                                    </div>
+                                </div>
+                            ),
+                    )}
                 </div>
             </CardContent>
         </Card>
