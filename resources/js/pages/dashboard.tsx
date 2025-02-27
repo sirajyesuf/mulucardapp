@@ -35,6 +35,7 @@ interface Card {
     created_at: string; // ISO 8601 date string
     updated_at: string; // ISO 8601 date string
     social_links: SocialLink[];
+    headline: string;
 }
 
 // Type for the array of cards
@@ -61,6 +62,7 @@ export default function Dashboard() {
                             phone={card.phone}
                             banner_color={card.banner_color}
                             links={card.social_links}
+                            headline={card.headline}
                         />
                     </div>
                 ))}

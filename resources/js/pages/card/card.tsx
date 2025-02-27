@@ -8,6 +8,7 @@ type MuluCardProps = {
     last_name: string;
     organization: string;
     job_title: string;
+    headline: string;
     phone: string;
     email: string;
     banner_color: string;
@@ -29,6 +30,7 @@ export default function MuluCard({
     job_title,
     phone,
     email,
+    headline,
 }: MuluCardProps) {
     console.log(links);
     return (
@@ -61,6 +63,8 @@ export default function MuluCard({
                         <p className="text-md font-bold capitalize">{job_title}</p>
                     </div>
                 </div>
+
+                <div className="font-mute p-2 text-center">{headline}.</div>
 
                 <div className="flex flex-row flex-wrap items-start justify-center gap-2 border-none">
                     {links.map((link, index) => {
@@ -106,7 +110,6 @@ export default function MuluCard({
                 </div>
 
                 <div className="flex flex-col gap-2 rounded-lg border-t-2 p-2 shadow-none">
-                    {/* <h1 className="text-md font-bold text-black">Location</h1> */}
                     <div className="flex items-center justify-center gap-2 p-2">
                         <MapPin className="h-10 w-10" color={banner_color} />
                         <p className="font-mute text-md">Alemnesh Plaza, 9th Floor, Bole, Addis Ababa, Ethiopia</p>

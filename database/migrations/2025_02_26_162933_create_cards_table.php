@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string("avatar")->nullable();
             $table->string("logo")->nullable();
             $table->string("banner_color")->nullable();
+            $table->string('headline');
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
@@ -12,6 +13,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
+
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
     avatar: File | null;
@@ -30,6 +32,7 @@ interface CardForm {
     }[];
     location: string;
     address: string;
+    headline: string;
 }
 
 export default function CreateCard() {
@@ -68,6 +71,7 @@ export default function CreateCard() {
         ],
         address: '',
         location: '',
+        headline: '',
     });
 
     // const handlePictureChange = (file: File | null, url: string) => {
@@ -123,6 +127,7 @@ export default function CreateCard() {
                             links={data.links}
                             address={data.address}
                             location={data.location}
+                            headline={data.headline}
                         />
                     </div>
                     <div className="col-span-3 border-none p-2">
@@ -175,73 +180,89 @@ export default function CreateCard() {
                                         <CardTitle>Personal</CardTitle>
                                         <CardDescription>Make changes to your account here.</CardDescription>
                                     </CardHeader>
-                                    <CardContent className="space-y-2">
-                                        <div className="space-y-1">
-                                            <Label htmlFor="fname">First Name</Label>
-                                            <Input
-                                                id="fname"
-                                                value={data.first_name}
-                                                onChange={(e) => setData('first_name', e.target.value)}
-                                                disabled={processing}
-                                            />
-                                            <InputError message={errors.first_name} className="mt-2" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <Label htmlFor="lname">Last Name</Label>
-                                            <Input
-                                                id="lname"
-                                                value={data.last_name}
-                                                onChange={(e) => setData('last_name', e.target.value)}
-                                                disabled={processing}
-                                            />
-                                            <InputError message={errors.last_name} className="mt-2" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <Label htmlFor="organization">Organization</Label>
-                                            <Input
-                                                id="organization"
-                                                value={data.organization}
-                                                onChange={(e) => setData('organization', e.target.value)}
-                                                disabled={processing}
-                                            />
-                                            <InputError message={errors.organization} className="mt-2" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <Label htmlFor="jobtitle">Job Title</Label>
-                                            <Input
-                                                id="jobtitle"
-                                                value={data.job_title}
-                                                onChange={(e) => setData('job_title', e.target.value)}
-                                                disabled={processing}
-                                            />
-
-                                            <InputError message={errors.job_title} className="mt-2" />
+                                    <CardContent className="space-y-4">
+                                        <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
+                                            <div className="space-y-1">
+                                                <Label htmlFor="fname">First Name</Label>
+                                                <Input
+                                                    id="fname"
+                                                    value={data.first_name}
+                                                    onChange={(e) => setData('first_name', e.target.value)}
+                                                    disabled={processing}
+                                                />
+                                                <InputError message={errors.first_name} className="mt-2" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor="lname">Last Name</Label>
+                                                <Input
+                                                    id="lname"
+                                                    value={data.last_name}
+                                                    onChange={(e) => setData('last_name', e.target.value)}
+                                                    disabled={processing}
+                                                />
+                                                <InputError message={errors.last_name} className="mt-2" />
+                                            </div>
                                         </div>
 
-                                        <div className="space-y-1">
-                                            <Label htmlFor="phone">Phone</Label>
-                                            <Input
-                                                id="phone"
-                                                type="tel"
-                                                value={data.phone}
-                                                onChange={(e) => setData('phone', e.target.value)}
-                                                disabled={processing}
-                                            />
+                                        <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
+                                            <div className="space-y-1">
+                                                <Label htmlFor="organization">Organization</Label>
+                                                <Input
+                                                    id="organization"
+                                                    value={data.organization}
+                                                    onChange={(e) => setData('organization', e.target.value)}
+                                                    disabled={processing}
+                                                />
+                                                <InputError message={errors.organization} className="mt-2" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label htmlFor="jobtitle">Job Title</Label>
+                                                <Input
+                                                    id="jobtitle"
+                                                    value={data.job_title}
+                                                    onChange={(e) => setData('job_title', e.target.value)}
+                                                    disabled={processing}
+                                                />
 
-                                            <InputError message={errors.phone} className="mt-2" />
+                                                <InputError message={errors.job_title} className="mt-2" />
+                                            </div>
                                         </div>
 
-                                        <div className="space-y-1">
-                                            <Label htmlFor="email">Email</Label>
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                value={data.email}
-                                                onChange={(e) => setData('email', e.target.value)}
-                                                disabled={processing}
-                                            />
+                                        <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
+                                            <div className="space-y-1">
+                                                <Label htmlFor="phone">Phone</Label>
+                                                <Input
+                                                    id="phone"
+                                                    type="tel"
+                                                    value={data.phone}
+                                                    onChange={(e) => setData('phone', e.target.value)}
+                                                    disabled={processing}
+                                                />
 
-                                            <InputError message={errors.email} className="mt-2" />
+                                                <InputError message={errors.phone} className="mt-2" />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <Label htmlFor="email">Email</Label>
+                                                <Input
+                                                    id="email"
+                                                    type="email"
+                                                    value={data.email}
+                                                    onChange={(e) => setData('email', e.target.value)}
+                                                    disabled={processing}
+                                                />
+
+                                                <InputError message={errors.email} className="mt-2" />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <Textarea
+                                                className="h-30 w-full"
+                                                placeholder="enter your headline text"
+                                                value={data.headline}
+                                                onChange={(e) => setData('headline', e.target.value)}
+                                            />
                                         </div>
                                     </CardContent>
                                 </Card>
