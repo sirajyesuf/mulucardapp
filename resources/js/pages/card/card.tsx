@@ -17,23 +17,14 @@ type MuluCardProps = {
     }[];
 };
 
-export default function MuluCard({
-    previewUrl,
-    previewLogo,
-    background_color,
-    links,
-    first_name,
-    last_name,
-    organization,
-    job_title,
-}: MuluCardProps) {
+export default function MuluCard({ previewUrl, previewLogo, banner_color, links, first_name, last_name, organization, job_title }: MuluCardProps) {
     return (
         <Card className="rounded-lg bg-gray-50 p-0 shadow-none">
             <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
                 <div
                     className="h-[200px] w-full"
                     style={{
-                        backgroundColor: background_color,
+                        backgroundColor: banner_color,
                     }}
                 ></div>
                 <div className="relative -mt-14 flex flex-row justify-between border-none px-4">

@@ -1,4 +1,5 @@
 import ImageUpload from '@/components/image-upload';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Facebook, Globe, Instagram, Linkedin, LoaderCircle, Mail, Phone, Twitter, Youtube } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
+
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
     avatar: File | null;
@@ -18,7 +20,7 @@ interface CardForm {
     last_name: string;
     organization: string;
     job_title: string;
-    background_color: string;
+    banner_color: string;
     links: {
         name: string;
         value: string;
@@ -53,7 +55,7 @@ export default function CreateCard() {
         last_name: '',
         organization: '',
         job_title: '',
-        background_color: colors[0],
+        banner_color: colors[0],
         links: [
             { name: 'email', value: '', label: 'Email', Icon: Mail, placeholder: 'example@example.com', type: 'email' },
             { name: 'phone', value: '', label: 'Phone', Icon: Phone, placeholder: '123-456-7890', type: 'tel' },
@@ -113,7 +115,7 @@ export default function CreateCard() {
                             last_name={data.last_name}
                             organization={data.organization}
                             job_title={data.job_title}
-                            background_color={data.background_color}
+                            banner_color={data.banner_color}
                             links={data.links}
                         />
                     </div>
@@ -121,7 +123,7 @@ export default function CreateCard() {
                         <Tabs defaultValue="display" className="w-full">
                             <TabsList className="grid w-full grid-cols-3">
                                 <TabsTrigger value="display">Display</TabsTrigger>
-                                <TabsTrigger value="account">Information</TabsTrigger>
+                                <TabsTrigger value="personal_information">Information</TabsTrigger>
                                 <TabsTrigger value="links">Links</TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
@@ -133,8 +135,15 @@ export default function CreateCard() {
                                     <CardContent className="space-y-4">
                                         {/* <FileUpload id="picture-upload" label="Select a picture to upload" onFileChange={handlePictureChange} />
                                         <FileUpload id="logo-upload" label="Select a logo to upload" onFileChange={handleLogoChange} /> */}
-                                        <ImageUpload id="avatar-upload" label="Upload Avatar" onImageChange={handleAvatarChange} />
-                                        <ImageUpload id="logo-upload" label="Upload Logo" onImageChange={handleLogoChange} />
+                                        <div>
+                                            <ImageUpload id="avatar-upload" label="Upload Avatar" onImageChange={handleAvatarChange} />
+                                            <InputError message={errors.avatar} className="mt-2" />
+                                        </div>
+
+                                        <div>
+                                            <ImageUpload id="logo-upload" label="Upload Logo" onImageChange={handleLogoChange} />
+                                            <InputError message={errors.logo} className="mt-2" />
+                                        </div>
                                         <div className="flex flex-row gap-4 rounded-lg border-2 p-2">
                                             {colors.map((color, index) => (
                                                 <div key={index} className="cursor-pointer rounded-full border-2 p-2">
@@ -142,9 +151,9 @@ export default function CreateCard() {
                                                         <div
                                                             className="flex h-10 w-10 items-center justify-center rounded-full"
                                                             style={{ backgroundColor: color }}
-                                                            onClick={() => setData('background_color', color)}
+                                                            onClick={() => setData('banner_color', color)}
                                                         >
-                                                            {color === data.background_color && <Check color="white" />}
+                                                            {color === data.banner_color && <Check color="white" />}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -153,7 +162,7 @@ export default function CreateCard() {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
-                            <TabsContent value="account">
+                            <TabsContent value="personal_information">
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Personal</CardTitle>
@@ -168,6 +177,7 @@ export default function CreateCard() {
                                                 onChange={(e) => setData('first_name', e.target.value)}
                                                 disabled={processing}
                                             />
+                                            <InputError message={errors.first_name} className="mt-2" />
                                         </div>
                                         <div className="space-y-1">
                                             <Label htmlFor="lname">Last Name</Label>
@@ -177,6 +187,7 @@ export default function CreateCard() {
                                                 onChange={(e) => setData('last_name', e.target.value)}
                                                 disabled={processing}
                                             />
+                                            <InputError message={errors.last_name} className="mt-2" />
                                         </div>
                                         <div className="space-y-1">
                                             <Label htmlFor="organization">Organization</Label>
@@ -186,6 +197,7 @@ export default function CreateCard() {
                                                 onChange={(e) => setData('organization', e.target.value)}
                                                 disabled={processing}
                                             />
+                                            <InputError message={errors.organization} className="mt-2" />
                                         </div>
                                         <div className="space-y-1">
                                             <Label htmlFor="jobtitle">Job Title</Label>
@@ -195,6 +207,8 @@ export default function CreateCard() {
                                                 onChange={(e) => setData('job_title', e.target.value)}
                                                 disabled={processing}
                                             />
+
+                                            <InputError message={errors.job_title} className="mt-2" />
                                         </div>
                                     </CardContent>
                                 </Card>

@@ -24,13 +24,13 @@ class CardRequest extends FormRequest
             return [
                     // 'avatar' =>['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
                     // 'logo' => ['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
-                    'avatar' => 'nullable|image|max:2048', // Max 2MB, must be an image
-                    'logo' => 'nullable|image|max:2048',
+                    'avatar' => 'required|image|max:2048', // Max 2MB, must be an image
+                    'logo' => 'required|image|max:2048',
                     'first_name' => 'required|string|max:255',
                     'last_name' => 'required|string|max:255',
                     'organization' => 'required|string|max:255',
                     'job_title' => 'required|string|max:255',
-                    'background_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i', // Rename from banner_color
+                    'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
                     'links' => 'required|array|max:8',
                     'links.*.name' => [
                     'required',
