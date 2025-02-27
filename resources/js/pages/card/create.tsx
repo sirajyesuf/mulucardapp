@@ -1,4 +1,4 @@
-import FileUpload from '@/components/file-upload';
+import ImageUpload from '@/components/image-upload';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,11 +9,11 @@ import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Facebook, Globe, Instagram, Linkedin, LoaderCircle, Mail, Phone, Twitter, Youtube } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
-    avatar: string;
-    logo: string;
+    avatar: File | null;
+    logo: File | null;
     first_name: string;
     last_name: string;
     organization: string;
@@ -25,13 +25,24 @@ interface CardForm {
         label: string;
         Icon: React.ComponentType;
         placeholder: string;
-        type: string;
+        ty;
     }[];
 }
 
 export default function CreateCard() {
-    // const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    // const [previewLogo, setPreviewLogo] = useState<string | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+    const handleAvatarChange = (file: File | null, previewUrl: string | null) => {
+        console.log(file);
+        setData('avatar', file);
+        setAvatarPreview(previewUrl);
+    };
+
+    const handleLogoChange = (file: File | null, previewUrl: string | null) => {
+        setData('logo', file);
+        setLogoPreview(previewUrl);
+    };
 
     const colors = ['#3a59ae', '#a580e5', '#4a4a4a'];
 
@@ -55,18 +66,28 @@ export default function CreateCard() {
         ],
     });
 
-    const handlePictureChange = (file: File | null, url: string) => {
-        setData('avatar', url);
-    };
+    // const handlePictureChange = (file: File | null, url: string) => {
+    //     setData('avatar', url);
+    // };
 
-    const handleLogoChange = (file: File | null, url: string) => {
-        setData('logo', url);
-    };
+    // const handleLogoChange = (file: File | null, url: string) => {
+    //     setData('logo', url);
+    // };
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
 
-        post(route('card.store'));
+        post(route('card.store'), {
+            onSuccess: () => {
+                console.log('Upload successful!');
+            },
+            onError: (errors) => {
+                console.log('Upload errors:', errors);
+            },
+            // Ensure multipart/form-data is used (Inertia does this automatically with files)
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
     return (
@@ -86,8 +107,8 @@ export default function CreateCard() {
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
                     <div className="shahasErrorsdow-xl col-span-2 hidden rounded-lg border-2 p-2 md:block">
                         <MuluCard
-                            previewUrl={data.avatar}
-                            previewLogo={data.logo}
+                            previewUrl={avatarPreview}
+                            previewLogo={logoPreview}
                             first_name={data.first_name}
                             last_name={data.last_name}
                             organization={data.organization}
@@ -110,8 +131,10 @@ export default function CreateCard() {
                                         <CardDescription>Make changes to your account here.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        <FileUpload id="picture-upload" label="Select a picture to upload" onFileChange={handlePictureChange} />
-                                        <FileUpload id="logo-upload" label="Select a logo to upload" onFileChange={handleLogoChange} />
+                                        {/* <FileUpload id="picture-upload" label="Select a picture to upload" onFileChange={handlePictureChange} />
+                                        <FileUpload id="logo-upload" label="Select a logo to upload" onFileChange={handleLogoChange} /> */}
+                                        <ImageUpload id="avatar-upload" label="Upload Avatar" onImageChange={handleAvatarChange} />
+                                        <ImageUpload id="logo-upload" label="Upload Logo" onImageChange={handleLogoChange} />
                                         <div className="flex flex-row gap-4 rounded-lg border-2 p-2">
                                             {colors.map((color, index) => (
                                                 <div key={index} className="cursor-pointer rounded-full border-2 p-2">
@@ -121,7 +144,7 @@ export default function CreateCard() {
                                                             style={{ backgroundColor: color }}
                                                             onClick={() => setData('background_color', color)}
                                                         >
-                                                            {color === data.background_color && <Check color="white" />}{' '}
+                                                            {color === data.background_color && <Check color="white" />}
                                                         </div>
                                                     </div>
                                                 </div>

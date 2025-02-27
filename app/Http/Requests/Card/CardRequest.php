@@ -22,8 +22,10 @@ class CardRequest extends FormRequest
     public function rules(): array
     {
             return [
-                    'avatar' =>['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
-                    'logo' => ['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
+                    // 'avatar' =>['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
+                    // 'logo' => ['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
+                    'avatar' => 'nullable|image|max:2048', // Max 2MB, must be an image
+                    'logo' => 'nullable|image|max:2048',
                     'first_name' => 'required|string|max:255',
                     'last_name' => 'required|string|max:255',
                     'organization' => 'required|string|max:255',

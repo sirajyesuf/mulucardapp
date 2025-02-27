@@ -16,7 +16,16 @@ class CardController extends Controller
     public function  store(Request $request){
 
         $validated = $request->validated();
+// Handle file uploads
+        $avatarPath = $request->file('avatar')
+            ? $request->file('avatar')->store('avatars', 'public')
+            : null;
+        $logoPath = $request->file('logo')
+            ? $request->file('logo')->store('logos', 'public')
+            : null;
         $card = Card::create([
+            'avatar' => $avatarPath,
+            'logo' => $logoPath,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'job_title' => $request->job_title,
@@ -31,6 +40,6 @@ class CardController extends Controller
                 'url' => $link['value'],
             ]);
         }
-        return redirect()->route('card.create');
+        return redirect()->route('dashboard')->with('success', 'Card created successfully!');
     }
 }
