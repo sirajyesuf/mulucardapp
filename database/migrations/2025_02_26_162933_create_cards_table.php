@@ -15,6 +15,13 @@ return new class extends Migration
             $table->string("last_name");
             $table->string("organization");
             $table->string("job_title");
+
+            $table->string("email")->nullable();
+            $table->string("phone")->nullable();
+
+            $table->string("avatar")->nullable();
+            $table->string("logo")->nullable();
+            $table->string("banner_color")->nullable();
             $table->timestamps();
         });
     }

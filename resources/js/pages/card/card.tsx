@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Facebook, Instagram, Linkedin } from 'lucide-react';
 
 type MuluCardProps = {
     previewUrl: any;
@@ -9,11 +8,27 @@ type MuluCardProps = {
     organization: string;
     job_title: string;
     background_color: string;
+    links: {
+        name: string;
+        value: string;
+        label: string;
+        Icon: React.ComponentType;
+        placeholder: string;
+    }[];
 };
 
-export default function MuluCard({ previewUrl, previewLogo, background_color, first_name, last_name, organization, job_title }: MuluCardProps) {
+export default function MuluCard({
+    previewUrl,
+    previewLogo,
+    background_color,
+    links,
+    first_name,
+    last_name,
+    organization,
+    job_title,
+}: MuluCardProps) {
     return (
-        <Card className="rounded-none bg-gray-50 p-0 shadow-none">
+        <Card className="rounded-lg bg-gray-50 p-0 shadow-none">
             <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
                 <div
                     className="h-[200px] w-full"
@@ -43,31 +58,16 @@ export default function MuluCard({ previewUrl, previewLogo, background_color, fi
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-row items-center gap-4 rounded-lg bg-gray-100 p-2">
-                        <div className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-[#ff8c39]">
-                            <Linkedin size={40} color="white" />
+                <div className="flex flex-row flex-wrap items-start justify-center gap-2 border-none">
+                    {links.map((link, index) => (
+                        <div key={index} className="flex flex-row flex-wrap items-center gap-2 rounded-lg border-none p-0">
+                            <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
+                                <a href="#" className="text-xl font-bold text-black">
+                                    <link.Icon size={20} color="white" />
+                                </a>
+                            </div>
                         </div>
-                        <a href="#" className="text-xl font-bold text-black">
-                            Linkedin
-                        </a>
-                    </div>
-                    <div className="flex flex-row items-center gap-4 rounded-lg bg-gray-100 p-2">
-                        <div className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-[#ff8c39]">
-                            <Instagram size={40} color="white" />
-                        </div>
-                        <a href="#" className="text-xl font-bold text-black">
-                            Facebook
-                        </a>
-                    </div>
-                    <div className="flex flex-row items-center gap-4 rounded-lg bg-gray-100 p-2">
-                        <div className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-[#ff8c39]">
-                            <Facebook size={40} color="white" />
-                        </div>
-                        <a href="#" className="text-xl font-bold text-black">
-                            Instagram
-                        </a>
-                    </div>
+                    ))}
                 </div>
             </CardContent>
         </Card>

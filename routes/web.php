@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth'])->group(function(){
 
     Route::get('card/create',[CardController::class,"create"])->name("card.create");
+    Route::post('card/create',[CardController::class,"store"])->name("card.store");
 
 });
 
