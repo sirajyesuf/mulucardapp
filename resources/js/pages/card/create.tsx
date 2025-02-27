@@ -28,6 +28,8 @@ interface CardForm {
         url: string;
         placeholder: string;
     }[];
+    location: string;
+    address: string;
 }
 
 export default function CreateCard() {
@@ -64,6 +66,8 @@ export default function CreateCard() {
             { name: 'linkedin', url: '', placeholder: 'https://linkedin.com/example' },
             { name: 'youtube', url: '', placeholder: 'https://youtube.com/example' },
         ],
+        address: '',
+        location: '',
     });
 
     // const handlePictureChange = (file: File | null, url: string) => {
@@ -117,14 +121,17 @@ export default function CreateCard() {
                             email={data.email}
                             banner_color={data.banner_color}
                             links={data.links}
+                            address={data.address}
+                            location={data.location}
                         />
                     </div>
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display" className="w-full">
-                            <TabsList className="grid w-full grid-cols-3">
+                            <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="display">Display</TabsTrigger>
                                 <TabsTrigger value="personal_information">Information</TabsTrigger>
                                 <TabsTrigger value="links">Links</TabsTrigger>
+                                <TabsTrigger value="location">Location</TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
                                 <Card>
@@ -269,6 +276,37 @@ export default function CreateCard() {
                                                 </div>
                                             );
                                         })}
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                            <TabsContent value="location">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Location</CardTitle>
+                                        <CardDescription>Enter your address and location details.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2">
+                                        <div className="space-y-1">
+                                            <Label htmlFor="address">Address</Label>
+                                            <Input
+                                                id="address"
+                                                value={data.address}
+                                                onChange={(e) => setData('address', e.target.value)}
+                                                disabled={processing}
+                                            />
+                                            <InputError message={errors.address} className="mt-2" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label htmlFor="lname">Location</Label>
+                                            <Input
+                                                id="location"
+                                                value={data.location}
+                                                onChange={(e) => setData('location', e.target.value)}
+                                                disabled={processing}
+                                            />
+                                            <InputError message={errors.location} className="mt-2" />
+                                        </div>
                                     </CardContent>
                                 </Card>
                             </TabsContent>

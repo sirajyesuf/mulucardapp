@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
+import { MapPin } from 'lucide-react';
 type MuluCardProps = {
     previewUrl: any;
     previewLogo: any;
@@ -101,6 +102,17 @@ export default function MuluCard({
                         }}
                     >
                         visit website
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-2 rounded-lg border-t-2 p-2 shadow-none">
+                    {/* <h1 className="text-md font-bold text-black">Location</h1> */}
+                    <div className="flex items-center justify-center gap-2 p-2">
+                        <MapPin className="h-10 w-10" color={banner_color} />
+                        <p className="font-mute text-md">Alemnesh Plaza, 9th Floor, Bole, Addis Ababa, Ethiopia</p>
+                    </div>
+                    <div className="cursor-pointer rounded-4xl p-2 text-center font-bold text-white" style={{ backgroundColor: banner_color }}>
+                        view on google map
                     </div>
                 </div>
             </CardContent>
