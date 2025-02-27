@@ -37,7 +37,7 @@ class CardRequest extends FormRequest
                     'string',
                     Rule::in(['email', 'phone', 'website', 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube']),
                     ],
-                    'links.*.value' => [
+                    'links.*.url' => [
                     'nullable', // Allow empty strings
                     'string',
                     $this->validateLinkValue(),

@@ -6,12 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
+import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Check, Facebook, Globe, Instagram, Linkedin, LoaderCircle, Mail, Phone, Twitter, Youtube } from 'lucide-react';
+import { Check, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
-
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
     avatar: File | null;
@@ -23,11 +23,8 @@ interface CardForm {
     banner_color: string;
     links: {
         name: string;
-        value: string;
-        label: string;
-        Icon: React.ComponentType;
+        url: string;
         placeholder: string;
-        ty;
     }[];
 }
 
@@ -36,7 +33,6 @@ export default function CreateCard() {
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
     const handleAvatarChange = (file: File | null, previewUrl: string | null) => {
-        console.log(file);
         setData('avatar', file);
         setAvatarPreview(previewUrl);
     };
@@ -57,14 +53,12 @@ export default function CreateCard() {
         job_title: '',
         banner_color: colors[0],
         links: [
-            { name: 'email', value: '', label: 'Email', Icon: Mail, placeholder: 'example@example.com', type: 'email' },
-            { name: 'phone', value: '', label: 'Phone', Icon: Phone, placeholder: '123-456-7890', type: 'tel' },
-            { name: 'website', value: '', label: 'Website', Icon: Globe, placeholder: 'https://example.com', type: 'url' },
-            { name: 'facebook', value: '', label: 'Facebook', Icon: Facebook, placeholder: 'https://facebook.com/example', type: 'url' },
-            { name: 'twitter', value: '', label: 'Twitter', Icon: Twitter, placeholder: 'https://twitter.com/example', type: 'url' },
-            { name: 'instagram', value: '', label: 'Instagram', Icon: Instagram, placeholder: 'https://instagram.com/example', type: 'url' },
-            { name: 'linkedin', value: '', label: 'LinkedIn', Icon: Linkedin, placeholder: 'https://linkedin.com/example', type: 'url' },
-            { name: 'youtube', value: '', label: 'Youtube', Icon: Youtube, placeholder: 'https://youtube.com/example', type: 'url' },
+            { name: 'website', url: '', placeholder: 'https://example.com' },
+            { name: 'facebook', url: '', placeholder: 'https://facebook.com/example' },
+            { name: 'twitter', url: '', placeholder: 'https://twitter.com/example' },
+            { name: 'instagram', url: '', placeholder: 'https://instagram.com/example' },
+            { name: 'linkedin', url: '', placeholder: 'https://linkedin.com/example' },
+            { name: 'youtube', url: '', placeholder: 'https://youtube.com/example' },
         ],
     });
 
@@ -220,42 +214,29 @@ export default function CreateCard() {
                                         <CardDescription>add social media links.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        {/* <div className="space-y-2 rounded-lg border-2 border-dashed p-2">
-                                        <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
-                                            <Mail />
-                                            Email
-                                        </div>
-                                        <Input type="email" width="50px" className="h-[50px]" placeholder="example@example.com" />
-                                        <Input type="text" width="50px" className="h-[50px]" placeholder="Email Address" />
-                                    </div>
-                                    <div className="space-y-2 rounded-lg border-2 border-dashed p-2">
-                                        <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
-                                            <Phone />
-                                            Call
-                                        </div>
-                                        <Input type="tel" width="50px" className="h-[50px]" placeholder="example@example.com" />
-                                        <Input type="text" width="50px" className="h-[50px]" placeholder="Email Address" />
-                                    </div> */}
-                                        {data.links.map((link, index) => (
-                                            <div key={index} className="space-y-2 rounded-lg border-2 border-dashed p-2">
-                                                <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
-                                                    <link.Icon />
-                                                    {link.label}
+                                        {data.links.map((link, index) => {
+                                            const Icon = socialIconMap[link.name.toLowerCase()] || Globe;
+                                            return (
+                                                <div key={index} className="space-y-2 rounded-lg border-2 border-dashed p-2">
+                                                    <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
+                                                        <Icon className="h-6 w-6" />
+                                                        {link.name}
+                                                    </div>
+                                                    <Input
+                                                        type="url"
+                                                        className="h-[50px] w-full"
+                                                        placeholder={link.placeholder}
+                                                        value={link.url}
+                                                        onChange={(e) => {
+                                                            const updatedLinks = [...data.links];
+                                                            updatedLinks[index] = { ...updatedLinks[index], url: e.target.value };
+                                                            setData('links', updatedLinks);
+                                                        }}
+                                                        disabled={processing}
+                                                    />
                                                 </div>
-                                                <Input
-                                                    type={link.type}
-                                                    className="h-[50px] w-full"
-                                                    placeholder={link.placeholder}
-                                                    value={link.value}
-                                                    onChange={(e) => {
-                                                        const updatedLinks = [...data.links];
-                                                        updatedLinks[index] = { ...updatedLinks[index], value: e.target.value };
-                                                        setData('links', updatedLinks);
-                                                    }}
-                                                    disabled={processing}
-                                                />
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </CardContent>
                                 </Card>
                             </TabsContent>

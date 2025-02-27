@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Http\Requests\Card\CardRequest as Request;
 use App\Models\Card;
+use Illuminate\Support\Facades\Storage;
+
 
 class CardController extends Controller
 {
@@ -16,12 +18,12 @@ class CardController extends Controller
     public function  store(Request $request){
 
         $validated = $request->validated();
-// Handle file uploads
+
         $avatarPath = $request->file('avatar')
-            ? $request->file('avatar')->store('avatars', 'public')
+            ? Storage::url($request->file('avatar')->store('avatars', 'public'))
             : null;
         $logoPath = $request->file('logo')
-            ? $request->file('logo')->store('logos', 'public')
+            ? Storage::url($request->file('logo')->store('logos', 'public'))
             : null;
         $card = Card::create([
             'avatar' => $avatarPath,
@@ -35,10 +37,11 @@ class CardController extends Controller
         ]);
 
         // Store each link in the social_links table
+        //
         foreach ($validated['links'] as $link) {
             $card->socialLinks()->create([
                 'name' => $link['name'],
-                'url' => $link['value'],
+                'url' => $link['url'],
             ]);
         }
         return redirect()->route('dashboard')->with('success', 'Card created successfully!');
