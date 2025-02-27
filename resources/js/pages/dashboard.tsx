@@ -46,7 +46,7 @@ export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col items-center justify-center gap-4 rounded-xl p-4">
+            <div className="grid h-full flex-1 grid-cols-2 items-center justify-center gap-2 rounded-xl border-2 p-4">
                 <EmptyCard />
                 {cards.map((card, index) => (
                     <div className="w-[500px] border-2" key={index}>
