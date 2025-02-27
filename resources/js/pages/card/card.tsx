@@ -3,23 +3,39 @@ import { Facebook, Instagram, Linkedin } from 'lucide-react';
 
 type MuluCardProps = {
     previewUrl: any;
+    previewLogo: any;
     first_name: string;
     last_name: string;
     organization: string;
     job_title: string;
+    background_color: string;
 };
 
-export default function MuluCard({ previewUrl, first_name, last_name, organization, job_title }: MuluCardProps) {
+export default function MuluCard({ previewUrl, previewLogo, background_color, first_name, last_name, organization, job_title }: MuluCardProps) {
     return (
-        <Card className="rounded-lg">
-            <CardHeader className="flex h-[400px] w-full items-center justify-center rounded-lg border-none bg-white">
-                <img src={previewUrl} alt="siraj yesuf" className="h-full w-full border-none object-contain" />
+        <Card className="rounded-none bg-gray-50 p-0 shadow-none">
+            <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
+                <div
+                    className="h-[200px] w-full"
+                    style={{
+                        backgroundColor: background_color,
+                    }}
+                ></div>
+                <div className="relative -mt-14 flex flex-row justify-between border-none px-4">
+                    <div className="bordr-white flex h-[100px] w-[100px] items-center justify-center rounded-full border-4 border-gray-500 bg-white">
+                        <img src={previewUrl} alt="" className="h-full w-full rounded-full border-none object-contain" />
+                    </div>
+                    <div className="flex h-[100px] w-[100px] items-center justify-center rounded-lg border-4 border-gray-500 bg-white">
+                        <img src={previewLogo} alt="" className="h-full w-full rounded-full border-none object-contain" />
+                    </div>
+                </div>
             </CardHeader>
-            <div className="h-5 w-full bg-[#ff8c39]"></div>
-            <CardContent className="border-none">
-                <div className="mb-8">
-                    <div className="text-xl font-bold capitalize">
-                        {first_name} {last_name}
+            <CardContent className="border-none bg-gray-50 p-2">
+                <div className="mb-8 flex flex-col items-center border-none">
+                    <div className="font-norma flex flex-row space-x-4 text-2xl capitalize">
+                        <p>{first_name}</p>
+
+                        <p>{last_name}</p>
                     </div>
                     <div>
                         <p className="text-md font-bold capitalize">{organization}</p>
