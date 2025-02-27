@@ -7,7 +7,7 @@ type MuluCardProps = {
     last_name: string;
     organization: string;
     job_title: string;
-    background_color: string;
+    banner_color: string;
     links: {
         name: string;
         value: string;
