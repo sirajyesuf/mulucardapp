@@ -37,6 +37,8 @@ class CardController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'headline' => $request->headline,
+            'address' => $request->address,
+            'location' => $request->location,
         ]);
 
         // Store each link in the social_links table

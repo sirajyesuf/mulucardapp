@@ -38,10 +38,15 @@ class CardRequest extends FormRequest
                     Rule::in(['email', 'phone', 'website', 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube']),
                     ],
                     'links.*.url' => [
-                    'nullable', // Allow empty strings
+                    'nullable',
                     'string',
                     $this->validateLinkValue(),
                     ],
+                    'phone' => 'required|string|max:255',
+                    'email' => 'required|string|email|max:255',
+                    'headline' => 'required|string|max:255',
+                    'address' => 'required|string|max:255',
+                    'location' => 'required|string|max:255',
             ];
     }
 
@@ -53,16 +58,6 @@ class CardRequest extends FormRequest
 
                 if ($value) {
                     switch ($name) {
-                        case 'email':
-                            if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                                $fail("The {$name} must be a valid email address.");
-                            }
-                            break;
-                        case 'phone':
-                            // if (!preg_match('/^\d{3}-\d{3}-\d{4}$/', $value)) {
-                            //     $fail("The {$name} must be in the format XXX-XXX-XXXX.");
-                            // }
-                            break;
                         default:
                             if (!filter_var($value, FILTER_VALIDATE_URL)) {
                                 $fail("The {$name} must be a valid URL.");

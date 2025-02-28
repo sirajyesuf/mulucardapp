@@ -263,6 +263,7 @@ export default function CreateCard() {
                                                 value={data.headline}
                                                 onChange={(e) => setData('headline', e.target.value)}
                                             />
+                                            <InputError message={errors.headline} className="mt-2" />
                                         </div>
                                     </CardContent>
                                 </Card>

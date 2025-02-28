@@ -17,6 +17,8 @@ type MuluCardProps = {
         url: string;
         placeholder: string;
     }[];
+    address: string;
+    location: string;
 };
 
 export default function MuluCard({
@@ -31,6 +33,8 @@ export default function MuluCard({
     phone,
     email,
     headline,
+    address,
+    location,
 }: MuluCardProps) {
     console.log(links);
     return (
@@ -116,6 +120,7 @@ export default function MuluCard({
                     </div>
                     <div className="cursor-pointer rounded-4xl p-2 text-center font-bold text-white" style={{ backgroundColor: banner_color }}>
                         view on google map
+                        {location}
                     </div>
                 </div>
             </CardContent>

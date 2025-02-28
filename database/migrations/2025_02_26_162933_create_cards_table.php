@@ -23,6 +23,9 @@ return new class extends Migration
             $table->string("logo")->nullable();
             $table->string("banner_color")->nullable();
             $table->string('headline');
+
+            $table->string("address")->nullable();
+            $table->string("location")->nullable();
             $table->timestamps();
         });
     }
