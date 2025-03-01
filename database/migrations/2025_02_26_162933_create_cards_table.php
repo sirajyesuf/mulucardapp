@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
+            $table->string("url")->unique();
             $table->unsignedBigInteger('user_id');
             $table->string("first_name");
             $table->string("last_name");
@@ -26,6 +27,7 @@ return new class extends Migration
 
             $table->string("address")->nullable();
             $table->string("location")->nullable();
+            $table->string('qr_code')->nullable();
             $table->timestamps();
         });
     }

@@ -22,6 +22,7 @@ Route::middleware(['auth'])->group(function(){
 
     Route::get('card/create',[CardController::class,"create"])->name("card.create");
     Route::post('card/create',[CardController::class,"store"])->name("card.store");
+    Route::get('card/{url}',[CardController::class,"show"])->name("card.show");
 
 });
 

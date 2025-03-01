@@ -113,7 +113,7 @@ export default function CreateCard() {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="shahasErrorsdow-xl col-span-2 hidden rounded-lg border-2 p-2 md:block">
+                    <div className="col-span-2 hidden rounded-lg border-2 p-2 shadow-xl md:block">
                         <MuluCard
                             previewUrl={avatarPreview}
                             previewLogo={logoPreview}

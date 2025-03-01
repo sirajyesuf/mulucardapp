@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
 import { MapPin } from 'lucide-react';
 type MuluCardProps = {
+    url: string;
     previewUrl: any;
     previewLogo: any;
     first_name: string;
@@ -71,7 +72,7 @@ export default function MuluCard({
                 <div className="font-mute p-2 text-center">{headline}.</div>
 
                 <div className="flex flex-row flex-wrap items-start justify-center gap-2 border-none">
-                    {links.map((link, index) => {
+                    {links?.map((link, index) => {
                         const Icon = socialIconMap[link.name.toLowerCase()] || Globe; // Fallback to Globe
                         return (
                             link.url && ( // Only render if link.url is not empty

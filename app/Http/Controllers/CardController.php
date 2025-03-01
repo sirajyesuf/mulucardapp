@@ -6,8 +6,8 @@ use Inertia\Inertia;
 use App\Http\Requests\Card\CardRequest as Request;
 use App\Models\Card;
 use Illuminate\Support\Facades\Storage;
-
-
+use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class CardController extends Controller
 {
     public function create(){
@@ -25,7 +25,10 @@ class CardController extends Controller
         $logoPath = $request->file('logo')
             ? Storage::url($request->file('logo')->store('logos', 'public'))
             : null;
+        $url = $this->generateUniqueUrl();
+        $qrCodePath = $this->generateQRCode($url,$request->banner_color);
         $card = Card::create([
+            'url' => $url,
             'avatar' => $avatarPath,
             'logo' => $logoPath,
             'first_name' => $request->first_name,
@@ -39,10 +42,10 @@ class CardController extends Controller
             'headline' => $request->headline,
             'address' => $request->address,
             'location' => $request->location,
+            'qr_code' => $qrCodePath
         ]);
 
-        // Store each link in the social_links table
-        //
+
         foreach ($validated['links'] as $link) {
             $card->socialLinks()->create([
                 'name' => $link['name'],
@@ -50,5 +53,43 @@ class CardController extends Controller
             ]);
         }
         return redirect()->route('dashboard')->with('success', 'Card created successfully!');
+    }
+
+    public function show($url)
+    {
+        $card = Card::where('url', $url)->with('socialLinks')->firstOrFail();
+
+        return Inertia::render('card/show', ['card' => $card]);
+    }
+
+   protected  function generateUniqueUrl($length = 8) {
+        do {
+            // Generate a random string of specified length
+            $uniqueString = Str::random($length);
+
+            // Check if it exists in the cards table url column
+            $exists = Card::where('url', $uniqueString)->exists();
+        } while ($exists); // Keep generating if it already exists
+
+        return $uniqueString;
+    }
+
+
+    protected function generateQrCode($url,$color){
+
+        $size = 400;
+        list($r, $g, $b) = sscanf($color, "#%02x%02x%02x");
+
+
+        $qrCode = QrCode::format('png')
+            ->size($size)
+            ->color($r, $g, $b)
+            ->generate($url);
+
+        $path = 'qrcodes/' . Str::random(40) . '.png';
+        Storage::disk('public')->put($path, $qrCode);
+        
+        return $path;
+
     }
 }
