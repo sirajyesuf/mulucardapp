@@ -62,6 +62,66 @@ class CardController extends Controller
         return Inertia::render('card/show', ['card' => $card]);
     }
 
+
+    public function edit($id)
+    {
+        $card = Card::findOrFail($id);
+
+        return Inertia::render('card/edit', ['card' => $card]);
+    }
+
+    public function update(Request $request,$id)
+    {       $validated = $request->validated();
+
+            $card = Card::findOrFail($id);
+
+            // Update the card with validated data
+            $card->update($validated);
+
+            // Handle file uploads if present
+            // if ($request->hasFile('avatar')) {
+            //     $card->avatar = $request->file('avatar')->store('avatars', 'public');
+            // }
+            // if ($request->hasFile('logo')) {
+            //     $card->logo = $request->file('logo')->store('logos', 'public');
+            // }
+
+            $card->save();
+
+            return redirect()->route('card.show', $card->id)->with('success', 'Card updated successfully');
+    }
+
+    public function personalizedURL($id) {
+
+        $validated = request()->validate([
+            'personalizedurl' => [
+                'required',              // Must not be empty
+                'string',                // Must be a string
+                'max:255',               // Max length of 255 characters
+                'unique:cards,url',      // Must be unique in the 'url' column of the 'cards' table
+                'regex:/^[a-zA-Z0-9]+$/' // Only letters (a-z, A-Z) and numbers (0-9), no spaces or special characters
+            ],
+        ]);
+
+        $card = Card::findOrFail($id);
+
+        $card->url = $validated['personalizedurl'];
+
+        $card->save();
+
+        return redirect()->route('card.show', $card->url)->with('success', 'Card  updated successfully');
+    }
+
+
+    public function delete($id) {
+
+        $card = Card::findOrFail($id);
+
+        $card->delete();
+
+        return redirect()->route('card.create');
+    }
+
    protected  function generateUniqueUrl($length = 8) {
         do {
             // Generate a random string of specified length
@@ -88,8 +148,10 @@ class CardController extends Controller
 
         $path = 'qrcodes/' . Str::random(40) . '.png';
         Storage::disk('public')->put($path, $qrCode);
-        
+
         return $path;
 
     }
+
+
 }

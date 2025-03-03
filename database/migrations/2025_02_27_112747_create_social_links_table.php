@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');  // Name of the social media platform
             $table->string('url');   // URL of the social media profile
             $table->unsignedBigInteger("card_id");
-            $table->foreign('card_id')->references('id')->on('cards');
+            $table->foreign('card_id')->references('id')->on('cards')->onDelete('cascade');
             $table->timestamps();
         });
     }

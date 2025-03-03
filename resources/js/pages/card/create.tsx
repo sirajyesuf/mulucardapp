@@ -41,7 +41,7 @@ export default function CreateCard() {
     const [logoFileName, setLogoFileName] = useState<string | null>(null);
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
     const logoInputRef = useRef<HTMLInputElement | null>(null);
-    const colors = ['#3a59ae', '#a580e5', '#4a4a4a'];
+    const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
 
     const { data, setData, post, processing, errors, hasErrors } = useForm<CardForm>({
         avatar: '',
@@ -346,7 +346,7 @@ export default function CreateCard() {
                                             </div>
                                         </div>
                                         {/* image end */}
-                                        <div className="flex flex-row gap-4 rounded-lg border-2 p-2">
+                                        <div className="flex flex-row flex-wrap gap-2 rounded-lg border-2 p-2">
                                             {colors.map((color, index) => (
                                                 <div key={index} className="cursor-pointer rounded-full border-2 p-2">
                                                     <div className="flex items-center space-x-2">
