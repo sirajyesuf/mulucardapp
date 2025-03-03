@@ -1,7 +1,7 @@
-import EmptyCard from '@/components/empty-card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 import MuluCard from './card/card';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -45,17 +45,24 @@ type CardList = Card[];
 export default function Dashboard() {
     const { props } = usePage();
     function showCardDetail(url: string) {
-        console.log(url);
         router.get(route('card.show', { url: url }));
     }
     const cards = props.cards as CardList | undefined; // Type assertion with fallback
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="grid h-full flex-1 grid-cols-2 items-center justify-center gap-2 rounded-xl border-2 p-4">
-                <EmptyCard />
+            <div className="flex flex-row justify-end rounded-xl border-2 p-2">
+                <Link
+                    className="flex flex-row items-center justify-center gap-4 rounded-lg bg-[#7239d6] px-4 py-2 text-white shadow-none"
+                    href="card/create"
+                >
+                    <Plus width={30} height={30} />
+                    <span className="text-md font-bold capitalize">new card</span>
+                </Link>
+            </div>
+            <div className="grid h-full flex-1 grid-cols-1 items-center justify-center gap-2 rounded-xl p-4 md:grid-cols-2">
                 {cards?.map((card, index) => (
-                    <div className="w-[500px] cursor-pointer border-2" key={index} onClick={() => showCardDetail(card.url)}>
+                    <div className="w-full cursor-pointer border-2 md:w-[500px]" key={index} onClick={() => showCardDetail(card.url)}>
                         <MuluCard
                             previewUrl={card.avatar}
                             previewLogo={card.logo}
