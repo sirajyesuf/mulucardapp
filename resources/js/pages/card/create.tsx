@@ -1,4 +1,3 @@
-import ImageUpload from '@/components/image-upload';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,8 +10,8 @@ import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Check, LoaderCircle } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { Check, LoaderCircle, Upload, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
@@ -38,20 +37,13 @@ interface CardForm {
 export default function CreateCard() {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
-
-    const handleAvatarChange = (file: File | null, previewUrl: string | null) => {
-        setData('avatar', file);
-        setAvatarPreview(previewUrl);
-    };
-
-    const handleLogoChange = (file: File | null, previewUrl: string | null) => {
-        setData('logo', file);
-        setLogoPreview(previewUrl);
-    };
-
+    const [avatarFileName, setAvatarFileName] = useState<string | null>(null);
+    const [logoFileName, setLogoFileName] = useState<string | null>(null);
+    const avatarInputRef = useRef<HTMLInputElement | null>(null);
+    const logoInputRef = useRef<HTMLInputElement | null>(null);
     const colors = ['#3a59ae', '#a580e5', '#4a4a4a'];
 
-    const { data, setData, post, processing, errors } = useForm<CardForm>({
+    const { data, setData, post, processing, errors, hasErrors } = useForm<CardForm>({
         avatar: '',
         logo: '',
         first_name: '',
@@ -74,13 +66,34 @@ export default function CreateCard() {
         headline: '',
     });
 
-    // const handlePictureChange = (file: File | null, url: string) => {
-    //     setData('avatar', url);
-    // };
-
-    // const handleLogoChange = (file: File | null, url: string) => {
-    //     setData('logo', url);
-    // };
+    const handleFileChange = (field: 'avatar' | 'logo') => (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            const previewUrl = URL.createObjectURL(file);
+            if (field === 'avatar') {
+                if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+                setAvatarPreview(previewUrl);
+                setAvatarFileName(file.name);
+                setData('avatar', file);
+            } else {
+                if (logoPreview) URL.revokeObjectURL(logoPreview);
+                setLogoPreview(previewUrl);
+                setLogoFileName(file.name);
+                setData('logo', file);
+            }
+        } else {
+            if (field === 'avatar') {
+                setAvatarPreview(null);
+                setAvatarFileName(null);
+                setData('avatar', null);
+            } else {
+                setLogoPreview(null);
+                setLogoFileName(null);
+                setData('logo', null);
+            }
+            if (file) alert('Please select an image file (e.g., PNG, JPEG)');
+        }
+    };
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
@@ -97,6 +110,52 @@ export default function CreateCard() {
             preserveScroll: true,
         });
     };
+
+    const removeFile = (field: 'avatar' | 'logo') => {
+        if (field === 'avatar') {
+            setAvatarPreview(null);
+            setAvatarFileName(null);
+            setData('avatar', null);
+        } else {
+            setLogoPreview(null);
+            setLogoFileName(null);
+            setData('logo', null);
+        }
+    };
+
+    // const openFileDialog = (field: 'avatar' | 'logo') => {
+    //     console.log('Opening file dialog', field);
+    //     // const ref = field === 'avatar' ? avatarInputRef : logoInputRef;
+    //     let ref = null;
+    //     if (field == 'avatar') ref = avatarInputRef;
+    //     else if (field == 'logo') ref = logoInputRef;
+
+    //     console.log(ref);
+    //     if (ref?.current) {
+    //         ref.current.click();
+    //     }
+    // };
+    //
+    // Functions to trigger clicks on the inputs
+    const triggerAvatarInputClick = () => {
+        if (avatarInputRef.current) {
+            avatarInputRef.current.click(); // Programmatically click the avatar input
+        }
+    };
+
+    const triggerLogoInputClick = () => {
+        if (logoInputRef.current) {
+            logoInputRef.current.click(); // Programmatically click the logo input
+        }
+    };
+
+    // Cleanup preview URLs on unmount
+    useEffect(() => {
+        return () => {
+            if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+            if (logoPreview) URL.revokeObjectURL(logoPreview);
+        };
+    }, [avatarPreview, logoPreview]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -145,17 +204,148 @@ export default function CreateCard() {
                                         <CardDescription>Make changes to your account here.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        {/* <FileUpload id="picture-upload" label="Select a picture to upload" onFileChange={handlePictureChange} />
-                                        <FileUpload id="logo-upload" label="Select a logo to upload" onFileChange={handleLogoChange} /> */}
-                                        <div>
-                                            <ImageUpload id="avatar-upload" label="Upload Avatar" onImageChange={handleAvatarChange} />
-                                            <InputError message={errors.avatar} className="mt-2" />
-                                        </div>
+                                        {/* image start */}
+                                        {/* <div className="rounded-lg border-2 p-8 text-center">
+                                            <Upload className="mx-auto h-6 w-12 text-gray-400" />
+                                            <p className="mt-2 text-sm text-gray-600">Upload Avatar</p>
+                                            <div className="mt-4 flex flex-row items-center justify-center gap-4 rounded-lg border-2 bg-gray-200 px-4">
+                                                <Label htmlFor="avatar-upload" className="px-4 py-2 text-sm font-medium text-black">
+                                                    {avatarFileName ? `${avatarFileName}` : 'Choose File'}
+                                                </Label>
+                                                {avatarFileName && (
+                                                    <X
+                                                        className="h-6 w-6 cursor-pointer text-gray-400"
+                                                        color="red"
+                                                        onClick={() => removeFile('avatar')}
+                                                    />
+                                                )}
+                                            </div>
 
-                                        <div>
-                                            <ImageUpload id="logo-upload" label="Upload Logo" onImageChange={handleLogoChange} />
-                                            <InputError message={errors.logo} className="mt-2" />
+                                            <Input
+                                                id="avatar-upload"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileChange('avatar')}
+                                                className="hidden"
+                                            />
+                                            <InputError message={errors.avatar} className="mt-2" />
+                                        </div> */}
+
+                                        <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <div className="rounded-lg bg-gray-100 p-4">
+                                                    <Upload className="text-muted-foreground mx-auto h-6 w-6" />
+                                                </div>
+                                                <p className="text-foreground mt-2 text-sm font-medium">Upload Avatar</p>
+
+                                                {avatarFileName ? (
+                                                    <div className="bg-muted/50 mx-auto mt-4 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border px-3 py-2">
+                                                        <span className="truncate text-sm">{avatarFileName}</span>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeFile('avatar')}
+                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6 rounded-full p-0"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                            <span className="sr-only">Remove file</span>
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => triggerAvatarInputClick()}
+                                                        className="mt-4"
+                                                    >
+                                                        Choose File
+                                                    </Button>
+                                                )}
+
+                                                <input
+                                                    ref={avatarInputRef}
+                                                    id="avatar-upload"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange('avatar')}
+                                                    className="hidden"
+                                                />
+                                                <InputError message={errors.avatar} className="mt-2" />
+                                            </div>
                                         </div>
+                                        {/* <div className="rounded-lg border-2 p-8 text-center">
+                                            <Upload className="mx-auto h-6 w-12 text-gray-400" />
+                                            <p className="mt-2 text-sm text-gray-600">Upload Logo</p>
+
+                                            <div className="mt-4 flex flex-row items-center justify-center gap-4 rounded-lg border-2 bg-gray-200 px-4">
+                                                <Label htmlFor="logo-upload" className="px-4 py-2 text-sm font-medium text-black">
+                                                    {logoFileName ? `${logoFileName}` : 'Choose File'}
+                                                </Label>
+                                                {logoFileName && (
+                                                    <X
+                                                        className="h-6 w-6 cursor-pointer text-gray-400"
+                                                        color="red"
+                                                        onClick={() => removeFile('logo')}
+                                                    />
+                                                )}
+                                            </div>
+                                            <Input
+                                                id="logo-upload"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileChange('logo')}
+                                                className="hidden"
+                                            />
+                                            <InputError message={errors.logo} className="mt-2" />
+                                        </div> */}
+
+                                        <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <div className="rounded-lg bg-gray-100 p-4">
+                                                    <Upload className="text-muted-foreground mx-auto h-6 w-6" />
+                                                </div>
+                                                <p className="text-foreground mt-2 text-sm font-medium">Logo Avatar</p>
+
+                                                {logoFileName ? (
+                                                    <div className="bg-muted/50 mx-auto mt-4 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border px-3 py-2">
+                                                        <span className="truncate text-sm">{logoFileName}</span>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeFile('logo')}
+                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6 rounded-full p-0"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                            <span className="sr-only">Remove file</span>
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => triggerLogoInputClick()}
+                                                        className="mt-4"
+                                                    >
+                                                        Choose File
+                                                    </Button>
+                                                )}
+
+                                                <input
+                                                    ref={logoInputRef}
+                                                    id="logo-upload"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange('logo')}
+                                                    className="hidden"
+                                                />
+                                                <InputError message={errors.logo} className="mt-2" />
+                                            </div>
+                                        </div>
+                                        {/* image end */}
                                         <div className="flex flex-row gap-4 rounded-lg border-2 p-2">
                                             {colors.map((color, index) => (
                                                 <div key={index} className="cursor-pointer rounded-full border-2 p-2">
