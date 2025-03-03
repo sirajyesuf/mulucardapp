@@ -21,6 +21,7 @@ export default function ImageUpload({ id, label, onImageChange, accept = 'image/
 
             const newPreviewUrl = URL.createObjectURL(file);
             setPreviewUrl(newPreviewUrl);
+            console.log(file, newPreviewUrl);
 
             onImageChange(file, newPreviewUrl);
         } else {
