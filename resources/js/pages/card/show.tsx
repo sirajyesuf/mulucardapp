@@ -168,26 +168,28 @@ export default function ShowCard() {
                             </div>
                         </TabsList>
                         <TabsContent value="share">
-                            <Card className="">
-                                <CardContent className="grid h-[100%] items-center justify-center gap-4 border-none border-blue-600 p-2 md:grid-cols-1 lg:grid-cols-2">
-                                    <div className="flex items-center justify-center border-none">
-                                        <div className="h-[400px] w-[300px] rounded-3xl border-8 border-gray-500 p-4 md:w-[400px]">
-                                            <img src={`/storage/${card?.qr_code}`} alt="" className="h-full w-full object-cover" />
+                            <Card>
+                                {/* grid h-[100%] items-center justify-center gap-4 border-2 border-red-900 p-4 md:grid-cols-1 lg:grid-cols-2 */}
+                                <CardContent>
+                                    <div className="grid grid-cols-1 gap-4 rounded-3xl border-none p-4 md:grid-cols-2">
+                                        <div className="flex items-center justify-center rounded-lg border-2 p-4">
+                                            <div className="h-full w-full rounded-3xl border-4 border-gray-500 p-4">
+                                                <img src={`/storage/${card?.qr_code}`} alt="" className="h-full w-full object-cover" />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* <div className="flex h-full items-center justify-center rounded-lg border-none p-4">
-                                        <Button className="w-full rounded-lg border-2 p-2 py-8" variant="outline">
-                                            <Copy size={100} />
-                                            <span className="text-lg font-extrabold text-black capitalize">copy link</span>
-                                        </Button>
-                                    </div> */}
-
-                                    <div className="flex h-full items-center justify-center rounded-lg border-none p-4">
-                                        <Button className="w-full cursor-pointer rounded-lg border-2 p-2 py-8" variant="outline" onClick={handleCopy}>
-                                            {isCopied ? <Check size={100} className="text-green-500" /> : <Copy size={100} />}
-                                            <span className="text-lg font-extrabold text-black capitalize">{isCopied ? 'copied!' : 'copy link'}</span>
-                                        </Button>
+                                        <div className="flex h-full items-center justify-center rounded-lg border-2 p-4">
+                                            <Button
+                                                className="w-full cursor-pointer rounded-lg border-2 p-2 py-8"
+                                                variant="outline"
+                                                onClick={handleCopy}
+                                            >
+                                                {isCopied ? <Check size={100} className="text-green-500" /> : <Copy size={100} />}
+                                                <span className="text-lg font-extrabold text-black capitalize">
+                                                    {isCopied ? 'copied!' : 'copy link'}
+                                                </span>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
