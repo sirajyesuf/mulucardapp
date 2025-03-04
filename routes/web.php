@@ -5,7 +5,7 @@ use Inertia\Inertia;
 
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\DashboardController;
-
+use App\Models\Card;
 
 
 
@@ -31,3 +31,9 @@ Route::middleware(['auth'])->group(function(){
     Route::get('card/{id}/delete',[CardController::class,"delete"])->name("card.delete");
 
 });
+
+
+Route::get("/card/hello/{url}",function($url){
+    $card = Card::first();
+    return Inertia::render('hello',["url"=>$url,"card"=>$card]);
+})->name("card.hello");
