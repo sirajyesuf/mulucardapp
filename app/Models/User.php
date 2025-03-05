@@ -31,7 +31,7 @@ class User extends Authenticatable
 
         return URL::temporarySignedRoute(
                     'magic.verify',
-                    now()->addMinutes(30),
+                    now()->addMinutes(15),
                     ['user' => $this->id]
                 );
 

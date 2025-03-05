@@ -29,6 +29,8 @@ return new class extends Migration
             $table->string("location")->nullable();
             $table->string('qr_code')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
+
+            $table->json('business_hours')->nullable();
             $table->timestamps();
         });
     }

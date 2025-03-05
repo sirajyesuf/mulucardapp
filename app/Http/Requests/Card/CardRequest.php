@@ -22,32 +22,35 @@ class CardRequest extends FormRequest
     public function rules(): array
     {
             return [
-                    // 'avatar' =>['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
-                    // 'logo' => ['required', 'regex:/^data:image\/(jpeg|png|gif);base64,[A-Za-z0-9+\/=]+$/'],
-                    'avatar' => 'required|image|max:2048', // Max 2MB, must be an image
-                    'logo' => 'required|image|max:2048',
-                    'first_name' => 'required|string|max:255',
-                    'last_name' => 'required|string|max:255',
-                    'organization' => 'required|string|max:255',
-                    'job_title' => 'required|string|max:255',
-                    'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
-                    'links' => 'required|array|max:8',
-                    'links.*.name' => [
-                    'required',
-                    'string',
-                    Rule::in(['email', 'phone', 'website', 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube']),
-                    ],
-                    'links.*.url' => [
-                    'nullable',
-                    'string',
-                    $this->validateLinkValue(),
-                    ],
-                    'phone' => 'required|string|max:255',
-                    'email' => 'required|string|email|max:255',
-                    'headline' => 'required|string|max:255',
-                    'address' => 'required|string|max:255',
-                    'location' => 'required|string|max:255',
+                    // 'avatar' => 'required|image|max:2048',
+                    // 'logo' => 'required|image|max:2048',
+                    // 'first_name' => 'required|string|max:255',
+                    // 'last_name' => 'required|string|max:255',
+                    // 'organization' => 'required|string|max:255',
+                    // 'job_title' => 'required|string|max:255',
+                    // 'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
+                    // 'links' => 'required|array|max:8',
+                    // 'links.*.name' => [
+                    // 'required',
+                    // 'string',
+                    // Rule::in(['email', 'phone', 'website', 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube']),
+                    // ],
+                    // 'links.*.url' => [
+                    // 'nullable',
+                    // 'string',
+                    // $this->validateLinkValue(),
+                    // ],
+                    // 'phone' => 'required|string|max:255',
+                    // 'email' => 'required|string|email|max:255',
+                    // 'headline' => 'required|string|max:255',
+                    // 'address' => 'required|string|max:255',
+                    // 'location' => 'required|string|max:255',
+                    // 'business_hours' => 'required|array|max:7',
+                    'galleries' => 'required|array', // Ensure galleries is an array and is required
+                    'galleries.*.file' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048', // File is optional, must be an image, max size 2MB
+                    'galleries.*.description' => 'required|string|max:500', // Description is required, must be a string, max 500 characters
             ];
+
     }
 
     protected function validateLinkValue(): callable

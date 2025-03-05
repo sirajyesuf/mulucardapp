@@ -8,6 +8,7 @@ use App\Models\Card;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 class CardController extends Controller
 {
     public function create(){
@@ -52,6 +53,16 @@ class CardController extends Controller
                 'url' => $link['url'],
             ]);
         }
+
+        foreach ($validated['galleries'] as $gallery) {
+            $galleryPath = Storage::url($gallery['file']->store('galleries', 'public'));
+
+            $card->galleries()->create([
+                'path' => $galleryPath,
+                'description' => $gallery['description'],
+            ]);
+        }
+
         return redirect()->route('dashboard')->with('success', 'Card created successfully!');
     }
 

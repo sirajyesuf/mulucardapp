@@ -38,3 +38,44 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Card {
+    avatar: File | null | string;
+    logo: File | null | string;
+    first_name: string;
+    last_name: string;
+    organization: string;
+    job_title: string;
+    email: string;
+    phone: string;
+    banner_color: string;
+    links: {
+        name: string;
+        url: string;
+        placeholder: string;
+    }[];
+    location: string;
+    address: string;
+    headline: string;
+}
+
+type TimeSlot = {
+    open: string;
+    close: string;
+};
+
+type DaySchedule = {
+    isOpen: boolean;
+    timeSlots: TimeSlot[];
+};
+
+export type WeekSchedule = {
+    [key: string]: DaySchedule;
+};
+
+export interface Gallery {
+    id: string;
+    file: File | null;
+    preview: string | null;
+    description: string;
+}

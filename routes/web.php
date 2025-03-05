@@ -33,7 +33,7 @@ Route::middleware(['auth'])->group(function(){
 });
 
 
-Route::get("/card/hello/{url}",function($url){
+Route::get("hello/{url}",function($url){
     $card = Card::first();
     return Inertia::render('hello',["url"=>$url,"card"=>$card]);
 })->name("card.hello");

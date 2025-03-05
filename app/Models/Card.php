@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\SocialLink;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Models\Gallery;
 
 class Card extends Model
 {
@@ -19,5 +19,9 @@ class Card extends Model
 
     public function socialLinks(){
         return $this->hasMany(SocialLink::class);
+    }
+
+    public function galleries(){
+        return $this->hasMany(Gallery::class);
     }
 }

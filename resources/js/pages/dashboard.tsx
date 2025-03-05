@@ -53,7 +53,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex flex-row justify-end rounded-xl border-none p-2">
                 <Link
-                    className="flex flex-row items-center justify-center gap-4 rounded-lg bg-[#7239d6] px-4 py-2 text-white shadow-none"
+                    className="hover:bg- flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-500 px-4 py-2 text-white shadow-none hover:bg-gray-700"
                     href="card/create"
                 >
                     <Plus width={30} height={30} />
@@ -75,6 +75,7 @@ export default function Dashboard() {
                             banner_color={card.banner_color}
                             links={card.social_links}
                             headline={card.headline}
+                            business_hours={card.business_hours}
                         />
                     </div>
                 ))}

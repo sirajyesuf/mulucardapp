@@ -10,9 +10,9 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import { type BreadcrumbItem, type WeekSchedule } from '@/types';
+import { type BreadcrumbItem, type Gallery, type WeekSchedule } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Check, Clock, LoaderCircle, Upload, X } from 'lucide-react';
+import { Check, Clock, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
@@ -35,6 +35,7 @@ interface CardForm {
     address: string;
     headline: string;
     business_hours: WeekSchedule[];
+    galleries: Gallery[];
 }
 
 export default function CreateCard() {
@@ -129,7 +130,67 @@ export default function CreateCard() {
         address: '',
         location: '',
         headline: '',
+        galleries: [{ id: crypto.randomUUID(), file: null, preview: null, description: '' }],
     });
+
+    // const [items, setItems] = useState<Gallery[]>([{ id: crypto.randomUUID(), file: null, preview: null, description: '' }]);
+
+    const handleGalleryFileChange = (id: string, file: File | null) => {
+        let newGallery = data.galleries.map((item: Gallery) => {
+            if (item.id === id) {
+                return {
+                    ...item,
+                    file,
+                    preview: file ? URL.createObjectURL(file) : null,
+                };
+            }
+            return item;
+        });
+
+        setData('galleries', newGallery);
+    };
+
+    const handleDescriptionChange = (id: string, description: string) => {
+        let newGallery = data.galleries.map((item: Gallery) => {
+            if (item.id === id) {
+                return {
+                    ...item,
+                    description,
+                };
+            }
+
+            return item;
+        });
+
+        setData('galleries', newGallery);
+    };
+    const addMoreItem = () => {
+        setData('galleries', [...data.galleries, { id: crypto.randomUUID(), file: null, preview: null, description: '' }]);
+    };
+
+    const removeItem = (id: string) => {
+        if (data.galleries.length > 1) {
+            setData(
+                'galleries',
+                data.galleries.filter((item: Gallery) => item.id !== id),
+            );
+        }
+    };
+
+    const removeGalleryFile = (id: string) => {
+        setData(
+            'galleries',
+            data.galleries.map((item: Gallery) => {
+                if (item.id === id) {
+                    return { ...item, file: null, preview: null };
+                }
+                return item;
+            }),
+        );
+    };
+
+    const validItems = data.galleries.filter((item: Gallery) => item.file && item.preview);
+    //
 
     const handleFileChange = (field: 'avatar' | 'logo') => (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -253,6 +314,7 @@ export default function CreateCard() {
                             location={data.location}
                             headline={data.headline}
                             business_hours={schedule}
+                            galleries={validItems}
                         />
                     </div>
                     <div className="col-span-3 border-none p-2">
@@ -667,7 +729,6 @@ export default function CreateCard() {
                                                                 <Button
                                                                     type="button"
                                                                     variant="ghost"
-                                                                    size="icon"
                                                                     // onClick={() => removeTimeSlot(day, index)}
                                                                     disabled={schedule[day].timeSlots.length <= 1}
                                                                 >
@@ -694,6 +755,106 @@ export default function CreateCard() {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
+
+                            {/* galleries tab start  */}
+                            <TabsContent value="gallery">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Location</CardTitle>
+                                        <CardDescription>Enter your address and location details.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2">
+                                        <div className="space-y-6">
+                                            {data.galleries.map((item, index) => (
+                                                <Card key={item.id} className="relative">
+                                                    <CardContent className="p-6">
+                                                        {data.galleries.length > 1 && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="absolute top-2 right-2"
+                                                                onClick={() => removeItem(item.id)}
+                                                            >
+                                                                <X className="h-5 w-5" />
+                                                                <span className="sr-only">Remove</span>
+                                                            </Button>
+                                                        )}
+
+                                                        <div className="space-y-4">
+                                                            <div>
+                                                                <Label htmlFor={`image-${item.id}`} className="mb-2 block">
+                                                                    Image {index + 1}
+                                                                </Label>
+
+                                                                <div className="flex flex-col gap-2">
+                                                                    {item.file ? (
+                                                                        <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
+                                                                            <span className="flex-1 truncate">{item.file.name}</span>
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                onClick={() => removeGalleryFile(item.id)}
+                                                                            >
+                                                                                <X className="h-4 w-4" />
+                                                                                <span className="sr-only">Remove file</span>
+                                                                            </Button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="flex items-center">
+                                                                            <Input
+                                                                                id={`image-${item.id}`}
+                                                                                type="file"
+                                                                                accept="image/*"
+                                                                                className="hidden"
+                                                                                onChange={(e) => {
+                                                                                    const file = e.target.files?.[0] || null;
+                                                                                    handleGalleryFileChange(item.id, file);
+                                                                                }}
+                                                                            />
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="outline"
+                                                                                onClick={() => document.getElementById(`image-${item.id}`)?.click()}
+                                                                                className="flex items-center gap-2"
+                                                                            >
+                                                                                <Upload className="h-4 w-4" />
+                                                                                Select Image
+                                                                            </Button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            <div>
+                                                                <Label htmlFor={`description-${item.id}`} className="mb-2 block">
+                                                                    Description
+                                                                </Label>
+                                                                <Textarea
+                                                                    id={`description-${item.id}`}
+                                                                    placeholder="Enter a description for this image"
+                                                                    value={item.description}
+                                                                    onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
+                                                                    className="min-h-24"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+
+                                            <div className="flex flex-col gap-4 sm:flex-row">
+                                                <Button type="button" variant="outline" onClick={addMoreItem} className="flex items-center gap-2">
+                                                    <PlusCircle className="h-5 w-5" />
+                                                    Add More
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                            {/* galleries tab end */}
                         </Tabs>
                     </div>
                 </div>

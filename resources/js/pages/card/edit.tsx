@@ -1,4 +1,3 @@
-import ImageUpload from '@/components/image-upload';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,8 +10,8 @@ import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Check, LoaderCircle } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { Check, LoaderCircle, Upload, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -20,6 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface CardForm {
+    id: number;
     avatar: File | null | string;
     logo: File | null | string;
     first_name: string;
@@ -39,69 +39,78 @@ interface CardForm {
     headline: string;
 }
 
-interface Props {
-    card: {
-        id: number;
-        avatar?: string | null;
-        logo?: string | null;
-        first_name: string;
-        last_name: string;
-        organization: string;
-        job_title: string;
-        email: string;
-        phone: string;
-        banner_color: string;
-        links: { name: string; url: string; placeholder: string }[];
-        location: string;
-        address: string;
-        headline: string;
-    };
+interface EditCardProps {
+    card: CardForm;
 }
 
-export default function EditCard({ card }: Props) {
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(card.avatar || null);
-    const [logoPreview, setLogoPreview] = useState<string | null>(card.logo || null);
+export default function EditCard({ card }: EditCardProps) {
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(typeof card.avatar === 'string' ? card.avatar : null);
+    const [logoPreview, setLogoPreview] = useState<string | null>(typeof card.logo === 'string' ? card.logo : null);
+    const [avatarFileName, setAvatarFileName] = useState<string | null>(null);
+    const [logoFileName, setLogoFileName] = useState<string | null>(null);
+    const avatarInputRef = useRef<HTMLInputElement | null>(null);
+    const logoInputRef = useRef<HTMLInputElement | null>(null);
+    const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
+
+    const defaultLinks = [
+        { name: 'website', url: '', placeholder: 'https://example.com' },
+        { name: 'facebook', url: '', placeholder: 'https://facebook.com/example' },
+        { name: 'twitter', url: '', placeholder: 'https://twitter.com/example' },
+        { name: 'instagram', url: '', placeholder: 'https://instagram.com/example' },
+        { name: 'linkedin', url: '', placeholder: 'https://linkedin.com/example' },
+        { name: 'youtube', url: '', placeholder: 'https://youtube.com/example' },
+    ];
 
     const { data, setData, put, processing, errors } = useForm<CardForm>({
-        avatar: card.avatar || null,
-        logo: card.logo || null,
+        id: card.id,
+        avatar: card.avatar,
+        logo: card.logo,
         first_name: card.first_name || '',
         last_name: card.last_name || '',
         organization: card.organization || '',
         job_title: card.job_title || '',
         phone: card.phone || '',
         email: card.email || '',
-        banner_color: card.banner_color || '#3a59ae',
-        links: card.links
-            ? card.links
-            : [
-                  { name: 'website', url: '', placeholder: 'https://example.com' },
-                  { name: 'facebook', url: '', placeholder: 'https://facebook.com/example' },
-                  { name: 'twitter', url: '', placeholder: 'https://twitter.com/example' },
-                  { name: 'instagram', url: '', placeholder: 'https://instagram.com/example' },
-                  { name: 'linkedin', url: '', placeholder: 'https://linkedin.com/example' },
-                  { name: 'youtube', url: '', placeholder: 'https://youtube.com/example' },
-              ],
+        banner_color: card.banner_color || colors[0],
+        links: Array.isArray(card.links) && card.links.length > 0 ? card.links : defaultLinks, // Safe check
         address: card.address || '',
         location: card.location || '',
         headline: card.headline || '',
     });
 
-    const handleAvatarChange = (file: File | null, previewUrl: string | null) => {
-        setData('avatar', file);
-        setAvatarPreview(previewUrl);
+    const handleFileChange = (field: 'avatar' | 'logo') => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            const previewUrl = URL.createObjectURL(file);
+            if (field === 'avatar') {
+                if (avatarPreview && avatarPreview !== card.avatar) URL.revokeObjectURL(avatarPreview);
+                setAvatarPreview(previewUrl);
+                setAvatarFileName(file.name);
+                setData('avatar', file);
+            } else {
+                if (logoPreview && logoPreview !== card.logo) URL.revokeObjectURL(logoPreview);
+                setLogoPreview(previewUrl);
+                setLogoFileName(file.name);
+                setData('logo', file);
+            }
+        } else {
+            if (field === 'avatar') {
+                if (avatarPreview && avatarPreview !== card.avatar) URL.revokeObjectURL(avatarPreview);
+                setAvatarPreview(typeof card.avatar === 'string' ? card.avatar : null);
+                setAvatarFileName(null);
+                setData('avatar', card.avatar);
+            } else {
+                if (logoPreview && logoPreview !== card.logo) URL.revokeObjectURL(logoPreview);
+                setLogoPreview(typeof card.logo === 'string' ? card.logo : null);
+                setLogoFileName(null);
+                setData('logo', card.logo);
+            }
+            if (file) alert('Please select an image file (e.g., PNG, JPEG)');
+        }
     };
-
-    const handleLogoChange = (file: File | null, previewUrl: string | null) => {
-        setData('logo', file);
-        setLogoPreview(previewUrl);
-    };
-
-    const colors = ['#3a59ae', '#a580e5', '#4a4a4a'];
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
-
         put(route('card.update', card.id), {
             onSuccess: () => {
                 console.log('Update successful!');
@@ -114,15 +123,49 @@ export default function EditCard({ card }: Props) {
         });
     };
 
+    const removeFile = (field: 'avatar' | 'logo') => {
+        console.log(field);
+        if (field === 'avatar') {
+            if (avatarPreview && avatarPreview !== card.avatar) URL.revokeObjectURL(avatarPreview);
+            // setAvatarPreview(typeof card.avatar === 'string' ? card.avatar : null);
+            setAvatarFileName(null);
+            // setData('avatar', card.avatar);
+        } else {
+            if (logoPreview && logoPreview !== card.logo) URL.revokeObjectURL(logoPreview);
+            setLogoPreview(typeof card.logo === 'string' ? card.logo : null);
+            setLogoFileName(null);
+            setData('logo', card.logo);
+        }
+    };
+
+    const triggerAvatarInputClick = () => {
+        if (avatarInputRef.current) {
+            avatarInputRef.current.click();
+        }
+    };
+
+    const triggerLogoInputClick = () => {
+        if (logoInputRef.current) {
+            logoInputRef.current.click();
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (avatarPreview && avatarPreview !== card.avatar) URL.revokeObjectURL(avatarPreview);
+            if (logoPreview && logoPreview !== card.logo) URL.revokeObjectURL(logoPreview);
+        };
+    }, [avatarPreview, logoPreview, card.avatar, card.logo]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Card" />
             <form onSubmit={submit}>
                 <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
-                    <Button variant="destructive" className="cursor-pointer">
-                        Cancel
+                    <Button variant="destructive" className="cursor-pointer" asChild>
+                        <a href="/dashboard">Cancel</a>
                     </Button>
-                    <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" tabIndex={5} disabled={processing}>
+                    <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Update Card
                     </Button>
@@ -160,15 +203,101 @@ export default function EditCard({ card }: Props) {
                                         <CardDescription>Update your card's display settings.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        <div>
-                                            <ImageUpload id="avatar-upload" label="Upload Avatar" onImageChange={handleAvatarChange} />
-                                            <InputError message={errors.avatar} className="mt-2" />
+                                        <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <div className="rounded-lg bg-gray-100 p-4">
+                                                    <Upload className="text-muted-foreground mx-auto h-6 w-6" />
+                                                </div>
+                                                <p className="text-foreground mt-2 text-sm font-medium">Upload Avatar</p>
+
+                                                {avatarFileName || avatarPreview ? (
+                                                    <div className="bg-muted/50 mx-auto mt-4 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border px-3 py-2">
+                                                        <span className="truncate text-sm">
+                                                            {avatarFileName || (typeof card.avatar === 'string' ? 'Existing Avatar' : 'No Avatar')}
+                                                        </span>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeFile('avatar')}
+                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6 rounded-full p-0"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                            <span className="sr-only">Remove file</span>
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => triggerAvatarInputClick()}
+                                                        className="mt-4"
+                                                    >
+                                                        Choose File
+                                                    </Button>
+                                                )}
+
+                                                <input
+                                                    ref={avatarInputRef}
+                                                    id="avatar-upload"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange('avatar')}
+                                                    className="hidden"
+                                                />
+                                                <InputError message={errors.avatar} className="mt-2" />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <ImageUpload id="logo-upload" label="Upload Logo" onImageChange={handleLogoChange} />
-                                            <InputError message={errors.logo} className="mt-2" />
+
+                                        <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <div className="rounded-lg bg-gray-100 p-4">
+                                                    <Upload className="text-muted-foreground mx-auto h-6 w-6" />
+                                                </div>
+                                                <p className="text-foreground mt-2 text-sm font-medium">Upload Logo</p>
+
+                                                {logoFileName || logoPreview ? (
+                                                    <div className="bg-muted/50 mx-auto mt-4 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border px-3 py-2">
+                                                        <span className="truncate text-sm">
+                                                            {logoFileName || (typeof card.logo === 'string' ? 'Existing Logo' : 'No Logo')}
+                                                        </span>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeFile('logo')}
+                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6 rounded-full p-0"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                            <span className="sr-only">Remove file</span>
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => triggerLogoInputClick()}
+                                                        className="mt-4"
+                                                    >
+                                                        Choose File
+                                                    </Button>
+                                                )}
+
+                                                <input
+                                                    ref={logoInputRef}
+                                                    id="logo-upload"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange('logo')}
+                                                    className="hidden"
+                                                />
+                                                <InputError message={errors.logo} className="mt-2" />
+                                            </div>
                                         </div>
-                                        <div className="flex flex-row gap-4 rounded-lg border-2 p-2">
+
+                                        <div className="flex flex-row flex-wrap gap-2 rounded-lg border-2 p-2">
                                             {colors.map((color, index) => (
                                                 <div key={index} className="cursor-pointer rounded-full border-2 p-2">
                                                     <div className="flex items-center space-x-2">
@@ -196,12 +325,26 @@ export default function EditCard({ card }: Props) {
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
                                                 <Label htmlFor="fname">First Name</Label>
-                                                <Input
-                                                    id="fname"
-                                                    value={data.first_name}
-                                                    onChange={(e) => setData('first_name', e.target.value)}
-                                                    disabled={processing}
-                                                />
+                                                <div className="relative">
+                                                    <Input
+                                                        id="fname"
+                                                        value={data.first_name}
+                                                        onChange={(e) => setData('first_name', e.target.value)}
+                                                        disabled={processing}
+                                                        className="pr-8" // Adds padding-right to avoid overlap with the X button
+                                                    />
+                                                    {data.first_name && !processing && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive absolute top-1/2 right-2 h-4 h-6 w-4 w-6 -translate-y-1/2 transform rounded-full p-0"
+                                                            onClick={() => setData('first_name', '')}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+
                                                 <InputError message={errors.first_name} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
@@ -215,6 +358,7 @@ export default function EditCard({ card }: Props) {
                                                 <InputError message={errors.last_name} className="mt-2" />
                                             </div>
                                         </div>
+
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
                                                 <Label htmlFor="organization">Organization</Label>
@@ -237,6 +381,7 @@ export default function EditCard({ card }: Props) {
                                                 <InputError message={errors.job_title} className="mt-2" />
                                             </div>
                                         </div>
+
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
                                                 <Label htmlFor="phone">Phone</Label>
@@ -261,6 +406,7 @@ export default function EditCard({ card }: Props) {
                                                 <InputError message={errors.email} className="mt-2" />
                                             </div>
                                         </div>
+
                                         <div>
                                             <Textarea
                                                 className="h-30 w-full"
@@ -281,11 +427,11 @@ export default function EditCard({ card }: Props) {
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {data.links.map((link, index) => {
-                                            const Icon = socialIconMap[link.name.toLowerCase()] || Globe;
+                                            const Icon = socialIconMap[link.name.toLowerCase()] || null;
                                             return (
                                                 <div key={index} className="space-y-2 rounded-lg border-2 border-dashed p-2">
                                                     <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
-                                                        <Icon className="h-6 w-6" />
+                                                        {Icon && <Icon className="h-6 w-6" />}
                                                         {link.name}
                                                     </div>
                                                     <Input
@@ -295,10 +441,7 @@ export default function EditCard({ card }: Props) {
                                                         value={link.url}
                                                         onChange={(e) => {
                                                             const updatedLinks = [...data.links];
-                                                            updatedLinks[index] = {
-                                                                ...updatedLinks[index],
-                                                                url: e.target.value,
-                                                            };
+                                                            updatedLinks[index] = { ...updatedLinks[index], url: e.target.value };
                                                             setData('links', updatedLinks);
                                                         }}
                                                         disabled={processing}

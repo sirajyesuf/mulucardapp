@@ -1,6 +1,6 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -223,16 +223,13 @@ export default function ShowCard() {
 
                                         <Button
                                             variant="outline"
-                                            className="border-2 border-red-400 font-extrabold text-red-500 hover:text-red-700"
+                                            className="cursor-pointer border-2 border-red-400 font-extrabold text-red-500 hover:text-red-700"
                                             onClick={() => deleteCard()}
                                         >
                                             Delete Card
                                         </Button>
                                     </div>
                                 </CardContent>
-                                <CardFooter>
-                                    <Button>Save password</Button>
-                                </CardFooter>
                             </Card>
                         </TabsContent>
                     </Tabs>
