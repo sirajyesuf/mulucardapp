@@ -3,14 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type WeekSchedule } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Check, LoaderCircle, Upload, X } from 'lucide-react';
+import { Check, Clock, LoaderCircle, Upload, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
@@ -32,6 +34,7 @@ interface CardForm {
     location: string;
     address: string;
     headline: string;
+    business_hours: WeekSchedule[];
 }
 
 export default function CreateCard() {
@@ -41,7 +44,69 @@ export default function CreateCard() {
     const [logoFileName, setLogoFileName] = useState<string | null>(null);
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
     const logoInputRef = useRef<HTMLInputElement | null>(null);
+
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    const [schedule, setSchedule] = useState<WeekSchedule>({
+        Monday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
+        Tuesday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
+        Wednesday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
+        Thursday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
+        Friday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
+        Saturday: { isOpen: false, timeSlots: [{ open: '10:00', close: '15:00' }] },
+        Sunday: { isOpen: false, timeSlots: [{ open: '10:00', close: '15:00' }] },
+    });
+
+    const timeOptions = [];
+
+    for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+            const formattedHour = hour.toString().padStart(2, '0');
+            const formattedMinute = minute.toString().padStart(2, '0');
+            timeOptions.push(`${formattedHour}:${formattedMinute}`);
+        }
+    }
+    const copyToAllDays = (fromDay: string) => {
+        const daySchedule = schedule[fromDay];
+        const updatedSchedule = { ...schedule };
+
+        daysOfWeek.forEach((day) => {
+            if (day !== fromDay) {
+                updatedSchedule[day] = {
+                    isOpen: daySchedule.isOpen,
+                    timeSlots: [...daySchedule.timeSlots.map((slot) => ({ ...slot }))],
+                };
+            }
+        });
+
+        setSchedule(updatedSchedule);
+    };
+    const updateTimeSlot = (day: string, index: number, field: 'open' | 'close', value: string) => {
+        const updatedTimeSlots = [...schedule[day].timeSlots];
+        updatedTimeSlots[index] = {
+            ...updatedTimeSlots[index],
+            [field]: value,
+        };
+
+        setSchedule({
+            ...schedule,
+            [day]: {
+                ...schedule[day],
+                timeSlots: updatedTimeSlots,
+            },
+        });
+    };
+
+    const toggleDayOpen = (day: string) => {
+        setSchedule({
+            ...schedule,
+            [day]: {
+                ...schedule[day],
+                isOpen: !schedule[day].isOpen,
+            },
+        });
+    };
 
     const { data, setData, post, processing, errors, hasErrors } = useForm<CardForm>({
         avatar: '',
@@ -187,15 +252,19 @@ export default function CreateCard() {
                             address={data.address}
                             location={data.location}
                             headline={data.headline}
+                            business_hours={schedule}
                         />
                     </div>
                     <div className="col-span-3 border-none p-2">
-                        <Tabs defaultValue="display" className="w-full">
-                            <TabsList className="grid w-full grid-cols-4">
+                        <Tabs defaultValue="display">
+                            <TabsList className="flex h-16 w-full flex-row flex-wrap justify-around md:h-12">
                                 <TabsTrigger value="display">Display</TabsTrigger>
                                 <TabsTrigger value="personal_information">Information</TabsTrigger>
-                                <TabsTrigger value="links">Links</TabsTrigger>
+                                <TabsTrigger value="links">Social Links</TabsTrigger>
                                 <TabsTrigger value="location">Location</TabsTrigger>
+                                <TabsTrigger value="business_hours">Business Hours</TabsTrigger>
+                                <TabsTrigger value="services">Services</TabsTrigger>
+                                <TabsTrigger value="gallery">Galleries</TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
                                 <Card>
@@ -519,6 +588,109 @@ export default function CreateCard() {
                                             />
                                             <InputError message={errors.location} className="mt-2" />
                                         </div>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                            <TabsContent value="business_hours">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Business Hours</CardTitle>
+                                        <CardDescription>Set the operating hours for your organization</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-6">
+                                        {daysOfWeek.map((day) => (
+                                            <div key={day} className="rounded-lg border p-4">
+                                                <div className="mb-4 flex items-center justify-between">
+                                                    <div className="flex items-center space-x-2">
+                                                        <Switch
+                                                            id={`${day}-toggle`}
+                                                            checked={schedule[day].isOpen}
+                                                            onCheckedChange={() => toggleDayOpen(day)}
+                                                        />
+                                                        <Label htmlFor={`${day}-toggle`} className="text-lg font-medium">
+                                                            {day}
+                                                        </Label>
+                                                    </div>
+                                                    {schedule[day].isOpen && (
+                                                        <div className="flex items-center gap-2">
+                                                            <Button type="button" variant="outline" size="sm" onClick={() => copyToAllDays(day)}>
+                                                                Apply to all days
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {schedule[day].isOpen ? (
+                                                    <div className="space-y-3">
+                                                        {schedule[day].timeSlots.map((timeSlot, index) => (
+                                                            <div key={index} className="flex items-center gap-2">
+                                                                <div className="flex items-center">
+                                                                    <Clock className="text-muted-foreground mr-2 h-4 w-4" />
+                                                                    <Select
+                                                                        value={timeSlot.open}
+                                                                        onValueChange={(value) => updateTimeSlot(day, index, 'open', value)}
+                                                                    >
+                                                                        <SelectTrigger className="w-[120px]">
+                                                                            <SelectValue placeholder="Opening time" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {timeOptions.map((time) => (
+                                                                                <SelectItem key={`open-${time}`} value={time}>
+                                                                                    {time}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+
+                                                                <span className="text-muted-foreground">to</span>
+
+                                                                <div className="flex items-center">
+                                                                    <Select
+                                                                        value={timeSlot.close}
+                                                                        onValueChange={(value) => updateTimeSlot(day, index, 'close', value)}
+                                                                    >
+                                                                        <SelectTrigger className="w-[120px]">
+                                                                            <SelectValue placeholder="Closing time" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {timeOptions.map((time) => (
+                                                                                <SelectItem key={`close-${time}`} value={time}>
+                                                                                    {time}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    // onClick={() => removeTimeSlot(day, index)}
+                                                                    disabled={schedule[day].timeSlots.length <= 1}
+                                                                >
+                                                                    {/* <Trash2 className="h-4 w-4" /> */}
+                                                                </Button>
+                                                            </div>
+                                                        ))}
+
+                                                        {/* <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="mt-2"
+                                                            onClick={() => addTimeSlot(day)}
+                                                        >
+                                                            <Plus className="mr-2 h-4 w-4" /> Add time slot
+                                                        </Button> */}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-muted-foreground italic">Closed</div>
+                                                )}
+                                            </div>
+                                        ))}
                                     </CardContent>
                                 </Card>
                             </TabsContent>
