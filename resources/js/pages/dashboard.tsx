@@ -51,7 +51,7 @@ export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex flex-row justify-end rounded-xl border-2 p-2">
+            <div className="flex flex-row justify-end rounded-xl border-none p-2">
                 <Link
                     className="flex flex-row items-center justify-center gap-4 rounded-lg bg-[#7239d6] px-4 py-2 text-white shadow-none"
                     href="card/create"

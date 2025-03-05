@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -7,36 +7,34 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth/auth-split-layout';
+// import AuthLayout from '@/layouts/auth/auth-card-layout';
+import AuthLayout from '@/layouts/auth-layout';
+
+import { toast } from 'sonner';
 
 interface LoginForm {
     email: string;
 }
 
-interface LoginProps {
-    status?: string;
-}
-
-export default function MagicLogin({ status }: LoginProps) {
-    const { success } = usePage().props;
-    const { data, setData, post, processing, errors } = useForm<LoginForm>({
+export default function MagicLogin() {
+    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        // post(route('login'), {
-        //     onFinish: () => reset('password'),
-        // });
 
-        post(route('login'));
+        post(route('login'), {
+            onFinish: () => {
+                reset();
+                toast.success('Login Magic Link Sent to Your Email Address.');
+            },
+        });
     };
 
     return (
         <AuthLayout title="Log in to your account" description="Enter your email Address">
             <Head title="Log in" />
-
-            {success && <div className="mb-4 rounded bg-green-100 p-2 text-green-700">{success as string}</div>}
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
@@ -56,33 +54,6 @@ export default function MagicLogin({ status }: LoginProps) {
                         <InputError message={errors.email} />
                     </div>
 
-                    {/* <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    Forgot password?
-                                </TextLink>
-                            )}
-                        </div>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            tabIndex={2}
-                            autoComplete="current-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
-                    </div> */}
-
-                    {/* <div className="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" tabIndex={3} />
-                        <Label htmlFor="remember">Remember me</Label>
-                    </div> */}
-
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Log in
@@ -96,8 +67,6 @@ export default function MagicLogin({ status }: LoginProps) {
                     </TextLink>
                 </div>
             </form>
-
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
         </AuthLayout>
     );
 }

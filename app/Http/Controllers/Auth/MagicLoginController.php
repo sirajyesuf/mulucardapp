@@ -8,7 +8,7 @@ use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
-
+use App\Mail\MagicLinkMail;
 class MagicLoginController extends Controller
 {
     public function show()
@@ -22,13 +22,9 @@ class MagicLoginController extends Controller
         $user = User::where('email', $request->email)->first();
         $url = $user->generateLoginUrl();
 
-        // Send the email
-        Mail::raw("Click this link to log in: $url", function ($message) use ($user) {
-        $message->to($user->email)->subject('Your Magic Login Link');
-        });
+        Mail::to($user->email)->send(new MagicLinkMail($url));
 
-
-        return redirect()->back()->with('success', 'Magic link sent! Check your email.');
+        return redirect()->back();
 
     }
 
