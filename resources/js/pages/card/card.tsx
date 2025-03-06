@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
-import { Gallery, WeekSchedule } from '@/types';
+import { Gallery, Service, WeekSchedule } from '@/types';
 import { MapPin } from 'lucide-react';
 
 type MuluCardProps = {
@@ -24,6 +24,7 @@ type MuluCardProps = {
     location: string;
     business_hours: WeekSchedule;
     galleries: Gallery[]; // Add galleries here
+    services: Service[];
 };
 
 export default function MuluCard({
@@ -42,8 +43,9 @@ export default function MuluCard({
     location,
     business_hours,
     galleries,
+    services,
 }: MuluCardProps) {
-    console.log(galleries);
+    console.log(services);
     return (
         <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
             <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
@@ -120,25 +122,44 @@ export default function MuluCard({
                     </div>
                 </div>
 
-                {/* <BusinessHoursPreview schedule={business_hours} /> */}
+                {services.length > 0 && (
+                    <Card className="border-none shadow-none">
+                        <CardHeader>
+                            <CardTitle>Our Services</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-6">
+                                {services.map((item) => (
+                                    <div key={item.id} className="space-y-2">
+                                        <div className="aspect-video w-full overflow-hidden rounded-lg border bg-white">
+                                            {item.path && <img src={item.path} alt={item.name} className="h-full w-full object-contain" />}
+                                        </div>
+                                        <div className="mt-2">
+                                            <h3 className="font-medium">{item.name}</h3>
+                                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                {item.description || 'No description provided'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {galleries.length > 0 && (
                     <Card className="border-none shadow-none">
+                        <CardHeader>
+                            <CardTitle>Galleries</CardTitle>
+                        </CardHeader>
                         <CardContent>
                             <div className="space-y-6">
-                                {galleries.map((item, index) => (
+                                {galleries.map((item) => (
                                     <div key={item.id} className="space-y-2">
                                         <div className="aspect-video w-full overflow-hidden rounded-lg border bg-white">
-                                            {item.preview && (
-                                                <img
-                                                    src={item.preview || '/placeholder.svg'}
-                                                    alt={`Preview ${index + 1}`}
-                                                    className="h-full w-full object-contain"
-                                                />
-                                            )}
+                                            {item.path && <img src={item.path} alt={item.description} className="h-full w-full object-contain" />}
                                         </div>
                                         <div className="mt-2">
-                                            <h3 className="font-medium">Image {index + 1}</h3>
                                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                                 {item.description || 'No description provided'}
                                             </p>

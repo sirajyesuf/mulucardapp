@@ -22,33 +22,38 @@ class CardRequest extends FormRequest
     public function rules(): array
     {
             return [
-                    // 'avatar' => 'required|image|max:2048',
-                    // 'logo' => 'required|image|max:2048',
-                    // 'first_name' => 'required|string|max:255',
-                    // 'last_name' => 'required|string|max:255',
-                    // 'organization' => 'required|string|max:255',
-                    // 'job_title' => 'required|string|max:255',
-                    // 'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
-                    // 'links' => 'required|array|max:8',
-                    // 'links.*.name' => [
-                    // 'required',
-                    // 'string',
-                    // Rule::in(['email', 'phone', 'website', 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube']),
-                    // ],
-                    // 'links.*.url' => [
-                    // 'nullable',
-                    // 'string',
-                    // $this->validateLinkValue(),
-                    // ],
-                    // 'phone' => 'required|string|max:255',
-                    // 'email' => 'required|string|email|max:255',
-                    // 'headline' => 'required|string|max:255',
-                    // 'address' => 'required|string|max:255',
-                    // 'location' => 'required|string|max:255',
+                    'avatar' => 'required|image|max:2048',
+                    'logo' => 'required|image|max:2048',
+                    'first_name' => 'required|string|max:255',
+                    'last_name' => 'required|string|max:255',
+                    'organization' => 'required|string|max:255',
+                    'job_title' => 'required|string|max:255',
+                    'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
+                    'links' => 'required|array|max:8',
+                    'links.*.name' => [
+                    'required',
+                    'string',
+                    Rule::in(['email', 'phone', 'website', 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube']),
+                    ],
+                    'links.*.url' => [
+                    'nullable',
+                    'string',
+                    $this->validateLinkValue(),
+                    ],
+                    'phone' => 'required|string|max:255',
+                    'email' => 'required|string|email|max:255',
+                    'headline' => 'required|string|max:255',
+                    'address' => 'required|string|max:255',
+                    'location' => 'required|string|max:255',
                     // 'business_hours' => 'required|array|max:7',
                     'galleries' => 'required|array', // Ensure galleries is an array and is required
-                    'galleries.*.file' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048', // File is optional, must be an image, max size 2MB
+                    'galleries.*.file' => 'file|mimes:jpeg,png,jpg|max:2048', // File is optional, must be an image, max size 2MB
                     'galleries.*.description' => 'required|string|max:500', // Description is required, must be a string, max 500 characters
+                    'services' => 'required|array',
+                    'services.*.file' => 'file|mimes:jpeg,png|max:2048',
+                    'services.*.name' => 'required|string',
+                    'services.*.description' => 'required|string|max:500'
+
             ];
 
     }

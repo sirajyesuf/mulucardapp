@@ -76,6 +76,14 @@ export type WeekSchedule = {
 export interface Gallery {
     id: string;
     file: File | null;
-    preview: string | null;
+    path: string | null;
+    description: string;
+}
+
+export interface Service {
+    id: string;
+    file: File | string | null;
+    path: string | null;
+    name: string;
     description: string;
 }

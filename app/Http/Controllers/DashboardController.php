@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use auth;
 class DashboardController extends Controller
@@ -10,7 +9,7 @@ class DashboardController extends Controller
     public function index()
     {
 
-        $cards = auth()->user()->cards()->with('socialLinks')->get();
+        $cards = auth()->user()->cards()->with('socialLinks','galleries','services')->get();
 
 
         return Inertia::render('dashboard', ['cards' => $cards]);

@@ -24,4 +24,8 @@ class Card extends Model
     public function galleries(){
         return $this->hasMany(Gallery::class);
     }
+
+    public function services(){
+        return $this->hasMany(Service::class);
+    }
 }

@@ -28,6 +28,7 @@ class CardController extends Controller
             : null;
         $url = $this->generateUniqueUrl();
         $qrCodePath = $this->generateQRCode($url,$request->banner_color);
+
         $card = Card::create([
             'url' => $url,
             'avatar' => $avatarPath,
@@ -54,12 +55,24 @@ class CardController extends Controller
             ]);
         }
 
-        foreach ($validated['galleries'] as $gallery) {
-            $galleryPath = Storage::url($gallery['file']->store('galleries', 'public'));
 
-            $card->galleries()->create([
-                'path' => $galleryPath,
-                'description' => $gallery['description'],
+        foreach ($validated['galleries'] as $gallery) {
+
+                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
+                $card->galleries()->create([
+                    'path' => Storage::url($path),
+                    'description' => $gallery['description'],
+                ]);
+
+        }
+
+        foreach($validated['services'] as $service) {
+
+            $path = Storage::disk('public')->putFile('services', $service['file']);
+            $card->services()->create([
+                'path' => Storage::url($path),
+                'name' => $service['name'],
+                'description' => $service['description']
             ]);
         }
 
