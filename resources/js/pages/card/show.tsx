@@ -107,7 +107,7 @@ export default function ShowCard() {
                             phone={card?.phone}
                             email={card?.email}
                             banner_color={card?.banner_color}
-                            links={card.social_links}
+                            links={card.links}
                             address={card?.address}
                             location={card?.location}
                             headline={card?.headline}

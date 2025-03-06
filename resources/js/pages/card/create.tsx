@@ -13,7 +13,7 @@ import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem, type Gallery, type Image, type Service, type WeekSchedule } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Clock, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
@@ -40,15 +40,6 @@ interface CardForm {
 }
 
 export default function CreateCard() {
-    // const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    // const [avatarFileName, setAvatarFileName] = useState<string | null>(null);
-
-    // const [logoPreview, setLogoPreview] = useState<string | null>(null);
-    // const [logoFileName, setLogoFileName] = useState<string | null>(null);
-
-    const avatarInputRef = useRef<HTMLInputElement | null>(null);
-    const logoInputRef = useRef<HTMLInputElement | null>(null);
-
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -269,34 +260,9 @@ export default function CreateCard() {
     const validItems = data.galleries.filter((item: Gallery) => item.file && item.path);
     const ValidServiceItems = data.services.filter((item: Service) => item.file && item.path);
 
-    const handleFileChange = (field: 'avatar' | 'logo') => (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (field: 'avatar' | 'logo') => (e) => {
         const file = e.target.files?.[0];
-        // console.log(file);
-        // if (file && file.type.startsWith('image/')) {
-        //     const previewUrl = URL.createObjectURL(file);
-        //     if (field === 'avatar') {
-        //         if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-        //         setAvatarPreview(previewUrl);
-        //         setAvatarFileName(file.name);
-        //         setData('avatar', file);
-        //     } else {
-        //         if (logoPreview) URL.revokeObjectURL(logoPreview);
-        //         setLogoPreview(previewUrl);
-        //         setLogoFileName(file.name);
-        //         setData('logo', file);
-        //     }
-        // } else {
-        //     if (field === 'avatar') {
-        //         setAvatarPreview(null);
-        //         setAvatarFileName(null);
-        //         setData('avatar', null);
-        //     } else {
-        //         setLogoPreview(null);
-        //         setLogoFileName(null);
-        //         setData('logo', null);
-        //     }
-        //     if (file) alert('Please select an image file (e.g., PNG, JPEG)');
-        // }
+
         if (field === 'avatar') {
             const newAvatar = {
                 file: file,
@@ -327,7 +293,6 @@ export default function CreateCard() {
             onError: (errors) => {
                 console.log('Upload errors:', errors);
             },
-            // Ensure multipart/form-data is used (Inertia does this automatically with files)
             preserveState: true,
             preserveScroll: true,
         });
@@ -335,49 +300,11 @@ export default function CreateCard() {
 
     const removeFile = (field: 'avatar' | 'logo') => {
         if (field === 'avatar') {
-            // setAvatarPreview(null);
-            // setAvatarFileName(null);
             setData('avatar', { file: null, path: null });
         } else {
-            // setLogoPreview(null);
-            // setLogoFileName(null);
             setData('logo', { file: null, path: null });
         }
     };
-
-    // const openFileDialog = (field: 'avatar' | 'logo') => {
-    //     console.log('Opening file dialog', field);
-    //     // const ref = field === 'avatar' ? avatarInputRef : logoInputRef;
-    //     let ref = null;
-    //     if (field == 'avatar') ref = avatarInputRef;
-    //     else if (field == 'logo') ref = logoInputRef;
-
-    //     console.log(ref);
-    //     if (ref?.current) {
-    //         ref.current.click();
-    //     }
-    // };
-    //
-    // Functions to trigger clicks on the inputs
-    const triggerAvatarInputClick = () => {
-        if (avatarInputRef.current) {
-            avatarInputRef.current.click(); // Programmatically click the avatar input
-        }
-    };
-
-    const triggerLogoInputClick = () => {
-        if (logoInputRef.current) {
-            logoInputRef.current.click(); // Programmatically click the logo input
-        }
-    };
-
-    // Cleanup preview URLs on unmount
-    // useEffect(() => {
-    //     return () => {
-    //         if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-    //         if (logoPreview) URL.revokeObjectURL(logoPreview);
-    //     };
-    // }, [avatarPreview, logoPreview]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -396,7 +323,6 @@ export default function CreateCard() {
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
                     <div className="col-span-2 hidden rounded-lg border-2 p-2 shadow-xl md:block">
                         <MuluCard
-                            // previewUrl={avatarPreview}
                             avatar={data.avatar}
                             logo={data.logo}
                             first_name={data.first_name}
@@ -466,75 +392,6 @@ export default function CreateCard() {
                                                 </div>
                                             )}
                                         </div>
-                                        {/* <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
-                                            <div className="flex flex-col items-center justify-center">
-                                                <div className="rounded-lg bg-gray-100 p-4">
-                                                    <Upload className="text-muted-foreground mx-auto h-6 w-6" />
-                                                </div>
-                                                <p className="text-foreground mt-2 text-sm font-medium">Upload Avatar</p>
-
-                                                {avatarFileName ? (
-                                                    <div className="bg-muted/50 mx-auto mt-4 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border px-3 py-2">
-                                                        <span className="truncate text-sm">{avatarFileName}</span>
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => removeFile('avatar')}
-                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6 rounded-full p-0"
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                            <span className="sr-only">Remove file</span>
-                                                        </Button>
-                                                    </div>
-                                                ) : (
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => triggerAvatarInputClick()}
-                                                        className="mt-4"
-                                                    >
-                                                        Choose File
-                                                    </Button>
-                                                )}
-
-                                                <input
-                                                    ref={avatarInputRef}
-                                                    id="avatar-upload"
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleFileChange('avatar')}
-                                                    className="hidden"
-                                                />
-                                                <InputError message={errors.avatar} className="mt-2" />
-                                            </div>
-                                        </div> */}
-                                        {/* <div className="rounded-lg border-2 p-8 text-center">
-                                            <Upload className="mx-auto h-6 w-12 text-gray-400" />
-                                            <p className="mt-2 text-sm text-gray-600">Upload Logo</p>
-
-                                            <div className="mt-4 flex flex-row items-center justify-center gap-4 rounded-lg border-2 bg-gray-200 px-4">
-                                                <Label htmlFor="logo-upload" className="px-4 py-2 text-sm font-medium text-black">
-                                                    {logoFileName ? `${logoFileName}` : 'Choose File'}
-                                                </Label>
-                                                {logoFileName && (
-                                                    <X
-                                                        className="h-6 w-6 cursor-pointer text-gray-400"
-                                                        color="red"
-                                                        onClick={() => removeFile('logo')}
-                                                    />
-                                                )}
-                                            </div>
-                                            <Input
-                                                id="logo-upload"
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileChange('logo')}
-                                                className="hidden"
-                                            />
-                                            <InputError message={errors.logo} className="mt-2" />
-                                        </div> */}
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
@@ -570,51 +427,6 @@ export default function CreateCard() {
                                             )}
                                         </div>
 
-                                        {/* <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
-                                            <div className="flex flex-col items-center justify-center">
-                                                <div className="rounded-lg bg-gray-100 p-4">
-                                                    <Upload className="text-muted-foreground mx-auto h-6 w-6" />
-                                                </div>
-                                                <p className="text-foreground mt-2 text-sm font-medium">Logo Avatar</p>
-
-                                                {logoFileName ? (
-                                                    <div className="bg-muted/50 mx-auto mt-4 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border px-3 py-2">
-                                                        <span className="truncate text-sm">{logoFileName}</span>
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => removeFile('logo')}
-                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6 rounded-full p-0"
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                            <span className="sr-only">Remove file</span>
-                                                        </Button>
-                                                    </div>
-                                                ) : (
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => triggerLogoInputClick()}
-                                                        className="mt-4"
-                                                    >
-                                                        Choose File
-                                                    </Button>
-                                                )}
-
-                                                <input
-                                                    ref={logoInputRef}
-                                                    id="logo-upload"
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleFileChange('logo')}
-                                                    className="hidden"
-                                                />
-                                                <InputError message={errors.logo} className="mt-2" />
-                                            </div>
-                                        </div> */}
-                                        {/* image end */}
                                         <div className="flex flex-row flex-wrap gap-2 rounded-lg border-2 p-2">
                                             {colors.map((color, index) => (
                                                 <div key={index} className="cursor-pointer rounded-full border-2 p-2">
@@ -867,23 +679,10 @@ export default function CreateCard() {
                                                                 <Button
                                                                     type="button"
                                                                     variant="ghost"
-                                                                    // onClick={() => removeTimeSlot(day, index)}
                                                                     disabled={schedule[day].timeSlots.length <= 1}
-                                                                >
-                                                                    {/* <Trash2 className="h-4 w-4" /> */}
-                                                                </Button>
+                                                                ></Button>
                                                             </div>
                                                         ))}
-
-                                                        {/* <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="mt-2"
-                                                            onClick={() => addTimeSlot(day)}
-                                                        >
-                                                            <Plus className="mr-2 h-4 w-4" /> Add time slot
-                                                        </Button> */}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted-foreground italic">Closed</div>
