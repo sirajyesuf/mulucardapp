@@ -51,8 +51,7 @@ export default function Dashboard() {
     function showCardDetail(url: string) {
         router.get(route('card.show', { url: url }));
     }
-    const cards = props.cards as CardList | undefined; // Type assertion with fallback
-    console.log(cards);
+    const cards = props.cards as CardList | undefined;
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -65,9 +64,9 @@ export default function Dashboard() {
                     <span className="text-md font-bold capitalize">new card</span>
                 </Link>
             </div>
-            <div className="grid h-full flex-1 grid-cols-1 items-center justify-center gap-2 rounded-xl p-4 md:grid-cols-2">
+            <div className="flex h-full flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-xl border-2 p-2">
                 {cards?.map((card, index) => (
-                    <ScrollArea className="h-[600px] w-full cursor-pointer rounded-md border md:w-[500px]">
+                    <ScrollArea className="h-[600px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
                         <div className="" key={index} onClick={() => showCardDetail(card.url)}>
                             <MuluCard
                                 previewUrl={card.avatar}
