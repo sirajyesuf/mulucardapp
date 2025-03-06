@@ -57,6 +57,8 @@ export interface Card {
     location: string;
     address: string;
     headline: string;
+    galleries: Gallery[];
+    services: Service[];
 }
 
 type TimeSlot = {
@@ -72,6 +74,11 @@ type DaySchedule = {
 export type WeekSchedule = {
     [key: string]: DaySchedule;
 };
+
+export interface Image {
+    file: File | null;
+    path: string | null;
+}
 
 export interface Gallery {
     id: string;

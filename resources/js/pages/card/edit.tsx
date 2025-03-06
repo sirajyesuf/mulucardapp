@@ -1,4 +1,3 @@
-import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,7 +10,7 @@ import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, LoaderCircle, Upload, X } from 'lucide-react';
-import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -29,14 +28,12 @@ interface CardForm {
     email: string;
     phone: string;
     banner_color: string;
-    links: {
-        name: string;
-        url: string;
-        placeholder: string;
-    }[];
+    links: { name: string; url: string; placeholder: string }[];
     location: string;
     address: string;
     headline: string;
+    galleries: any[];
+    services: any[];
 }
 
 interface EditCardProps {
@@ -72,10 +69,12 @@ export default function EditCard({ card }: EditCardProps) {
         phone: card.phone || '',
         email: card.email || '',
         banner_color: card.banner_color || colors[0],
-        links: Array.isArray(card.links) && card.links.length > 0 ? card.links : defaultLinks, // Safe check
+        links: card.links?.length > 0 ? card.links : defaultLinks,
         address: card.address || '',
         location: card.location || '',
         headline: card.headline || '',
+        services: card.services || [],
+        galleries: card.galleries || [],
     });
 
     const handleFileChange = (field: 'avatar' | 'logo') => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +108,7 @@ export default function EditCard({ card }: EditCardProps) {
         }
     };
 
-    const submit: FormEventHandler = (event) => {
+    const submit = (event: FormEvent) => {
         event.preventDefault();
         put(route('card.update', card.id), {
             onSuccess: () => {
@@ -124,12 +123,11 @@ export default function EditCard({ card }: EditCardProps) {
     };
 
     const removeFile = (field: 'avatar' | 'logo') => {
-        console.log(field);
         if (field === 'avatar') {
             if (avatarPreview && avatarPreview !== card.avatar) URL.revokeObjectURL(avatarPreview);
-            // setAvatarPreview(typeof card.avatar === 'string' ? card.avatar : null);
+            setAvatarPreview(typeof card.avatar === 'string' ? card.avatar : null);
             setAvatarFileName(null);
-            // setData('avatar', card.avatar);
+            setData('avatar', card.avatar);
         } else {
             if (logoPreview && logoPreview !== card.logo) URL.revokeObjectURL(logoPreview);
             setLogoPreview(typeof card.logo === 'string' ? card.logo : null);
@@ -160,42 +158,51 @@ export default function EditCard({ card }: EditCardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Card" />
-            <form onSubmit={submit}>
-                <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
-                    <Button variant="destructive" className="cursor-pointer" asChild>
+            <form onSubmit={submit} className="space-y-6 p-4">
+                <div className="flex justify-between gap-4">
+                    <Button variant="destructive" asChild>
                         <a href="/dashboard">Cancel</a>
                     </Button>
-                    <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    <Button type="submit" disabled={processing} className="bg-green-600 text-white">
+                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Update Card
                     </Button>
                 </div>
-                <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden rounded-lg border-2 p-2 shadow-xl md:block">
-                        <MuluCard
-                            previewUrl={avatarPreview}
-                            previewLogo={logoPreview}
-                            first_name={data.first_name}
-                            last_name={data.last_name}
-                            organization={data.organization}
-                            job_title={data.job_title}
-                            phone={data.phone}
-                            email={data.email}
-                            banner_color={data.banner_color}
-                            links={data.links}
-                            address={data.address}
-                            location={data.location}
-                            headline={data.headline}
-                        />
+
+                <div className="grid gap-6 md:grid-cols-5">
+                    <div className="hidden md:col-span-2 md:block">
+                        <Card className="sticky top-4">
+                            <CardContent className="p-4">
+                                <MuluCard
+                                    previewUrl={avatarPreview}
+                                    previewLogo={logoPreview}
+                                    first_name={data.first_name}
+                                    last_name={data.last_name}
+                                    organization={data.organization}
+                                    job_title={data.job_title}
+                                    phone={data.phone}
+                                    email={data.email}
+                                    banner_color={data.banner_color}
+                                    links={data.links}
+                                    address={data.address}
+                                    location={data.location}
+                                    headline={data.headline}
+                                    galleries={data.galleries}
+                                    services={data.services}
+                                />
+                            </CardContent>
+                        </Card>
                     </div>
-                    <div className="col-span-3 border-none p-2">
-                        <Tabs defaultValue="display" className="w-full">
+
+                    <div className="md:col-span-3">
+                        <Tabs defaultValue="personal_information" className="w-full">
                             <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="display">Display</TabsTrigger>
                                 <TabsTrigger value="personal_information">Information</TabsTrigger>
                                 <TabsTrigger value="links">Links</TabsTrigger>
                                 <TabsTrigger value="location">Location</TabsTrigger>
                             </TabsList>
+
                             <TabsContent value="display">
                                 <Card>
                                     <CardHeader>
@@ -246,7 +253,6 @@ export default function EditCard({ card }: EditCardProps) {
                                                     onChange={handleFileChange('avatar')}
                                                     className="hidden"
                                                 />
-                                                <InputError message={errors.avatar} className="mt-2" />
                                             </div>
                                         </div>
 
@@ -293,7 +299,6 @@ export default function EditCard({ card }: EditCardProps) {
                                                     onChange={handleFileChange('logo')}
                                                     className="hidden"
                                                 />
-                                                <InputError message={errors.logo} className="mt-2" />
                                             </div>
                                         </div>
 
@@ -315,52 +320,37 @@ export default function EditCard({ card }: EditCardProps) {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
+
                             <TabsContent value="personal_information">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Personal</CardTitle>
-                                        <CardDescription>Update your personal information.</CardDescription>
+                                        <CardTitle>Personal Information</CardTitle>
+                                        <CardDescription>Update your personal details</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
-                                            <div className="space-y-1">
-                                                <Label htmlFor="fname">First Name</Label>
-                                                <div className="relative">
-                                                    <Input
-                                                        id="fname"
-                                                        value={data.first_name}
-                                                        onChange={(e) => setData('first_name', e.target.value)}
-                                                        disabled={processing}
-                                                        className="pr-8" // Adds padding-right to avoid overlap with the X button
-                                                    />
-                                                    {data.first_name && !processing && (
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive absolute top-1/2 right-2 h-4 h-6 w-4 w-6 -translate-y-1/2 transform rounded-full p-0"
-                                                            onClick={() => setData('first_name', '')}
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                        </Button>
-                                                    )}
-                                                </div>
-
-                                                <InputError message={errors.first_name} className="mt-2" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label htmlFor="lname">Last Name</Label>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="first_name">First Name</Label>
                                                 <Input
-                                                    id="lname"
+                                                    id="first_name"
+                                                    value={data.first_name}
+                                                    onChange={(e) => setData('first_name', e.target.value)}
+                                                    disabled={processing}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="last_name">Last Name</Label>
+                                                <Input
+                                                    id="last_name"
                                                     value={data.last_name}
                                                     onChange={(e) => setData('last_name', e.target.value)}
                                                     disabled={processing}
                                                 />
-                                                <InputError message={errors.last_name} className="mt-2" />
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
-                                            <div className="space-y-1">
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="organization">Organization</Label>
                                                 <Input
                                                     id="organization"
@@ -368,22 +358,20 @@ export default function EditCard({ card }: EditCardProps) {
                                                     onChange={(e) => setData('organization', e.target.value)}
                                                     disabled={processing}
                                                 />
-                                                <InputError message={errors.organization} className="mt-2" />
                                             </div>
-                                            <div className="space-y-1">
-                                                <Label htmlFor="jobtitle">Job Title</Label>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="job_title">Job Title</Label>
                                                 <Input
-                                                    id="jobtitle"
+                                                    id="job_title"
                                                     value={data.job_title}
                                                     onChange={(e) => setData('job_title', e.target.value)}
                                                     disabled={processing}
                                                 />
-                                                <InputError message={errors.job_title} className="mt-2" />
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
-                                            <div className="space-y-1">
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="phone">Phone</Label>
                                                 <Input
                                                     id="phone"
@@ -392,9 +380,8 @@ export default function EditCard({ card }: EditCardProps) {
                                                     onChange={(e) => setData('phone', e.target.value)}
                                                     disabled={processing}
                                                 />
-                                                <InputError message={errors.phone} className="mt-2" />
                                             </div>
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="email">Email</Label>
                                                 <Input
                                                     id="email"
@@ -403,46 +390,45 @@ export default function EditCard({ card }: EditCardProps) {
                                                     onChange={(e) => setData('email', e.target.value)}
                                                     disabled={processing}
                                                 />
-                                                <InputError message={errors.email} className="mt-2" />
                                             </div>
                                         </div>
 
-                                        <div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="headline">Headline</Label>
                                             <Textarea
-                                                className="h-30 w-full"
-                                                placeholder="Enter your headline text"
+                                                id="headline"
                                                 value={data.headline}
                                                 onChange={(e) => setData('headline', e.target.value)}
+                                                disabled={processing}
                                             />
-                                            <InputError message={errors.headline} className="mt-2" />
                                         </div>
                                     </CardContent>
                                 </Card>
                             </TabsContent>
+
                             <TabsContent value="links">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Links</CardTitle>
-                                        <CardDescription>Update your social media links.</CardDescription>
+                                        <CardTitle>Social Links</CardTitle>
+                                        <CardDescription>Manage your social media connections</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {data.links.map((link, index) => {
-                                            const Icon = socialIconMap[link.name.toLowerCase()] || null;
+                                            const Icon = socialIconMap[link.name.toLowerCase()];
                                             return (
-                                                <div key={index} className="space-y-2 rounded-lg border-2 border-dashed p-2">
-                                                    <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
-                                                        {Icon && <Icon className="h-6 w-6" />}
-                                                        {link.name}
+                                                <div key={index} className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        {Icon && <Icon className="h-5 w-5" />}
+                                                        <Label className="capitalize">{link.name}</Label>
                                                     </div>
                                                     <Input
                                                         type="url"
-                                                        className="h-[50px] w-full"
                                                         placeholder={link.placeholder}
                                                         value={link.url}
                                                         onChange={(e) => {
-                                                            const updatedLinks = [...data.links];
-                                                            updatedLinks[index] = { ...updatedLinks[index], url: e.target.value };
-                                                            setData('links', updatedLinks);
+                                                            const newLinks = [...data.links];
+                                                            newLinks[index].url = e.target.value;
+                                                            setData('links', newLinks);
                                                         }}
                                                         disabled={processing}
                                                     />
@@ -452,14 +438,15 @@ export default function EditCard({ card }: EditCardProps) {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
+
                             <TabsContent value="location">
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Location</CardTitle>
-                                        <CardDescription>Update your address and location details.</CardDescription>
+                                        <CardDescription>Update your location details</CardDescription>
                                     </CardHeader>
-                                    <CardContent className="space-y-2">
-                                        <div className="space-y-1">
+                                    <CardContent className="space-y-4">
+                                        <div className="space-y-2">
                                             <Label htmlFor="address">Address</Label>
                                             <Input
                                                 id="address"
@@ -467,9 +454,8 @@ export default function EditCard({ card }: EditCardProps) {
                                                 onChange={(e) => setData('address', e.target.value)}
                                                 disabled={processing}
                                             />
-                                            <InputError message={errors.address} className="mt-2" />
                                         </div>
-                                        <div className="space-y-1">
+                                        <div className="space-y-2">
                                             <Label htmlFor="location">Location</Label>
                                             <Input
                                                 id="location"
@@ -477,7 +463,6 @@ export default function EditCard({ card }: EditCardProps) {
                                                 onChange={(e) => setData('location', e.target.value)}
                                                 disabled={processing}
                                             />
-                                            <InputError message={errors.location} className="mt-2" />
                                         </div>
                                     </CardContent>
                                 </Card>

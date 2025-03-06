@@ -22,8 +22,8 @@ class CardRequest extends FormRequest
     public function rules(): array
     {
             return [
-                    'avatar' => 'required|image|max:2048',
-                    'logo' => 'required|image|max:2048',
+                    'avatar.file' => 'required|image|max:2048',
+                    'logo.file' => 'required|image|max:2048',
                     'first_name' => 'required|string|max:255',
                     'last_name' => 'required|string|max:255',
                     'organization' => 'required|string|max:255',

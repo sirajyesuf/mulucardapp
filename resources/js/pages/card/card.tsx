@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
-import { Gallery, Service } from '@/types';
+import { Gallery, Service, type Image } from '@/types';
 import { MapPin } from 'lucide-react';
 
 type MuluCardProps = {
     url: string;
-    previewUrl: any;
-    previewLogo: any;
+    avatar: Image;
+    logo: Image;
     first_name: string;
     last_name: string;
     organization: string;
@@ -22,14 +22,13 @@ type MuluCardProps = {
     }[];
     address: string;
     location: string;
-    // business_hours: WeekSchedule;
-    galleries: Gallery[]; // Add galleries here
+    galleries: Gallery[];
     services: Service[];
 };
 
 export default function MuluCard({
-    previewUrl,
-    previewLogo,
+    avatar,
+    logo,
     banner_color,
     links,
     first_name,
@@ -44,7 +43,6 @@ export default function MuluCard({
     galleries,
     services,
 }: MuluCardProps) {
-    console.log(services);
     return (
         <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
             <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
@@ -56,10 +54,10 @@ export default function MuluCard({
                 ></div>
                 <div className="relative -mt-14 flex flex-row justify-between border-none px-4">
                     <div className="bordr-white flex h-[100px] w-[100px] items-center justify-center rounded-full border-4 border-gray-500 bg-white">
-                        <img src={previewUrl} alt="" className="h-full w-full rounded-full border-none object-contain" />
+                        <img src={avatar.path} alt="" className="h-full w-full rounded-full border-none object-contain" />
                     </div>
                     <div className="flex h-[100px] w-[100px] items-center justify-center rounded-lg border-4 border-gray-500 bg-white">
-                        <img src={previewLogo} alt="" className="h-full w-full rounded-full border-none object-contain" />
+                        <img src={logo.path} alt="" className="h-full w-full rounded-full border-none object-contain" />
                     </div>
                 </div>
             </CardHeader>
@@ -172,12 +170,13 @@ export default function MuluCard({
 
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
                     <div className="flex items-center justify-center gap-2 p-2">
-                        <MapPin className="h-10 w-10" color={banner_color} />
-                        <p className="font-mute text-md">Alemnesh Plaza, 9th Floor, Bole, Addis Ababa, Ethiopia</p>
+                        <MapPin className="h-8 w-8" color={banner_color} />
+                        <p className="font-mute text-md">{address}</p>
                     </div>
                     <div className="cursor-pointer rounded-4xl p-2 text-center font-bold text-white" style={{ backgroundColor: banner_color }}>
-                        view on google map
-                        {location}
+                        <a href={location} className="capitalize">
+                            view on google map
+                        </a>
                     </div>
                 </div>
             </CardContent>

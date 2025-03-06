@@ -8,6 +8,7 @@ use App\Models\Card;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Http\Resources\CardResource;
 
 class CardController extends Controller
 {
@@ -20,11 +21,11 @@ class CardController extends Controller
 
         $validated = $request->validated();
 
-        $avatarPath = $request->file('avatar')
-            ? Storage::url($request->file('avatar')->store('avatars', 'public'))
+        $avatarPath = $request->file('avatar.file')
+            ? Storage::url($request->file('avatar.file')->store('avatars', 'public'))
             : null;
-        $logoPath = $request->file('logo')
-            ? Storage::url($request->file('logo')->store('logos', 'public'))
+        $logoPath = $request->file('logo.file')
+            ? Storage::url($request->file('logo.file')->store('logos', 'public'))
             : null;
         $url = $this->generateUniqueUrl();
         $qrCodePath = $this->generateQRCode($url,$request->banner_color);
@@ -82,6 +83,7 @@ class CardController extends Controller
     public function show($url)
     {
         $card = Card::where('url', $url)->with('socialLinks', 'galleries', 'services')->firstOrFail();
+        $card = new CardResource($card);
 
         return Inertia::render('card/show', ['card' => $card]);
     }
@@ -89,7 +91,7 @@ class CardController extends Controller
 
     public function edit($id)
     {
-        $card = Card::findOrFail($id);
+        $card = Card::with('socialLinks', 'galleries', 'services')->findOrFail($id);
 
         return Inertia::render('card/edit', ['card' => $card]);
     }

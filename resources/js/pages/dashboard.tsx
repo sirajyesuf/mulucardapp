@@ -1,6 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Gallery, type Service } from '@/types';
+import { type BreadcrumbItem, type Gallery, type Image, type Service } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import MuluCard from './card/card';
@@ -21,10 +21,11 @@ interface SocialLink {
     updated_at: string; // ISO 8601 date string
 }
 
-// Type for the card object
 interface Card {
     id: number;
     url: string;
+    avatar: Image;
+    logo: Image;
     user_id: number;
     first_name: string;
     last_name: string;
@@ -32,26 +33,25 @@ interface Card {
     job_title: string;
     email: string | null;
     phone: string | null;
-    avatar: string | null; // Path to avatar file or null
-    logo: string | null; // Path to logo file or null
-    banner_color: string | null; // Hex color code or null
-    created_at: string; // ISO 8601 date string
-    updated_at: string; // ISO 8601 date string
+    banner_color: string | null;
+    created_at: string;
+    updated_at: string;
     social_links: SocialLink[];
     headline: string;
     services: Service[];
     galleries: Gallery[];
 }
 
-// Type for the array of cards
 type CardList = Card[];
-export default function Dashboard() {
-    const { props } = usePage();
 
+export default function Dashboard() {
     function showCardDetail(url: string) {
         router.get(route('card.show', { url: url }));
     }
-    const cards = props.cards as CardList | undefined;
+    const { props } = usePage();
+    const cards = props.cards as CardList;
+    console.log(cards);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -65,12 +65,12 @@ export default function Dashboard() {
                 </Link>
             </div>
             <div className="flex h-full flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-xl border-2 p-2">
-                {cards?.map((card, index) => (
+                {cards.map((card, index) => (
                     <ScrollArea className="h-[600px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
                         <div className="" key={index} onClick={() => showCardDetail(card.url)}>
                             <MuluCard
-                                previewUrl={card.avatar}
-                                previewLogo={card.logo}
+                                avatar={card.avatar}
+                                logo={card.logo}
                                 first_name={card.first_name}
                                 last_name={card.last_name}
                                 organization={card.organization}
@@ -78,7 +78,7 @@ export default function Dashboard() {
                                 email={card.email}
                                 phone={card.phone}
                                 banner_color={card.banner_color}
-                                links={card.social_links}
+                                links={card.links}
                                 headline={card.headline}
                                 services={card.services}
                                 galleries={card.galleries}

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Gallery, type Service } from '@/types';
+import { type BreadcrumbItem, type Card as CardType } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { Check, Copy, Download, Edit } from 'lucide-react';
 import { useState } from 'react';
@@ -18,44 +18,13 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
-// Type for individual social link
-interface SocialLink {
-    id: number;
-    name: string;
-    url: string;
-    card_id: number;
-    created_at: string; // ISO 8601 date string
-    updated_at: string; // ISO 8601 date string
-}
-
-// Type for the card object
-type Card = {
-    id: number;
-    url: string;
-    user_id: number;
-    first_name: string;
-    last_name: string;
-    organization: string;
-    job_title: string;
-    email: string | null;
-    phone: string | null;
-    avatar: string | null; // Path to avatar file or null
-    logo: string | null; // Path to logo file or null
-    banner_color: string | null; // Hex color code or null
-    created_at: string; // ISO 8601 date string
-    updated_at: string; // ISO 8601 date string
-    social_links: SocialLink[];
-    headline: string;
-    qr_code: string;
-    galleries: Gallery[];
-    services: Service[];
-};
 
 export default function ShowCard() {
     const [isCopied, setIsCopied] = useState(false);
     const { props } = usePage();
-    const card = props.card as Card | undefined;
+    const card = props.card as CardType;
     console.log(card);
+
     const { data, setData, post, get, errors, reset } = useForm({
         personalizedurl: '',
     });
@@ -129,8 +98,8 @@ export default function ShowCard() {
                 <div className="hidden rounded-lg border-2 p-4 md:block">
                     <div className="col-span-1 rounded-lg border-2 p-2 shadow-xl">
                         <MuluCard
-                            previewUrl={card?.avatar}
-                            previewLogo={card?.logo}
+                            avatar={card?.avatar}
+                            logo={card?.logo}
                             first_name={card?.first_name}
                             last_name={card?.last_name}
                             organization={card?.organization}

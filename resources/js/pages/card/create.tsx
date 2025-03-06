@@ -10,15 +10,15 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import { type BreadcrumbItem, type Gallery, type Service, type WeekSchedule } from '@/types';
+import { type BreadcrumbItem, type Gallery, type Image, type Service, type WeekSchedule } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Clock, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
-import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
-    avatar: File | null;
-    logo: File | null;
+    avatar: Image;
+    logo: Image;
     first_name: string;
     last_name: string;
     organization: string;
@@ -40,10 +40,12 @@ interface CardForm {
 }
 
 export default function CreateCard() {
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const [logoPreview, setLogoPreview] = useState<string | null>(null);
-    const [avatarFileName, setAvatarFileName] = useState<string | null>(null);
-    const [logoFileName, setLogoFileName] = useState<string | null>(null);
+    // const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    // const [avatarFileName, setAvatarFileName] = useState<string | null>(null);
+
+    // const [logoPreview, setLogoPreview] = useState<string | null>(null);
+    // const [logoFileName, setLogoFileName] = useState<string | null>(null);
+
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
     const logoInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -110,9 +112,15 @@ export default function CreateCard() {
         });
     };
 
-    const { data, setData, post, processing, errors, hasErrors } = useForm<CardForm>({
-        avatar: '',
-        logo: '',
+    const { data, setData, post, processing, errors } = useForm<CardForm>({
+        avatar: {
+            file: null,
+            path: null,
+        },
+        logo: {
+            file: null,
+            path: null,
+        },
         first_name: '',
         last_name: '',
         organization: '',
@@ -263,35 +271,54 @@ export default function CreateCard() {
 
     const handleFileChange = (field: 'avatar' | 'logo') => (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && file.type.startsWith('image/')) {
-            const previewUrl = URL.createObjectURL(file);
-            if (field === 'avatar') {
-                if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-                setAvatarPreview(previewUrl);
-                setAvatarFileName(file.name);
-                setData('avatar', file);
-            } else {
-                if (logoPreview) URL.revokeObjectURL(logoPreview);
-                setLogoPreview(previewUrl);
-                setLogoFileName(file.name);
-                setData('logo', file);
-            }
-        } else {
-            if (field === 'avatar') {
-                setAvatarPreview(null);
-                setAvatarFileName(null);
-                setData('avatar', null);
-            } else {
-                setLogoPreview(null);
-                setLogoFileName(null);
-                setData('logo', null);
-            }
-            if (file) alert('Please select an image file (e.g., PNG, JPEG)');
+        // console.log(file);
+        // if (file && file.type.startsWith('image/')) {
+        //     const previewUrl = URL.createObjectURL(file);
+        //     if (field === 'avatar') {
+        //         if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+        //         setAvatarPreview(previewUrl);
+        //         setAvatarFileName(file.name);
+        //         setData('avatar', file);
+        //     } else {
+        //         if (logoPreview) URL.revokeObjectURL(logoPreview);
+        //         setLogoPreview(previewUrl);
+        //         setLogoFileName(file.name);
+        //         setData('logo', file);
+        //     }
+        // } else {
+        //     if (field === 'avatar') {
+        //         setAvatarPreview(null);
+        //         setAvatarFileName(null);
+        //         setData('avatar', null);
+        //     } else {
+        //         setLogoPreview(null);
+        //         setLogoFileName(null);
+        //         setData('logo', null);
+        //     }
+        //     if (file) alert('Please select an image file (e.g., PNG, JPEG)');
+        // }
+        if (field === 'avatar') {
+            const newAvatar = {
+                file: file,
+                path: file ? URL.createObjectURL(file) : null,
+            };
+
+            setData('avatar', newAvatar);
+        }
+
+        if (field === 'logo') {
+            const newLogo = {
+                file: file,
+                path: file ? URL.createObjectURL(file) : null,
+            };
+
+            setData('logo', newLogo);
         }
     };
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
+        console.log(data);
 
         post(route('card.store'), {
             onSuccess: () => {
@@ -308,13 +335,13 @@ export default function CreateCard() {
 
     const removeFile = (field: 'avatar' | 'logo') => {
         if (field === 'avatar') {
-            setAvatarPreview(null);
-            setAvatarFileName(null);
-            setData('avatar', null);
+            // setAvatarPreview(null);
+            // setAvatarFileName(null);
+            setData('avatar', { file: null, path: null });
         } else {
-            setLogoPreview(null);
-            setLogoFileName(null);
-            setData('logo', null);
+            // setLogoPreview(null);
+            // setLogoFileName(null);
+            setData('logo', { file: null, path: null });
         }
     };
 
@@ -345,12 +372,12 @@ export default function CreateCard() {
     };
 
     // Cleanup preview URLs on unmount
-    useEffect(() => {
-        return () => {
-            if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-            if (logoPreview) URL.revokeObjectURL(logoPreview);
-        };
-    }, [avatarPreview, logoPreview]);
+    // useEffect(() => {
+    //     return () => {
+    //         if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    //         if (logoPreview) URL.revokeObjectURL(logoPreview);
+    //     };
+    // }, [avatarPreview, logoPreview]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -369,8 +396,9 @@ export default function CreateCard() {
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
                     <div className="col-span-2 hidden rounded-lg border-2 p-2 shadow-xl md:block">
                         <MuluCard
-                            previewUrl={avatarPreview}
-                            previewLogo={logoPreview}
+                            // previewUrl={avatarPreview}
+                            avatar={data.avatar}
+                            logo={data.logo}
                             first_name={data.first_name}
                             last_name={data.last_name}
                             organization={data.organization}
@@ -382,7 +410,7 @@ export default function CreateCard() {
                             address={data.address}
                             location={data.location}
                             headline={data.headline}
-                            business_hours={schedule}
+                            // business_hours={schedule}
                             galleries={validItems}
                             services={ValidServiceItems}
                         />
@@ -405,34 +433,40 @@ export default function CreateCard() {
                                         <CardDescription>Make changes to your account here.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        {/* image start */}
-                                        {/* <div className="rounded-lg border-2 p-8 text-center">
-                                            <Upload className="mx-auto h-6 w-12 text-gray-400" />
-                                            <p className="mt-2 text-sm text-gray-600">Upload Avatar</p>
-                                            <div className="mt-4 flex flex-row items-center justify-center gap-4 rounded-lg border-2 bg-gray-200 px-4">
-                                                <Label htmlFor="avatar-upload" className="px-4 py-2 text-sm font-medium text-black">
-                                                    {avatarFileName ? `${avatarFileName}` : 'Choose File'}
-                                                </Label>
-                                                {avatarFileName && (
-                                                    <X
-                                                        className="h-6 w-6 cursor-pointer text-gray-400"
-                                                        color="red"
-                                                        onClick={() => removeFile('avatar')}
+                                        <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
+                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
+                                                Upload Your Avatar
+                                            </Label>
+                                            {data.avatar.file ? (
+                                                <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
+                                                    <span className="flex-1 truncate">{data.avatar.file.name}</span>
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('avatar')}>
+                                                        <X className="h-4 w-4" />
+                                                        <span className="sr-only">Remove file</span>
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center">
+                                                    <Input
+                                                        id="avatar-upload"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={handleFileChange('avatar')}
                                                     />
-                                                )}
-                                            </div>
-
-                                            <Input
-                                                id="avatar-upload"
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileChange('avatar')}
-                                                className="hidden"
-                                            />
-                                            <InputError message={errors.avatar} className="mt-2" />
-                                        </div> */}
-
-                                        <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <Upload className="h-4 w-4" />
+                                                        Select Image
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {/* <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="rounded-lg bg-gray-100 p-4">
                                                     <Upload className="text-muted-foreground mx-auto h-6 w-6" />
@@ -475,7 +509,7 @@ export default function CreateCard() {
                                                 />
                                                 <InputError message={errors.avatar} className="mt-2" />
                                             </div>
-                                        </div>
+                                        </div> */}
                                         {/* <div className="rounded-lg border-2 p-8 text-center">
                                             <Upload className="mx-auto h-6 w-12 text-gray-400" />
                                             <p className="mt-2 text-sm text-gray-600">Upload Logo</p>
@@ -502,7 +536,41 @@ export default function CreateCard() {
                                             <InputError message={errors.logo} className="mt-2" />
                                         </div> */}
 
-                                        <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
+                                        <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
+                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
+                                                Logo Your Avatar
+                                            </Label>
+                                            {data.logo.file ? (
+                                                <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
+                                                    <span className="flex-1 truncate">{data.logo.file.name}</span>
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('avatar')}>
+                                                        <X className="h-4 w-4" />
+                                                        <span className="sr-only">Remove file</span>
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center">
+                                                    <Input
+                                                        id="logo-upload"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={handleFileChange('logo')}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => document.getElementById('logo-upload')?.click()}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <Upload className="h-4 w-4" />
+                                                        Select Image
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* <div className="w-full rounded-lg border-2 p-6 text-center hover:border-dashed">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="rounded-lg bg-gray-100 p-4">
                                                     <Upload className="text-muted-foreground mx-auto h-6 w-6" />
@@ -545,7 +613,7 @@ export default function CreateCard() {
                                                 />
                                                 <InputError message={errors.logo} className="mt-2" />
                                             </div>
-                                        </div>
+                                        </div> */}
                                         {/* image end */}
                                         <div className="flex flex-row flex-wrap gap-2 rounded-lg border-2 p-2">
                                             {colors.map((color, index) => (
