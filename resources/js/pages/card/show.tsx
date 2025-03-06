@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type Gallery, type Service } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { Check, Copy, Download, Edit } from 'lucide-react';
 import { useState } from 'react';
@@ -47,6 +47,8 @@ type Card = {
     social_links: SocialLink[];
     headline: string;
     qr_code: string;
+    galleries: Gallery[];
+    services: Service[];
 };
 
 export default function ShowCard() {
@@ -140,6 +142,8 @@ export default function ShowCard() {
                             address={card?.address}
                             location={card?.location}
                             headline={card?.headline}
+                            services={card?.services}
+                            galleries={card?.galleries}
                         />
                     </div>
                 </div>

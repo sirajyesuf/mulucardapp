@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
-import { Gallery, Service, WeekSchedule } from '@/types';
+import { Gallery, Service } from '@/types';
 import { MapPin } from 'lucide-react';
 
 type MuluCardProps = {
@@ -22,7 +22,7 @@ type MuluCardProps = {
     }[];
     address: string;
     location: string;
-    business_hours: WeekSchedule;
+    // business_hours: WeekSchedule;
     galleries: Gallery[]; // Add galleries here
     services: Service[];
 };
@@ -41,7 +41,6 @@ export default function MuluCard({
     headline,
     address,
     location,
-    business_hours,
     galleries,
     services,
 }: MuluCardProps) {
