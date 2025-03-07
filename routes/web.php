@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HelloController;
-
-
+use Inertia\Inertia;
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
@@ -33,3 +32,4 @@ Route::middleware(['auth'])->group(function(){
 
 
 Route::get("/hello/{url}",[HelloController::class,"index"])->name("card.hello");
+Route::get('/card/{id}/vcard', [CardController::class, 'downloadVCard'])->name('card.vcard');

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Resources\CardResource;
-
+use JeroenDesloovere\VCard\VCard;
 class CardController extends Controller
 {
     public function create(){
@@ -150,6 +150,49 @@ class CardController extends Controller
         $card->delete();
 
         return redirect()->route('card.create');
+    }
+
+    public function downloadVCard($id){
+
+        $card = Card::findOrFail($id);
+
+        // Create a new vCard instance
+        $vcard = new VCard();
+
+        // Add personal data
+        $vcard->addName($card->last_name, $card->first_name);
+        $vcard->addEmail($card->email);
+        $vcard->addPhoneNumber($card->phone, 'WORK');
+        $vcard->addCompany($card->organization);
+        $vcard->addJobtitle($card->job_title);
+        // $vcard->addAddress(null, null, $card->address, $card->location);
+
+        // Add social links (optional, non-standard but supported by some clients)
+        foreach ($card->socialLinks ?? [] as $link) {
+            if (!empty($link['url'])) {
+                $vcard->addUrl($link['url'], strtoupper($link['name']));
+            }
+        }
+
+        // Optionally add a photo (if avatar exists)
+        if (!empty($card->avatar)) {
+            $avatarPath = storage_path('app/public/' . $card->avatar);
+            if (file_exists($avatarPath)) {
+                $vcard->addPhoto($avatarPath);
+            }
+        }
+
+        // Generate the vCard content
+        // $vcardContent = $vcard->getOutput();
+
+        // Return as a downloadable file
+        // return response($vcardContent, 200, [
+        //     'Content-Type' => 'text/vcard',
+        //     'Content-Disposition' => 'attachment; filename="contact.vcf"',
+        // ]);
+        //
+        return $vcard->download();
+
     }
 
    protected  function generateUniqueUrl($length = 8) {
