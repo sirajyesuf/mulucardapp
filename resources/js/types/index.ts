@@ -40,8 +40,8 @@ export interface User {
 }
 
 export interface Card {
-    avatar: File | null | string;
-    logo: File | null | string;
+    avatar: Image;
+    logo: Image;
     first_name: string;
     last_name: string;
     organization: string;

@@ -46,9 +46,9 @@ class CardRequest extends FormRequest
                     'address' => 'required|string|max:255',
                     'location' => 'required|string|max:255',
                     // 'business_hours' => 'required|array|max:7',
-                    'galleries' => 'required|array', // Ensure galleries is an array and is required
-                    'galleries.*.file' => 'file|mimes:jpeg,png,jpg|max:2048', // File is optional, must be an image, max size 2MB
-                    'galleries.*.description' => 'required|string|max:500', // Description is required, must be a string, max 500 characters
+                    'galleries' => 'required|array',
+                    'galleries.*.file' => 'file|mimes:jpeg,png,jpg|max:2048',
+                    'galleries.*.description' => 'required|string|max:500',
                     'services' => 'required|array',
                     'services.*.file' => 'file|mimes:jpeg,png|max:2048',
                     'services.*.name' => 'required|string',

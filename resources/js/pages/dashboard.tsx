@@ -40,6 +40,8 @@ interface Card {
     headline: string;
     services: Service[];
     galleries: Gallery[];
+    address: string;
+    location: string;
 }
 
 type CardList = Card[];
@@ -82,6 +84,8 @@ export default function Dashboard() {
                                 headline={card.headline}
                                 services={card.services}
                                 galleries={card.galleries}
+                                address={card.address}
+                                location={card.location}
                             />
                         </div>
                     </ScrollArea>

@@ -1,11 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\DashboardController;
-use App\Models\Card;
+use App\Http\Controllers\HelloController;
 
 
 
@@ -33,9 +32,4 @@ Route::middleware(['auth'])->group(function(){
 });
 
 
-Route::get("/hello/{url}",function($url){
-
-    $card = Card::with('socialLinks', 'galleries', 'services')->where('url', $url)->first();
-
-    return Inertia::render('hello',["url"=>$url,"card"=>$card]);
-})->name("card.hello");
+Route::get("/hello/{url}",[HelloController::class,"index"])->name("card.hello");

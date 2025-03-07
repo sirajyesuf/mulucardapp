@@ -174,7 +174,7 @@ export default function MuluCard({
                         <p className="font-mute text-md">{address}</p>
                     </div>
                     <div className="cursor-pointer rounded-4xl p-2 text-center font-bold text-white" style={{ backgroundColor: banner_color }}>
-                        <a href={location} className="capitalize">
+                        <a href={location} target="_blank" className="capitalize">
                             view on google map
                         </a>
                     </div>

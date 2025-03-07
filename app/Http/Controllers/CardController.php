@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Http\Requests\Card\CardRequest as Request;
+use App\Http\Requests\Card\UpdateCardRequest as UpdateRequest;
 use App\Models\Card;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -92,17 +93,20 @@ class CardController extends Controller
     public function edit($id)
     {
         $card = Card::with('socialLinks', 'galleries', 'services')->findOrFail($id);
+        $card = new CardResource($card);
 
         return Inertia::render('card/edit', ['card' => $card]);
     }
 
-    public function update(Request $request,$id)
+    public function update(UpdateRequest $request,$id)
     {       $validated = $request->validated();
 
-            $card = Card::findOrFail($id);
+            dd($validated);
+
+            // $card = Card::findOrFail($id);
 
             // Update the card with validated data
-            $card->update($validated);
+            // $card->update($validated);
 
             // Handle file uploads if present
             // if ($request->hasFile('avatar')) {
@@ -112,7 +116,7 @@ class CardController extends Controller
             //     $card->logo = $request->file('logo')->store('logos', 'public');
             // }
 
-            $card->save();
+            // $card->save();
 
             return redirect()->route('card.show', $card->id)->with('success', 'Card updated successfully');
     }
