@@ -1,3 +1,4 @@
+import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Gallery, type Image, type Service } from '@/types';
@@ -59,12 +60,34 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex flex-row justify-end rounded-xl border-none p-2">
                 <Link
-                    className="hover:bg- flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-500 px-4 py-2 text-white shadow-none hover:bg-gray-700"
+                    className="flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 px-4 py-2 text-black shadow-none hover:bg-gray-100"
                     href="card/create"
                 >
                     <Plus width={30} height={30} />
                     <span className="text-md font-bold capitalize">new card</span>
                 </Link>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8 rounded-lg border-none border-gray-300 p-2 md:grid-cols-3">
+                <Card className="flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold capitalize">Number of cards</h1>
+                    <p className="text-2xl font-extrabold">100</p>
+                </Card>
+
+                <Card className="flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold capitalize">Number of active cards</h1>
+                    <p className="text-xl font-extrabold">100</p>
+                </Card>
+
+                <Card className="flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold capitalize">Number of inactive cards</h1>
+                    <p className="text-2xl font-extrabold">100</p>
+                </Card>
+
+                {/* <Card className="flex flex-col items-center justify-center">
+                    <h1 className="text-2xl font-bold">Number of cards</h1>
+                    <p className="text-4xl font-extrabold">100</p>
+                </Card> */}
             </div>
             <div className="flex h-full flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-xl border-2 p-2">
                 {cards.map((card, index) => (
