@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Card as CardType } from '@/types';
@@ -95,8 +96,8 @@ export default function ShowCard() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="grid h-full flex-1 grid-cols-1 gap-2 rounded-xl border-none p-4 md:grid-cols-3">
-                <div className="hidden rounded-lg border-2 p-4 md:block">
-                    <div className="col-span-1 rounded-lg border-2 p-2 shadow-xl">
+                <div className="col-span-1 hidden rounded-sm border-2 p-0 md:block">
+                    <ScrollArea className="h-[800px] pr-2">
                         <MuluCard
                             avatar={card?.avatar}
                             logo={card?.logo}
@@ -114,7 +115,7 @@ export default function ShowCard() {
                             services={card?.services}
                             galleries={card?.galleries}
                         />
-                    </div>
+                    </ScrollArea>
                 </div>
 
                 <div className="col-span-2 flex flex-col justify-between rounded-lg border-2 p-4">
