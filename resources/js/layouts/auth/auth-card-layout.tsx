@@ -17,7 +17,9 @@ export default function AuthCardLayout({
                 <Link href={route('home')} className="flex items-center gap-2 self-center font-medium">
                     <div className="flex h-9 w-9 items-center justify-center">
                         {/* <AppLogoIcon className="size-9 fill-current text-black dark:text-white" /> */}
-                        MuluCard
+                    <a href="/" className="flex items-center gap-[1px] text-xl font-semibold">
+                    <span className="text-brand-purple">Mulu</span><span>Card</span>
+                    </a>
                     </div>
                 </Link>
 

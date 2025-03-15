@@ -61,18 +61,12 @@ export interface Card {
     services: Service[];
 }
 
-type TimeSlot = {
+export type DaySchedule = {
+    id: string;
+    day: string;
+    isOpen: boolean;
     open: string;
     close: string;
-};
-
-type DaySchedule = {
-    isOpen: boolean;
-    timeSlots: TimeSlot[];
-};
-
-export type WeekSchedule = {
-    [key: string]: DaySchedule;
 };
 
 export interface Image {
@@ -93,4 +87,13 @@ export interface Service {
     path: string | null;
     name: string;
     description: string;
+}
+
+export interface Plan {
+    name:string;
+    price:string;
+    type:string;
+    number_of_vcard:string;
+    description:string
+    features:string[]
 }

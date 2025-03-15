@@ -89,7 +89,7 @@ export default function Dashboard() {
                     <p className="text-4xl font-extrabold">100</p>
                 </Card> */}
             </div>
-            <div className="flex h-full flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-xl border-2 p-2">
+            <div className="flex h-full flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-xl border-none p-2">
                 {cards.map((card, index) => (
                     <ScrollArea className="h-[600px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
                         <div className="" key={index} onClick={() => showCardDetail(card.url)}>

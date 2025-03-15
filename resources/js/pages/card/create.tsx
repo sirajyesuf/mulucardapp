@@ -3,17 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import { type BreadcrumbItem, type Gallery, type Image, type Service, type WeekSchedule } from '@/types';
+import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Service } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@radix-ui/react-select';
 import { Check, Clock, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
@@ -34,7 +34,7 @@ interface CardForm {
     location: string;
     address: string;
     headline: string;
-    business_hours: WeekSchedule[];
+    business_hours: DaySchedule[];
     galleries: Gallery[];
     services: Service[];
 }
@@ -43,64 +43,59 @@ export default function CreateCard() {
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    const [schedule, setSchedule] = useState<WeekSchedule>({
-        Monday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
-        Tuesday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
-        Wednesday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
-        Thursday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
-        Friday: { isOpen: true, timeSlots: [{ open: '09:00', close: '17:00' }] },
-        Saturday: { isOpen: false, timeSlots: [{ open: '10:00', close: '15:00' }] },
-        Sunday: { isOpen: false, timeSlots: [{ open: '10:00', close: '15:00' }] },
-    });
+    const timeOptions = [23, 5, 66, 78];
 
-    const timeOptions = [];
+    // for (let hour = 0; hour < 24; hour++) {
+    //     for (let minute = 0; minute < 60; minute += 30) {
+    //         const formattedHour = hour.toString().padStart(2, '0');
+    //         const formattedMinute = minute.toString().padStart(2, '0');
+    //         timeOptions.push(`${formattedHour}:${formattedMinute}`);
+    //     }
+    // }
+    console.log(timeOptions);
+    // const copyToAllDays = (fromDay: string) => {
+    //     const daySchedule = schedule[fromDay];
+    //     const updatedSchedule = { ...schedule };
 
-    for (let hour = 0; hour < 24; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-            const formattedHour = hour.toString().padStart(2, '0');
-            const formattedMinute = minute.toString().padStart(2, '0');
-            timeOptions.push(`${formattedHour}:${formattedMinute}`);
-        }
-    }
-    const copyToAllDays = (fromDay: string) => {
-        const daySchedule = schedule[fromDay];
-        const updatedSchedule = { ...schedule };
+    //     daysOfWeek.forEach((day) => {
+    //         if (day !== fromDay) {
+    //             updatedSchedule[day] = {
+    //                 isOpen: daySchedule.isOpen,
+    //                 timeSlots: [...daySchedule.timeSlots.map((slot) => ({ ...slot }))],
+    //             };
+    //         }
+    //     });
 
-        daysOfWeek.forEach((day) => {
-            if (day !== fromDay) {
-                updatedSchedule[day] = {
-                    isOpen: daySchedule.isOpen,
-                    timeSlots: [...daySchedule.timeSlots.map((slot) => ({ ...slot }))],
+    //     setSchedule(updatedSchedule);
+    // };
+    // const updateTimeSlot = (day: string, index: number, field: 'open' | 'close', value: string) => {
+    //     const updatedTimeSlots = [...schedule[day].timeSlots];
+    //     updatedTimeSlots[index] = {
+    //         ...updatedTimeSlots[index],
+    //         [field]: value,
+    //     };
+
+    //     setSchedule({
+    //         ...schedule,
+    //         [day]: {
+    //             ...schedule[day],
+    //             timeSlots: updatedTimeSlots,
+    //         },
+    //     });
+    // };
+
+    const toggleDayOpen = (day: DaySchedule) => {
+        const updatedSchedule = data.business_hours.map((item) => {
+            if (item.id === day.id) {
+                return {
+                    ...item,
+                    isOpen: !item.isOpen,
                 };
             }
+            return item;
         });
 
-        setSchedule(updatedSchedule);
-    };
-    const updateTimeSlot = (day: string, index: number, field: 'open' | 'close', value: string) => {
-        const updatedTimeSlots = [...schedule[day].timeSlots];
-        updatedTimeSlots[index] = {
-            ...updatedTimeSlots[index],
-            [field]: value,
-        };
-
-        setSchedule({
-            ...schedule,
-            [day]: {
-                ...schedule[day],
-                timeSlots: updatedTimeSlots,
-            },
-        });
-    };
-
-    const toggleDayOpen = (day: string) => {
-        setSchedule({
-            ...schedule,
-            [day]: {
-                ...schedule[day],
-                isOpen: !schedule[day].isOpen,
-            },
-        });
+        setData('business_hours', updatedSchedule);
     };
 
     const { data, setData, post, processing, errors } = useForm<CardForm>({
@@ -132,6 +127,15 @@ export default function CreateCard() {
         headline: '',
         galleries: [{ id: crypto.randomUUID(), file: null, path: null, description: '' }],
         services: [{ id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }],
+        business_hours: [
+            { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '', close: '' },
+            { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '', close: '' },
+            { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '', close: '' },
+            { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '', close: '' },
+            { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '', close: '' },
+            { id: crypto.randomUUID(), day: 'Saturday', isOpen: true, open: '', close: '' },
+            { id: crypto.randomUUID(), day: 'Sunday', isOpen: true, open: '', close: '' },
+        ],
     });
 
     const handleGalleryFileChange = (id: string, file: File | null) => {
@@ -611,78 +615,83 @@ export default function CreateCard() {
                                         <CardDescription>Set the operating hours for your organization</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
-                                        {daysOfWeek.map((day) => (
-                                            <div key={day} className="rounded-lg border p-4">
+                                        {data.business_hours.map((day: DaySchedule) => (
+                                            <div key={day.id} className="rounded-lg border p-4">
                                                 <div className="mb-4 flex items-center justify-between">
                                                     <div className="flex items-center space-x-2">
                                                         <Switch
-                                                            id={`${day}-toggle`}
-                                                            checked={schedule[day].isOpen}
+                                                            id={`${day.id}-toggle`}
+                                                            checked={day.isOpen}
                                                             onCheckedChange={() => toggleDayOpen(day)}
                                                         />
-                                                        <Label htmlFor={`${day}-toggle`} className="text-lg font-medium">
-                                                            {day}
+                                                        <Label htmlFor={`${day.id}-toggle`} className="text-lg font-medium">
+                                                            {day.day}
                                                         </Label>
                                                     </div>
-                                                    {schedule[day].isOpen && (
+                                                    {day.isOpen && (
                                                         <div className="flex items-center gap-2">
-                                                            <Button type="button" variant="outline" size="sm" onClick={() => copyToAllDays(day)}>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                // onClick={() => copyToAllDays(day)}
+                                                            >
                                                                 Apply to all days
                                                             </Button>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                {schedule[day].isOpen ? (
+                                                {day.isOpen ? (
                                                     <div className="space-y-3">
-                                                        {schedule[day].timeSlots.map((timeSlot, index) => (
-                                                            <div key={index} className="flex items-center gap-2">
-                                                                <div className="flex items-center">
-                                                                    <Clock className="text-muted-foreground mr-2 h-4 w-4" />
-                                                                    <Select
-                                                                        value={timeSlot.open}
-                                                                        onValueChange={(value) => updateTimeSlot(day, index, 'open', value)}
-                                                                    >
-                                                                        <SelectTrigger className="w-[120px]">
-                                                                            <SelectValue placeholder="Opening time" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            {timeOptions.map((time) => (
-                                                                                <SelectItem key={`open-${time}`} value={time}>
-                                                                                    {time}
-                                                                                </SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-
-                                                                <span className="text-muted-foreground">to</span>
-
-                                                                <div className="flex items-center">
-                                                                    <Select
-                                                                        value={timeSlot.close}
-                                                                        onValueChange={(value) => updateTimeSlot(day, index, 'close', value)}
-                                                                    >
-                                                                        <SelectTrigger className="w-[120px]">
-                                                                            <SelectValue placeholder="Closing time" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            {timeOptions.map((time) => (
-                                                                                <SelectItem key={`close-${time}`} value={time}>
-                                                                                    {time}
-                                                                                </SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    disabled={schedule[day].timeSlots.length <= 1}
-                                                                ></Button>
+                                                        {/* {schedule[day].timeSlots.map((timeSlot, index) => ( */}
+                                                        <div className="flex items-center gap-2 border-4">
+                                                            <div className="flex items-center">
+                                                                <Clock className="text-muted-foreground mr-2 h-4 w-4" />
+                                                                <Select
+                                                                    value={day.open}
+                                                                    // onValueChange={(value) => updateTimeSlot(day, index, 'open', value)}
+                                                                >
+                                                                    <SelectTrigger className="w-[120px]">
+                                                                        <SelectValue placeholder="Opening time" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent className="border border-red-900">
+                                                                        {timeOptions.map((time) => (
+                                                                            <SelectItem key={`open-${time}`} value={time}>
+                                                                                {time}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
                                                             </div>
-                                                        ))}
+
+                                                            <span className="text-muted-foreground">to</span>
+
+                                                            <div className="flex items-center">
+                                                                <Select
+                                                                    value={day.close}
+                                                                    // onValueChange={(value) => updateTimeSlot(day, index, 'close', value)}
+                                                                >
+                                                                    <SelectTrigger className="w-[120px]">
+                                                                        <SelectValue placeholder="Closing time" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {timeOptions.map((time) => (
+                                                                            <SelectItem key={`close-${time}`} value={time}>
+                                                                                {time}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                // disabled={day.timeSlots.length <= 1}
+                                                            ></Button>
+                                                        </div>
+                                                        {/* ))} */}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted-foreground italic">Closed</div>

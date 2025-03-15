@@ -110,6 +110,9 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    --brand-purple: #9b87f5;
+    --brand-purple-dark: #8670e0;
 }
 
 .dark {
@@ -162,10 +165,24 @@
 */
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+@layer utilities {
+    .bg-brand-purple {
+        background-color: var(--brand-purple);
+    }
+
+    .text-brand-purple {
+        color: var(--brand-purple);
+    }
+
+    .bg-brand-purple-dark {
+        background-color: var(--brand-purple-dark);
     }
 }
