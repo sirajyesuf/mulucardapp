@@ -72,7 +72,7 @@ export default function Dashboard() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 rounded-sm border-2 p-2 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 rounded-sm border-none p-2 md:grid-cols-3">
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
                     <h1 className="text-xl font-bold capitalize">Number of cards</h1>
                     <p className="text-2xl font-extrabold">100</p>
@@ -88,9 +88,9 @@ export default function Dashboard() {
                     <p className="text-2xl font-extrabold">100</p>
                 </Card>
             </div>
-            <div className="flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-2 p-4">
+            <div className="flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-none p-4">
                 {cards.map((card, index) => (
-                    <ScrollArea className="h-[600px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
+                    <ScrollArea className="h-[500px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
                         <div className="" key={index} onClick={() => showCardDetail(card.url)}>
                             <MuluCard
                                 avatar={card.avatar}

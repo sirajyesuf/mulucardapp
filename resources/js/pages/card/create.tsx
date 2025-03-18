@@ -14,7 +14,7 @@ import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type L
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
 import { FormEventHandler } from 'react';
-
+import { ScrollArea } from '@/components/ui/scroll-area';
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
     avatar: Image;
@@ -314,7 +314,7 @@ export default function CreateCard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className='min-h-screen'>
                 <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
                     <Button variant="destructive" className="cursor-pointer">
                         Cancel
@@ -326,26 +326,31 @@ export default function CreateCard() {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden rounded-lg border-2 p-2 shadow-xl md:block">
-                        <MuluCard
-                            avatar={data.avatar}
-                            logo={data.logo}
-                            first_name={data.first_name}
-                            last_name={data.last_name}
-                            organization={data.organization}
-                            job_title={data.job_title}
-                            phone={data.phone}
-                            email={data.email}
-                            banner_color={data.banner_color}
-                            links={data.links}
-                            address={data.address}
-                            location={data.location}
-                            headline={data.headline}
-                            // business_hours={schedule}
-                            galleries={validItems}
-                            services={ValidServiceItems}
-                        />
+                    <div className="col-span-2 hidden  h-[820px] rounded-lg border-2 p-2 shadow-xl md:block border-red-500">
+                    <ScrollArea className="h-[800px]  cursor-pointer rounded-md border-4">
+
+                    <MuluCard
+                    avatar={data.avatar}
+                    logo={data.logo}
+                    first_name={data.first_name}
+                    last_name={data.last_name}
+                    organization={data.organization}
+                    job_title={data.job_title}
+                    phone={data.phone}
+                    email={data.email}
+                    banner_color={data.banner_color}
+                    links={data.links}
+                    address={data.address}
+                    location={data.location}
+                    headline={data.headline}
+                    // business_hours={schedule}
+                    galleries={validItems}
+                    services={ValidServiceItems}
+                    />
+
+                    </ScrollArea>
                     </div>
+                     
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
                             <TabsList className="flex h-auto w-full flex-row flex-wrap justify-around">

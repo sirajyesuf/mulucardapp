@@ -1,7 +1,7 @@
 import Footer from '@/components/footer';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import AppLayoutTemplate from '@/layouts/app/app-header-layout';
+import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 interface AppLayoutProps {
     children: React.ReactNode;
