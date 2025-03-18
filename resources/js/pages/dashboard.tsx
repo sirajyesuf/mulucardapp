@@ -68,28 +68,23 @@ export default function Dashboard() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 rounded-lg border-none border-gray-300 p-2 md:grid-cols-3">
-                <Card className="flex flex-col items-center justify-center">
+            <div className="grid grid-cols-1 gap-8 rounded-sm border-none border-gray-300 p-2 md:grid-cols-3">
+                <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
                     <h1 className="text-xl font-bold capitalize">Number of cards</h1>
                     <p className="text-2xl font-extrabold">100</p>
                 </Card>
 
-                <Card className="flex flex-col items-center justify-center">
+                <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
                     <h1 className="text-xl font-bold capitalize">Number of active cards</h1>
                     <p className="text-xl font-extrabold">100</p>
                 </Card>
 
-                <Card className="flex flex-col items-center justify-center">
+                <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
                     <h1 className="text-xl font-bold capitalize">Number of inactive cards</h1>
                     <p className="text-2xl font-extrabold">100</p>
                 </Card>
-
-                {/* <Card className="flex flex-col items-center justify-center">
-                    <h1 className="text-2xl font-bold">Number of cards</h1>
-                    <p className="text-4xl font-extrabold">100</p>
-                </Card> */}
             </div>
-            <div className="flex h-full flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-xl border-none p-2">
+            <div className="flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-2 p-4">
                 {cards.map((card, index) => (
                     <ScrollArea className="h-[600px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
                         <div className="" key={index} onClick={() => showCardDetail(card.url)}>
