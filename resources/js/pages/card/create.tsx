@@ -3,16 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Service } from '@/types';
+import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@radix-ui/react-select';
-import { Check, Clock, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
+import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
@@ -26,11 +26,7 @@ interface CardForm {
     email: string;
     phone: string;
     banner_color: string;
-    links: {
-        name: string;
-        url: string;
-        placeholder: string;
-    }[];
+    links: Link[];
     location: string;
     address: string;
     headline: string;
@@ -41,48 +37,53 @@ interface CardForm {
 
 export default function CreateCard() {
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
-    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    // const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    const timeOptions = [23, 5, 66, 78];
+    const timeOptions = [];
 
-    // for (let hour = 0; hour < 24; hour++) {
-    //     for (let minute = 0; minute < 60; minute += 30) {
-    //         const formattedHour = hour.toString().padStart(2, '0');
-    //         const formattedMinute = minute.toString().padStart(2, '0');
-    //         timeOptions.push(`${formattedHour}:${formattedMinute}`);
-    //     }
-    // }
-    console.log(timeOptions);
-    // const copyToAllDays = (fromDay: string) => {
-    //     const daySchedule = schedule[fromDay];
-    //     const updatedSchedule = { ...schedule };
+    for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+            const formattedHour = hour.toString().padStart(2, '0');
+            const formattedMinute = minute.toString().padStart(2, '0');
+            timeOptions.push(`${formattedHour}:${formattedMinute}`);
+        }
+    }
+    // console.log(timeOptions);
+    const copyToAllDays = (day: DaySchedule) => {
+        // const daySchedule = schedule[fromDay];
+        // const updatedSchedule = { ...schedule };
+        const updatedSchedule = data.business_hours.map((item) => {
+            return {
+                ...item,
+                open: day.open,
+                close: day.close,
+            };
+        });
 
-    //     daysOfWeek.forEach((day) => {
-    //         if (day !== fromDay) {
-    //             updatedSchedule[day] = {
-    //                 isOpen: daySchedule.isOpen,
-    //                 timeSlots: [...daySchedule.timeSlots.map((slot) => ({ ...slot }))],
-    //             };
-    //         }
-    //     });
+        setData('business_hours', updatedSchedule);
+    };
+    const updateTimeSlot = (day: DaySchedule, field: 'open' | 'close', value: string) => {
+        console.log(day, field, value);
+        const updatedSchedule = data.business_hours.map((item) => {
+            if (item.id === day.id) {
+                if (field === 'open') {
+                    return {
+                        ...item,
+                        open: value,
+                    };
+                } else if (field === 'close') {
+                    return {
+                        ...item,
+                        close: value,
+                    };
+                }
+            }
 
-    //     setSchedule(updatedSchedule);
-    // };
-    // const updateTimeSlot = (day: string, index: number, field: 'open' | 'close', value: string) => {
-    //     const updatedTimeSlots = [...schedule[day].timeSlots];
-    //     updatedTimeSlots[index] = {
-    //         ...updatedTimeSlots[index],
-    //         [field]: value,
-    //     };
+            return item;
+        });
 
-    //     setSchedule({
-    //         ...schedule,
-    //         [day]: {
-    //             ...schedule[day],
-    //             timeSlots: updatedTimeSlots,
-    //         },
-    //     });
-    // };
+        setData('business_hours', updatedSchedule);
+    };
 
     const toggleDayOpen = (day: DaySchedule) => {
         const updatedSchedule = data.business_hours.map((item) => {
@@ -347,7 +348,7 @@ export default function CreateCard() {
                     </div>
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
-                            <TabsList className="flex h-16 w-full flex-row flex-wrap justify-around md:h-12">
+                            <TabsList className="flex h-auto w-full flex-row flex-wrap justify-around">
                                 <TabsTrigger value="display">Display</TabsTrigger>
                                 <TabsTrigger value="personal_information">Information</TabsTrigger>
                                 <TabsTrigger value="links">Social Links</TabsTrigger>
@@ -395,6 +396,8 @@ export default function CreateCard() {
                                                     </Button>
                                                 </div>
                                             )}
+
+                                            <InputError message={errors['avatar.file']} className="mt-2" />
                                         </div>
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
@@ -429,6 +432,7 @@ export default function CreateCard() {
                                                     </Button>
                                                 </div>
                                             )}
+                                            <InputError message={errors['logo.file']} className="mt-2" />
                                         </div>
 
                                         <div className="flex flex-row flex-wrap gap-2 rounded-lg border-2 p-2">
@@ -570,6 +574,8 @@ export default function CreateCard() {
                                                         }}
                                                         disabled={processing}
                                                     />
+
+                                                    <InputError message={errors.link} className="mt-2" />
                                                 </div>
                                             );
                                         })}
@@ -615,7 +621,7 @@ export default function CreateCard() {
                                         <CardDescription>Set the operating hours for your organization</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
-                                        {data.business_hours.map((day: DaySchedule) => (
+                                        {data.business_hours.map((day: DaySchedule, index) => (
                                             <div key={day.id} className="rounded-lg border p-4">
                                                 <div className="mb-4 flex items-center justify-between">
                                                     <div className="flex items-center space-x-2">
@@ -634,28 +640,28 @@ export default function CreateCard() {
                                                                 type="button"
                                                                 variant="outline"
                                                                 size="sm"
-                                                                // onClick={() => copyToAllDays(day)}
+                                                                onClick={() => copyToAllDays(day)}
+                                                                className="flex items-center gap-2"
                                                             >
-                                                                Apply to all days
+                                                                <Copy className="h-4 w-4 md:hidden" />
+                                                                <span className="hidden md:inline">Apply to all days</span>
                                                             </Button>
                                                         </div>
                                                     )}
                                                 </div>
-
                                                 {day.isOpen ? (
                                                     <div className="space-y-3">
-                                                        {/* {schedule[day].timeSlots.map((timeSlot, index) => ( */}
-                                                        <div className="flex items-center gap-2 border-4">
+                                                        <div className="flex flex-row items-center gap-2 md:flex-row">
                                                             <div className="flex items-center">
-                                                                <Clock className="text-muted-foreground mr-2 h-4 w-4" />
+                                                                <Clock className="text-muted-foreground mr-2 hidden h-4 w-4 md:block" />
                                                                 <Select
                                                                     value={day.open}
-                                                                    // onValueChange={(value) => updateTimeSlot(day, index, 'open', value)}
+                                                                    onValueChange={(value) => updateTimeSlot(day, 'open', value)}
                                                                 >
-                                                                    <SelectTrigger className="w-[120px]">
+                                                                    <SelectTrigger className="w-[100px] md:w-[150px]">
                                                                         <SelectValue placeholder="Opening time" />
                                                                     </SelectTrigger>
-                                                                    <SelectContent className="border border-red-900">
+                                                                    <SelectContent>
                                                                         {timeOptions.map((time) => (
                                                                             <SelectItem key={`open-${time}`} value={time}>
                                                                                 {time}
@@ -664,34 +670,28 @@ export default function CreateCard() {
                                                                     </SelectContent>
                                                                 </Select>
                                                             </div>
-
                                                             <span className="text-muted-foreground">to</span>
 
                                                             <div className="flex items-center">
                                                                 <Select
                                                                     value={day.close}
-                                                                    // onValueChange={(value) => updateTimeSlot(day, index, 'close', value)}
+                                                                    onValueChange={(value) => updateTimeSlot(day, 'close', value)}
                                                                 >
-                                                                    <SelectTrigger className="w-[120px]">
+                                                                    <SelectTrigger className="w-[100px] md:w-[150px]">
                                                                         <SelectValue placeholder="Closing time" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
                                                                         {timeOptions.map((time) => (
-                                                                            <SelectItem key={`close-${time}`} value={time}>
+                                                                            <SelectItem key={`open-${time}`} value={time}>
                                                                                 {time}
                                                                             </SelectItem>
                                                                         ))}
                                                                     </SelectContent>
                                                                 </Select>
                                                             </div>
-
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                // disabled={day.timeSlots.length <= 1}
-                                                            ></Button>
                                                         </div>
-                                                        {/* ))} */}
+                                                        <InputError message={errors[`business_hours.${index}.open`]} className="mt-2" />
+                                                        <InputError message={errors[`business_hours.${index}.close`]} className="mt-2" />{' '}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted-foreground italic">Closed</div>
@@ -711,7 +711,7 @@ export default function CreateCard() {
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                         <div className="space-y-6">
-                                            {data.services.map((item) => (
+                                            {data.services.map((item,index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
                                                         {data.services.length > 1 && (
@@ -766,6 +766,9 @@ export default function CreateCard() {
                                                                             </Button>
                                                                         </div>
                                                                     )}
+                                                                    
+                                                                    <InputError message={errors[`services.${index}.file` as keyof typeof errors]} className="mt-2" />
+
                                                                 </div>
                                                             </div>
 
@@ -779,6 +782,9 @@ export default function CreateCard() {
                                                                     value={item.name}
                                                                     onChange={(e) => handleServiceNameChange(item.id, e.target.value)}
                                                                 />
+                                                                
+                                                                <InputError message={errors[`services.${index}.name` as keyof typeof errors]} className="mt-2" />
+
                                                             </div>
 
                                                             <div>
@@ -792,6 +798,8 @@ export default function CreateCard() {
                                                                     onChange={(e) => handleServiceDescriptionChange(item.id, e.target.value)}
                                                                     className="min-h-24"
                                                                 />
+                                                                <InputError message={errors[`services.${index}.description` as keyof typeof errors]} className="mt-2" />
+
                                                             </div>
                                                         </div>
                                                     </CardContent>
@@ -846,7 +854,6 @@ export default function CreateCard() {
                                                                 <Label htmlFor={`image-${item.id}`} className="mb-2 block">
                                                                     Image {index + 1}
                                                                 </Label>
-
                                                                 <div className="flex flex-col gap-2">
                                                                     {item.file ? (
                                                                         <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -885,6 +892,7 @@ export default function CreateCard() {
                                                                         </div>
                                                                     )}
                                                                 </div>
+                                                                <InputError message={errors[`galleries.${index}.file` as keyof typeof errors]} className="mt-2" />
                                                             </div>
 
                                                             <div>
@@ -898,6 +906,7 @@ export default function CreateCard() {
                                                                     onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
                                                                     className="min-h-24"
                                                                 />
+                                                                 <InputError message={errors[`galleries.${index}.description` as keyof typeof errors]} className="mt-2" />
                                                             </div>
                                                         </div>
                                                     </CardContent>

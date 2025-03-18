@@ -69,6 +69,12 @@ export type DaySchedule = {
     close: string;
 };
 
+export type Link = {
+    name: string;
+    url: string;
+    placeholder: string;
+};
+
 export interface Image {
     file: File | null;
     path: string | null;
@@ -90,10 +96,10 @@ export interface Service {
 }
 
 export interface Plan {
-    name:string;
-    price:string;
-    type:string;
-    number_of_vcard:string;
-    description:string
-    features:string[]
+    name: string;
+    price: string;
+    type: string;
+    number_of_vcard: string;
+    description: string;
+    features: string[];
 }

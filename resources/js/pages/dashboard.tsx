@@ -1,9 +1,11 @@
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Gallery, type Image, type Service } from '@/types';
+
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import MuluCard from './card/card';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -60,15 +62,17 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex flex-row justify-end rounded-xl border-none p-2">
                 <Link
-                    className="flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 px-4 py-2 text-black shadow-none hover:bg-gray-100"
+                    className="flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 p-0 text-black shadow-none hover:bg-gray-100"
                     href="card/create"
                 >
-                    <Plus width={30} height={30} />
-                    <span className="text-md font-bold capitalize">new card</span>
+                    <Button size="lg" className="bg-brand-purple hover:bg-brand-purple-dark group transition-colors">
+                        <span>Create New Card</span>
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 rounded-sm border-none border-gray-300 p-2 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 rounded-sm border-2 p-2 md:grid-cols-3">
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
                     <h1 className="text-xl font-bold capitalize">Number of cards</h1>
                     <p className="text-2xl font-extrabold">100</p>

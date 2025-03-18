@@ -1,5 +1,6 @@
 import Footer from '@/components/footer';
 import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import AppLayoutTemplate from '@/layouts/app/app-header-layout';
 import { type BreadcrumbItem } from '@/types';
 interface AppLayoutProps {
@@ -10,7 +11,7 @@ interface AppLayoutProps {
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
     <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
         <Toaster richColors />
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
         <Footer />
     </AppLayoutTemplate>
 );
