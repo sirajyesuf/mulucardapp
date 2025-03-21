@@ -121,25 +121,51 @@ class CardController extends Controller
             return redirect()->route('card.show', $card->id)->with('success', 'Card updated successfully');
     }
 
-    public function personalizedURL($id) {
+
+    public function settings($id){
 
         $validated = request()->validate([
             'personalizedurl' => [
-                'required',              // Must not be empty
+                'nullable',
                 'string',                // Must be a string
                 'max:255',               // Max length of 255 characters
                 'unique:cards,url',      // Must be unique in the 'url' column of the 'cards' table
                 'regex:/^[a-zA-Z0-9]+$/' // Only letters (a-z, A-Z) and numbers (0-9), no spaces or special characters
             ],
+            'cardname' => [
+                'nullable',
+                'string',                // Must be a string
+                'max:255',               // Max length of 255 characters
+            ],
+
+            'pausecard' => [
+                'nullable',
+                'boolean',               // Must be a boolean
+            ],
         ]);
+
 
         $card = Card::findOrFail($id);
 
-        $card->url = $validated['personalizedurl'];
+        if(request()->has('personalizedurl') and !empty($validated['personalizedurl'])) {
+
+            $card->url = $validated['personalizedurl'];
+        }
+
+        if(request()->has('cardname') and !empty($validated['cardname'])) {
+            $card->cardname = $validated['cardname'];
+        }
+
+        if(request()->has('pausecard') and !empty($validated['pausecard'])) {
+            $card->pausecard = $validated['pausecard'];
+        }
 
         $card->save();
 
-        return redirect()->route('card.show', $card->url)->with('success', 'Card  updated successfully');
+
+
+        return to_route('card.show', $card->url);
+
     }
 
 

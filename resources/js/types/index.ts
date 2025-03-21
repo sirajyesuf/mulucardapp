@@ -40,6 +40,9 @@ export interface User {
 }
 
 export interface Card {
+    url: string;
+    cardname: string;
+    pausecard: boolean;
     avatar: Image;
     logo: Image;
     first_name: string;

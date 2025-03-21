@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Card as CardType } from '@/types';
@@ -22,12 +23,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function ShowCard() {
     const [isCopied, setIsCopied] = useState(false);
+    const [activeTab, setActiveTab] = useState('share');
+
     const { props } = usePage();
     const card = props.card as CardType;
-    console.log(card);
 
-    const { data, setData, post, get, errors, reset } = useForm({
-        personalizedurl: '',
+    const { data, setData, post, errors, reset } = useForm({
+        personalizedurl: card.url,
+        cardname: card.cardname,
+        pausecard: card.pausecard,
     });
 
     const DownloadQRCode = () => {
@@ -42,14 +46,14 @@ export default function ShowCard() {
         router.get(route('card.edit', { id: card?.id }));
     };
 
-    const personalizedURL = (event) => {
+    const settings = (event) => {
         event.preventDefault();
 
-        post(route('card.personalizedurl', { id: card.id }), {
+        post(route('card.settings', { id: card.id }), {
             onFinish: () => {
                 console.log('Upload successful!');
                 reset();
-                toast.success('URL has been updated');
+                toast.success('card updated successfully');
             },
             onSuccess: () => {
                 console.log('Upload successful!');
@@ -64,7 +68,7 @@ export default function ShowCard() {
         get(route('card.delete', { id: card.id }), {
             onFinish: () => {
                 console.log('Upload successful!');
-                reset();
+                // reset();
                 toast.success('Card has been deleted');
             },
             onSuccess: () => {
@@ -118,8 +122,8 @@ export default function ShowCard() {
                     </ScrollArea>
                 </div>
 
-                <div className="col-span-2 flex flex-col justify-between rounded-lg border-2 p-4">
-                    <Tabs defaultValue="share" className="w-full">
+                <div className="col-span-2 flex flex-col justify-between rounded-lg border-none p-4">
+                    <Tabs defaultValue="share" className="w-full" onValueChange={(value) => setActiveTab(value)}>
                         <TabsList className="flex h-16 w-full flex-row justify-between px-4">
                             <div className="space-x-4">
                                 <TabsTrigger value="share" className="font-bold">
@@ -131,9 +135,12 @@ export default function ShowCard() {
                             </div>
 
                             <div className="flex flex-row gap-4">
-                                <Button variant="outline" className="cursor-pointer" onClick={() => DownloadQRCode()}>
-                                    <Download size={100} />
-                                </Button>
+                                {activeTab === 'share' && (
+                                    <Button variant="outline" className="cursor-pointer" onClick={() => DownloadQRCode()}>
+                                        <Download size={100} />
+                                    </Button>
+                                )}
+
                                 <Button variant="outline" className="cursor-pointer bg-green-600 hover:bg-green-800" onClick={() => EditCard()}>
                                     <Edit size={100} color="white" />
 
@@ -141,9 +148,19 @@ export default function ShowCard() {
                                 </Button>
                             </div>
                         </TabsList>
-                        <TabsContent value="share">
-                            <Card>
-                                {/* grid h-[100%] items-center justify-center gap-4 border-2 border-red-900 p-4 md:grid-cols-1 lg:grid-cols-2 */}
+                        <TabsContent value="share" className="border-none">
+                            <Card className="shadow-none">
+                                <div className="grid grid-cols-1 gap-4 rounded-sm border-none p-2 md:grid-cols-2">
+                                    <Card className="flex flex-col items-center justify-center shadow-none">
+                                        <h1 className="text-xl font-bold capitalize">TOTAL VIEWS</h1>
+                                        <p className="text-2xl font-extrabold">100</p>
+                                    </Card>
+
+                                    <Card className="flex flex-col items-center justify-center shadow-none">
+                                        <h1 className="text-xl font-bold capitalize">TOTAL SAVES</h1>
+                                        <p className="text-xl font-extrabold">100</p>
+                                    </Card>
+                                </div>
                                 <CardContent>
                                     <div className="grid grid-cols-1 gap-4 rounded-3xl border-none p-4 md:grid-cols-2">
                                         <div className="flex items-center justify-center rounded-lg border-2 p-4">
@@ -154,7 +171,7 @@ export default function ShowCard() {
 
                                         <div className="flex h-full items-center justify-center rounded-lg border-2 p-4">
                                             <Button
-                                                className="w-full cursor-pointer rounded-lg border-2 p-2 py-8"
+                                                className="w-full cursor-pointer rounded-xl border-4 p-2 py-8"
                                                 variant="outline"
                                                 onClick={handleCopy}
                                             >
@@ -169,13 +186,13 @@ export default function ShowCard() {
                             </Card>
                         </TabsContent>
                         <TabsContent value="settings">
-                            <Card>
+                            <Card className="shadow-none">
                                 <CardHeader>
                                     <CardTitle>Settings</CardTitle>
                                     <CardDescription>Edit the details of this card.</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-8">
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 rounded-lg border-2 border-dashed border-gray-400 p-4">
                                         <Label htmlFor="personalized">Personalized Url</Label>
                                         <Input
                                             id="personalized"
@@ -189,7 +206,31 @@ export default function ShowCard() {
                                         </span>
                                         <InputError message={errors.personalizedurl} className="mt-2" />
                                     </div>
-                                    <div className="flex flex-row items-center justify-between rounded-lg border-2 border-red-400 px-4 py-4">
+
+                                    <div className="space-y-2 rounded-lg border-2 border-dashed border-gray-400 p-4">
+                                        <Label htmlFor="cardname">Card Name</Label>
+                                        <Input
+                                            id="cardname"
+                                            type="text"
+                                            name="cardname"
+                                            value={data.cardname}
+                                            onChange={(e) => setData('cardname', e.target.value)}
+                                        />
+                                        <InputError message={errors.cardname} className="mt-2" />
+                                    </div>
+
+                                    <div className="space-y-2 rounded-lg border-2 border-gray-400 p-4">
+                                        <div className="flex items-center space-x-2">
+                                            <Switch
+                                                id="airplane-mode"
+                                                className=""
+                                                checked={data.pausecard}
+                                                onCheckedChange={(e) => setData('pausecard', e)}
+                                            />
+                                            <Label htmlFor="airplane-mode">Disable this card temporarily</Label>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row items-center justify-between rounded-lg border-4 border-red-400 bg-red-50 px-4 py-4">
                                         <div className="flex flex-col">
                                             <p className="font-extrabold">Delete</p>
                                             <p className="text-mute font-normal">Delete this card permanently.</p>
@@ -207,13 +248,14 @@ export default function ShowCard() {
                             </Card>
                         </TabsContent>
                     </Tabs>
-                    {data.personalizedurl && (
+                    {activeTab === 'settings' && (
                         <form
-                            onSubmit={personalizedURL}
-                            className="-mx-4 -mb-4 flex flex-row justify-end gap-4 rounded-none border-t-2 p-4 shadow-none"
+                            onSubmit={settings}
+                            className="-mx-4 mt-2 -mb-4 flex flex-row justify-end rounded-xl border-2 bg-gray-50 p-2 shadow-none"
                         >
-                            <Button variant="destructive">Cancel</Button>
-                            <Button variant="outline">Save</Button>
+                            <Button variant="outline" className="border-green-400 bg-green-400 hover:border-green-600 hover:bg-green-600">
+                                Save
+                            </Button>
                         </form>
                     )}
                 </div>
