@@ -31,12 +31,8 @@ class CardRequest extends FormRequest
                     'job_title' => 'required|string|max:255',
                     'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
                     'links' => 'required|array|max:6',
-                    'links.*.name' => [
-                    'required',
-                    'string',
-                    Rule::in(['website', 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube']),
-                    ],
-                    'links.*.url' => "nullable|url:https",
+                    'links.*.name' => 'required|string|max:255',
+                    'links.*.url' => "required|url:https",
                     'phone' => 'required|string|max:255',
                     'email' => 'required|string|email|max:255',
                     'headline' => 'required|string|max:255',
@@ -80,11 +76,14 @@ class CardRequest extends FormRequest
         public function messages(): array
         {
                 $dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                $links = ['Website','Facebook', 'Twitter', 'Instagram', 'LinkedIn', 'YouTube'];
                 $business_messages = [];
                 $gallery_messages = [];
                 $services_messages = [];
+                $links_messages = [];
 
-                // Generate custom messages for each day in business_hours
+
+
                 foreach ($dayNames as $index => $dayName) {
                     $business_messages["business_hours.{$index}.open.required"] = "Please select an opening time for {$dayName}.";
                     $business_messages["business_hours.{$index}.close.required"] = "Please select a closing time for {$dayName}.";
@@ -92,33 +91,38 @@ class CardRequest extends FormRequest
                     $business_messages["business_hours.{$index}.close.date_format"] = "The closing time for {$dayName} must be in HH:MM format (e.g., 17:00).";
                 }
 
-               
+
                 foreach(request()->galleries as $index => $gallery) {
                     $gallery_messages["galleries.{$index}.file.required"] = "the image file is required.";
                     $gallery_messages["galleries.{$index}.description.required"] = "Please enter a description.";
                 }
 
-                foreach(request()->services as $index => $gallery) {
+                foreach(request()->services as $index => $service) {
                     $services_messages["services.{$index}.file.required"] = "the image file is required";
                     $services_messages["services.{$index}.name.required"] = "the name field is required";
                     $services_messages["services.{$index}.description.required"] =  "the description field is required";
 
                 }
 
+                foreach($links as $index => $link) {
+                    $links_messages["links.{$index}.url.required"] = "The {$link} field is required.";
+                }
 
 
-                
+
+
                 return [
-                'avatar.file.required' => 'The avatar file is required.',
-                'avatar.file.image' => 'The avatar file must be a valid image file.',
+                'avatar.file.required' => 'The avatar field is required.',
+                'avatar.file.image' => 'The avatar field must be a valid image file.',
                 'avatar.file.max' => 'The avatar file size must not exceed 2MB.',
 
-                'logo.file.required' => 'The logo file is required.',
-                'logo.file.image' => 'The logo file must be a valid image file.',
-                'logo.file.max' => 'The logo file size must not exceed 2MB.',
+                'logo.file.required' => 'The logo field is required.',
+                'logo.file.image' => 'The logo field must be a valid image file.',
+                'logo.file.max' => 'The logo field size must not exceed 2MB.',
                 ... $business_messages,
                 ...$gallery_messages,
-                ...$services_messages
+                ...$services_messages,
+                ...$links_messages
 
 
 

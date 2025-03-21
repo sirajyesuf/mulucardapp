@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,7 +15,6 @@ import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type L
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
 import { FormEventHandler } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 interface CardForm {
     avatar: Image;
@@ -314,7 +314,7 @@ export default function CreateCard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <form onSubmit={submit} className='min-h-screen'>
+            <form onSubmit={submit} className="min-h-screen">
                 <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
                     <Button variant="destructive" className="cursor-pointer">
                         Cancel
@@ -326,31 +326,29 @@ export default function CreateCard() {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden  h-[820px] rounded-lg border-2 p-2 shadow-xl md:block border-red-500">
-                    <ScrollArea className="h-[800px]  cursor-pointer rounded-md border-4">
-
-                    <MuluCard
-                    avatar={data.avatar}
-                    logo={data.logo}
-                    first_name={data.first_name}
-                    last_name={data.last_name}
-                    organization={data.organization}
-                    job_title={data.job_title}
-                    phone={data.phone}
-                    email={data.email}
-                    banner_color={data.banner_color}
-                    links={data.links}
-                    address={data.address}
-                    location={data.location}
-                    headline={data.headline}
-                    // business_hours={schedule}
-                    galleries={validItems}
-                    services={ValidServiceItems}
-                    />
-
-                    </ScrollArea>
+                    <div className="col-span-2 hidden h-[820px] rounded-lg border-2 border-red-500 p-2 shadow-xl md:block">
+                        <ScrollArea className="h-[800px] cursor-pointer rounded-md border-4">
+                            <MuluCard
+                                avatar={data.avatar}
+                                logo={data.logo}
+                                first_name={data.first_name}
+                                last_name={data.last_name}
+                                organization={data.organization}
+                                job_title={data.job_title}
+                                phone={data.phone}
+                                email={data.email}
+                                banner_color={data.banner_color}
+                                links={data.links}
+                                address={data.address}
+                                location={data.location}
+                                headline={data.headline}
+                                // business_hours={schedule}
+                                galleries={validItems}
+                                services={ValidServiceItems}
+                            />
+                        </ScrollArea>
                     </div>
-                     
+
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
                             <TabsList className="flex h-auto w-full flex-row flex-wrap justify-around">
@@ -580,7 +578,7 @@ export default function CreateCard() {
                                                         disabled={processing}
                                                     />
 
-                                                    <InputError message={errors.link} className="mt-2" />
+                                                    <InputError message={errors[`links.${index}.url` as keyof typeof errors]} className="mt-2" />
                                                 </div>
                                             );
                                         })}
@@ -695,8 +693,25 @@ export default function CreateCard() {
                                                                 </Select>
                                                             </div>
                                                         </div>
-                                                        <InputError message={errors[`business_hours.${index}.open`]} className="mt-2" />
-                                                        <InputError message={errors[`business_hours.${index}.close`]} className="mt-2" />{' '}
+                                                        {errors[`business_hours.${index}.open` as keyof typeof errors] &&
+                                                        errors[`business_hours.${index}.close` as keyof typeof errors] ? (
+                                                            <InputError message={`please select both opening and closing time for ${day.day}`} className="mt-2" />
+                                                        ) : (
+                                                            <>
+                                                                {errors[`business_hours.${index}.open` as keyof typeof errors] && (
+                                                                    <InputError
+                                                                        message={errors[`business_hours.${index}.open` as keyof typeof errors]}
+                                                                        className="mt-2"
+                                                                    />
+                                                                )}
+                                                                {errors[`business_hours.${index}.close` as keyof typeof errors] && (
+                                                                    <InputError
+                                                                        message={errors[`business_hours.${index}.close` as keyof typeof errors]}
+                                                                        className="mt-2"
+                                                                    />
+                                                                )}
+                                                            </>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <div className="text-muted-foreground italic">Closed</div>
@@ -716,7 +731,7 @@ export default function CreateCard() {
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                         <div className="space-y-6">
-                                            {data.services.map((item,index) => (
+                                            {data.services.map((item, index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
                                                         {data.services.length > 1 && (
@@ -771,9 +786,11 @@ export default function CreateCard() {
                                                                             </Button>
                                                                         </div>
                                                                     )}
-                                                                    
-                                                                    <InputError message={errors[`services.${index}.file` as keyof typeof errors]} className="mt-2" />
 
+                                                                    <InputError
+                                                                        message={errors[`services.${index}.file` as keyof typeof errors]}
+                                                                        className="mt-2"
+                                                                    />
                                                                 </div>
                                                             </div>
 
@@ -787,9 +804,11 @@ export default function CreateCard() {
                                                                     value={item.name}
                                                                     onChange={(e) => handleServiceNameChange(item.id, e.target.value)}
                                                                 />
-                                                                
-                                                                <InputError message={errors[`services.${index}.name` as keyof typeof errors]} className="mt-2" />
 
+                                                                <InputError
+                                                                    message={errors[`services.${index}.name` as keyof typeof errors]}
+                                                                    className="mt-2"
+                                                                />
                                                             </div>
 
                                                             <div>
@@ -803,8 +822,10 @@ export default function CreateCard() {
                                                                     onChange={(e) => handleServiceDescriptionChange(item.id, e.target.value)}
                                                                     className="min-h-24"
                                                                 />
-                                                                <InputError message={errors[`services.${index}.description` as keyof typeof errors]} className="mt-2" />
-
+                                                                <InputError
+                                                                    message={errors[`services.${index}.description` as keyof typeof errors]}
+                                                                    className="mt-2"
+                                                                />
                                                             </div>
                                                         </div>
                                                     </CardContent>
@@ -897,7 +918,10 @@ export default function CreateCard() {
                                                                         </div>
                                                                     )}
                                                                 </div>
-                                                                <InputError message={errors[`galleries.${index}.file` as keyof typeof errors]} className="mt-2" />
+                                                                <InputError
+                                                                    message={errors[`galleries.${index}.file` as keyof typeof errors]}
+                                                                    className="mt-2"
+                                                                />
                                                             </div>
 
                                                             <div>
@@ -911,7 +935,10 @@ export default function CreateCard() {
                                                                     onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
                                                                     className="min-h-24"
                                                                 />
-                                                                 <InputError message={errors[`galleries.${index}.description` as keyof typeof errors]} className="mt-2" />
+                                                                <InputError
+                                                                    message={errors[`galleries.${index}.description` as keyof typeof errors]}
+                                                                    className="mt-2"
+                                                                />
                                                             </div>
                                                         </div>
                                                     </CardContent>
