@@ -44,6 +44,7 @@ class CardResource extends JsonResource
             'qr_code' => $this->qr_code,
             'address' => $this->address,
             'location' => $this->location,
+            'business_hours' => $this->business_hours,
         ];
     }
 }

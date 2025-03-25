@@ -46,7 +46,8 @@ class CardController extends Controller
             'headline' => $request->headline,
             'address' => $request->address,
             'location' => $request->location,
-            'qr_code' => $qrCodePath
+            'qr_code' => $qrCodePath,
+            'business_hours' => $request->business_hours,
         ]);
 
 
@@ -101,7 +102,7 @@ class CardController extends Controller
     public function update(UpdateRequest $request,$id)
     {       $validated = $request->validated();
 
-            dd($validated);
+            // dd($validated);
 
             // $card = Card::findOrFail($id);
 

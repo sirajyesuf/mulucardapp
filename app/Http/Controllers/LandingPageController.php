@@ -14,9 +14,11 @@ class LandingPageController extends Controller
         $plans = Plan::all();
 
 
+
         return Inertia::render("welcome",[
 
             "plans"=>$plans
         ]);
+
     }
 }
