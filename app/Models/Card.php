@@ -11,6 +11,13 @@ class Card extends Model
 {
     protected $guarded = [];
 
+        protected function casts(): array
+    {
+        return [
+            'business_hours' => 'array',
+        ];
+    }
+
 
     public function user(){
         return $this->belongsTo(User::class);

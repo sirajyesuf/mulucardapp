@@ -9,6 +9,7 @@ class SocialLink extends Model
 {
     protected $guarded = [];
 
+
     public function card()
     {
         return $this->belongsTo(Card::class);
