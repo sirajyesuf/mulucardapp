@@ -3,14 +3,14 @@ import { Separator } from '@/components/ui/separator';
 import { ChevronRight } from 'lucide-react';
 import { useEffect } from 'react';
 
-import { Avatar } from '@/components/ui/avatar';
-import { Globe, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+// import { Globe, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
 import { Github, Instagram, Twitter } from 'lucide-react';
 
-import { ArrowRight } from 'lucide-react';
+import { EnterprisePlan, FreePlan, MostPopular } from '@/components/plans';
 import { type Plan } from '@/types';
 import { Link } from '@inertiajs/react';
+import { ArrowRight } from 'lucide-react';
 
 const Hero = () => {
     return (
@@ -94,7 +94,8 @@ const Navbar = () => {
             <div className="container mx-auto max-w-7xl">
                 <div className="flex items-center justify-between">
                     <a href="/" className="flex items-center gap-[1px] text-xl font-semibold">
-                        <span className="text-brand-purple">Mulu</span><span>Card</span>
+                        <span className="text-brand-purple">Mulu</span>
+                        <span>Card</span>
                     </a>
 
                     {/* Desktop Navigation */}
@@ -112,20 +113,10 @@ const Navbar = () => {
 
                     <div className="hidden items-center gap-4 md:flex">
                         <Button variant="ghost" className="font-medium">
-                            
-                            
-                            <Link href={route('login')}>
-                            Log in
-                            </Link>
+                            <Link href={route('login')}>Log in</Link>
                         </Button>
                         <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
-                            
-                            <Link href={route('register')}>
-                            Get Started
-                            
-                            </Link>
-
-
+                            <Link href={route('register')}>Get Started</Link>
                         </Button>
                     </div>
 
@@ -296,70 +287,69 @@ const Footer = () => {
     );
 };
 
-const CardPreview = () => {
-    return (
-        <div className="relative">
-            <div className="business-card glass animate-float p-6">
-                <div className="from-brand-purple to-brand-purple-light absolute top-0 right-0 left-0 h-24 rounded-t-xl bg-gradient-to-r"></div>
+// const CardPreview = () => {
+//     return (
+//         <div className="relative">
+//             <div className="business-card glass animate-float p-6">
+//                 <div className="from-brand-purple to-brand-purple-light absolute top-0 right-0 left-0 h-24 rounded-t-xl bg-gradient-to-r"></div>
 
-                <div className="relative flex h-full flex-col">
-                    <div className="mb-6 flex items-start justify-between">
-                        <Avatar className="h-20 w-20 border-4 border-white shadow-sm">
-                            <img
-                                src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80"
-                                alt="Profile"
-                            />
-                        </Avatar>
+//                 <div className="relative flex h-full flex-col">
+//                     <div className="mb-6 flex items-start justify-between">
+//                         <Avatar className="h-20 w-20 border-4 border-white shadow-sm">
+//                             <img
+//                                 src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80"
+//                                 alt="Profile"
+//                             />
+//                         </Avatar>
 
-                        <div className="mt-2">
-                            <h3 className="text-muted-foreground text-xs tracking-wider uppercase">mulucard</h3>
-                        </div>
-                    </div>
+//                         <div className="mt-2">
+//                             <h3 className="text-muted-foreground text-xs tracking-wider uppercase">mulucard</h3>
+//                         </div>
+//                     </div>
 
-                    <div className="space-y-2">
-                        <h2 className="text-xl font-bold">Alexander Thompson</h2>
-                        <p className="text-muted-foreground text-sm">Product Designer at Design Co.</p>
-                    </div>
+//                     <div className="space-y-2">
+//                         <h2 className="text-xl font-bold">Alexander Thompson</h2>
+//                         <p className="text-muted-foreground text-sm">Product Designer at Design Co.</p>
+//                     </div>
 
-                    <div className="mt-6 flex-grow space-y-3">
-                        <div className="flex items-center gap-3">
-                            <Phone className="text-brand-purple h-4 w-4" />
-                            <span className="text-sm">(555) 123-4567</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <Mail className="text-brand-purple h-4 w-4" />
-                            <span className="text-sm">alex.thompson@example.com</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <Globe className="text-brand-purple h-4 w-4" />
-                            <span className="text-sm">www.alexthompson.com</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <MapPin className="text-brand-purple h-4 w-4" />
-                            <span className="text-sm">San Francisco, CA</span>
-                        </div>
-                    </div>
+//                     <div className="mt-6 flex-grow space-y-3">
+//                         <div className="flex items-center gap-3">
+//                             <Phone className="text-brand-purple h-4 w-4" />
+//                             <span className="text-sm">(555) 123-4567</span>
+//                         </div>
+//                         <div className="flex items-center gap-3">
+//                             <Mail className="text-brand-purple h-4 w-4" />
+//                             <span className="text-sm">alex.thompson@example.com</span>
+//                         </div>
+//                         <div className="flex items-center gap-3">
+//                             <Globe className="text-brand-purple h-4 w-4" />
+//                             <span className="text-sm">www.alexthompson.com</span>
+//                         </div>
+//                         <div className="flex items-center gap-3">
+//                             <MapPin className="text-brand-purple h-4 w-4" />
+//                             <span className="text-sm">San Francisco, CA</span>
+//                         </div>
+//                     </div>
 
-                    <div className="mt-6 flex items-center gap-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0077B5]">
-                            <Linkedin className="h-3.5 w-3.5 text-white" />
-                        </div>
-                        <div className="bg-muted h-1.5 w-1.5 rounded-full"></div>
-                        <div className="ml-auto">
-                            <span className="text-muted-foreground text-xs">Scan or tap to connect</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+//                     <div className="mt-6 flex items-center gap-2">
+//                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0077B5]">
+//                             <Linkedin className="h-3.5 w-3.5 text-white" />
+//                         </div>
+//                         <div className="bg-muted h-1.5 w-1.5 rounded-full"></div>
+//                         <div className="ml-auto">
+//                             <span className="text-muted-foreground text-xs">Scan or tap to connect</span>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
 
-            {/* Card Shadow */}
-            <div className="absolute right-4 -bottom-2 left-4 h-[10px] rounded-full bg-black/10 blur-md"></div>
-        </div>
-    );
-};
+//             {/* Card Shadow */}
+//             <div className="absolute right-4 -bottom-2 left-4 h-[10px] rounded-full bg-black/10 blur-md"></div>
+//         </div>
+//     );
+// };
 
 import { Palette, Repeat, Share2, Shield, Smartphone, Zap } from 'lucide-react';
-import { Props } from 'node_modules/@headlessui/react/dist/types';
 
 const features = [
     {
@@ -426,10 +416,8 @@ const Features = () => {
     );
 };
 
-
-function index ({plans}:{plans:Plan[]}  ){
-
-    console.log(plans)
+function Index({ plans }: { plans: Plan[] }) {
+    console.log(plans);
 
     // Add subtle fade-in effect when the page loads
     useEffect(() => {
@@ -509,32 +497,25 @@ function index ({plans}:{plans:Plan[]}  ){
                         </div>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            
-
-                        {[...plans]
-  .sort((a, b) => {
-    if (a.type === 'free' && b.type !== 'free') return -1;
-    if (b.type === 'free' && a.type !== 'free') return 1;
-    if (a.type === 'professional' && b.type === 'enterprise') return -1;
-    if (b.type === 'professional' && a.type === 'enterprise') return 1;
-    return 0;
-  })
-  .map((plan, index) => (
-    <div key={index}>
-      {plan.type === 'free' ? (
-        <FreePlan {...plan} />
-      ) : plan.type === 'professional' ? (
-    
-        <MostPopular {...plan} />
-      ) : plan.type === 'enterprise' ? (
-        <EnterprisePlan {...plan} />
-      ) : null}
-    </div>
-  ))}
-
-                            
-
-
+                            {[...plans]
+                                .sort((a, b) => {
+                                    if (a.type === 'free' && b.type !== 'free') return -1;
+                                    if (b.type === 'free' && a.type !== 'free') return 1;
+                                    if (a.type === 'professional' && b.type === 'enterprise') return -1;
+                                    if (b.type === 'professional' && a.type === 'enterprise') return 1;
+                                    return 0;
+                                })
+                                .map((plan, index) => (
+                                    <div key={index}>
+                                        {plan.type === 'free' ? (
+                                            <FreePlan plan={plan} billing={false} />
+                                        ) : plan.type === 'professional' ? (
+                                            <MostPopular plan={plan} billing={false} />
+                                        ) : plan.type === 'enterprise' ? (
+                                            <EnterprisePlan plan={plan} />
+                                        ) : null}
+                                    </div>
+                                ))}
                         </div>
                     </div>
                 </section>
@@ -558,153 +539,6 @@ function index ({plans}:{plans:Plan[]}  ){
             <Footer />
         </div>
     );
-};
-
-function FreePlan({name,description,features}:Plan) {
-    return (
-        <div className="border-border animate-fade-in rounded-xl border bg-white p-8 shadow-sm" style={{ animationDelay: '0.1s' }}>
-            <div className="mb-6">
-                <h3 className="text-xl font-semibold">{name}</h3>
-                <div className="mt-4">
-                    <span className="text-4xl font-bold">Free</span>
-                    <span className="text-muted-foreground ml-2">forever</span>
-                </div>
-                <p className="text-muted-foreground mt-3">{description}</p>
-            </div>
-
-            <Separator className="my-6" />
-            
-
-            <ul className="mb-8 space-y-4">
-                {
-                    features.map((feature,index) => (
-                        <li className="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="text-brand-purple mt-0.5 mr-3 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                        <span> {feature}</span>
-                    </li>
-
-                    ))
-                }
-            </ul>
-
-            <Button className="w-full " variant="outline">
-                Get Started
-            </Button>
-        </div>
-    );
 }
 
-
-function MostPopular({name,description,features,price}:Plan){
-
-    return (
-        <div
-        className="border-brand-purple animate-fade-in relative rounded-xl border-2 bg-white p-8 shadow-md"
-        style={{ animationDelay: '0.2s' }}
-    >
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-            <div className="bg-brand-purple rounded-full px-4 py-1 text-xs font-medium text-white">Most Popular hey</div>
-        </div>
-
-        <div className="mb-6">
-            <h3 className="text-xl font-semibold">{name}</h3>
-            <div className="mt-4">
-                <span className="text-4xl font-bold">${price}</span>
-                <span className="text-muted-foreground ml-2">/ year</span>
-            </div>
-            <p className="text-muted-foreground mt-3">{description}</p>
-        </div>
-
-        <Separator className="my-6" />
-
-        <ul className="mb-8 space-y-4">
-            {
-                features.map((feature,index) => (
-
-                    <li className="flex items-start" key={index}>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-brand-purple mt-0.5 mr-3 h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                    <span>{feature}</span>
-                </li>
-
-                ))
-            }
-
-        </ul>
-
-        <Button className="bg-brand-purple hover:bg-brand-purple-dark w-full">Get Started</Button>
-    </div>
-    )
-}
-
-
-function EnterprisePlan({name,price,description,features}:Plan){
-
-    return (
-        <div
-        className="border-border animate-fade-in rounded-xl border bg-white p-8 shadow-sm"
-        style={{ animationDelay: '0.3s' }}
->
-        <div className="mb-6">
-            <h3 className="text-xl font-semibold">{name}</h3>
-            <div className="mt-4">
-                <span className="text-4xl font-bold">${price}</span>
-                <span className="text-muted-foreground ml-2">/ yearly</span>
-            </div>
-            <p className="text-muted-foreground mt-3">{description}</p>
-        </div>
-
-        <Separator className="my-6" />
-
-        <ul className="mb-8 space-y-4">
-            {
-                features.map((feature,index) => (
-
-                    <li className="flex items-start" key={index}>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-brand-purple mt-0.5 mr-3 h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                    <span>{feature}</span>
-                </li>
-                ))
-            }
-
-
-        </ul>
-
-        <Button className="w-full" variant="outline">
-            Contact Sales
-        </Button>
-    </div>
-    )
-}
-
-
-
-
-export default index;
+export default Index;

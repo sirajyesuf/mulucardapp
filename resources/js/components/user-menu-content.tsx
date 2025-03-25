@@ -3,7 +3,7 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type User } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { CircleDollarSign, CreditCard, LogOut, Settings } from 'lucide-react';
 
 interface UserMenuContentProps {
     user: User;
@@ -25,6 +25,19 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
                         <Settings className="mr-2" />
                         Settings
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
+                        <CircleDollarSign className="mr-2" />
+                        Manage Subscription
+                    </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
+                        <CreditCard className="mr-2" />
+                        Plans & Pricing
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>

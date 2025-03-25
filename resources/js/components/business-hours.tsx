@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { WeekSchedule } from '@/types';
 import { Clock } from 'lucide-react';
 
-export default function BusinessHoursPreview({ schedule }: WeekSchedule) {
-    console.log(schedule);
+export default function BusinessHoursPreview({ bussiness_hours }: { bussiness_hours: DaySchedule[] }) {
+    console.log('BusinessHoursPreview');
+    console.log(bussiness_hours);
     // Format time from 24h to 12h format
     const formatTime = (time: string) => {
         const [hours, minutes] = time.split(':').map(Number);
@@ -14,11 +14,13 @@ export default function BusinessHoursPreview({ schedule }: WeekSchedule) {
 
     // Group days with identical schedules
     const groupedSchedule = () => {
+        if (!bussiness_hours) return []; // Add simple undefined check
+
         const groups: { days: string[]; schedule: string }[] = [];
         const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
         daysOfWeek.forEach((day) => {
-            const daySchedule = schedule[day];
+            const daySchedule = bussiness_hours.find((schedule) => schedule.day === day);
             const scheduleString = getScheduleString(daySchedule);
 
             const existingGroup = groups.find((group) => group.schedule === scheduleString);
@@ -33,11 +35,9 @@ export default function BusinessHoursPreview({ schedule }: WeekSchedule) {
     };
 
     // Get a string representation of a day's schedule
-    const getScheduleString = (daySchedule: { isOpen: boolean; timeSlots: { open: string; close: string }[] }) => {
-        console.log(daySchedule);
-        if (!daySchedule.isOpen) return 'Closed';
-
-        return daySchedule.timeSlots.map((slot) => `${slot.open}-${slot.close}`).join(',');
+    const getScheduleString = (daySchedule?: DaySchedule) => {
+        if (!daySchedule || daySchedule.isOpen == '0') return 'Closed';
+        return `${daySchedule.open}-${daySchedule.close}`;
     };
 
     // Format days for display (e.g., "Monday, Tuesday" or "Monday - Wednesday")
@@ -76,17 +76,16 @@ export default function BusinessHoursPreview({ schedule }: WeekSchedule) {
                     {groupedSchedule().map((group, index) => (
                         <div key={index} className="border-b pb-3 last:border-b-0 last:pb-0">
                             <div className="font-medium">{formatDays(group.days)}</div>
-                            {group.schedule === 'Closed' ? (
-                                <div className="text-muted-foreground">Closed</div>
-                            ) : (
-                                <div className="text-muted-foreground">
-                                    {schedule[group.days[0]].timeSlots.map((slot, idx) => (
-                                        <div key={idx} className="flex items-center gap-1">
-                                            {formatTime(slot.open)} - {formatTime(slot.close)}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            <div className="text-muted-foreground">
+                                {group.schedule === 'Closed' ? (
+                                    'Closed'
+                                ) : (
+                                    <div className="flex items-center gap-1">
+                                        {formatTime(bussiness_hours.find((schedule) => schedule.day === group.days[0])!.open)} -{' '}
+                                        {formatTime(bussiness_hours.find((schedule) => schedule.day === group.days[0])!.close)}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>

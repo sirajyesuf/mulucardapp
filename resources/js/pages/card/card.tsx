@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
-import { Gallery, Service, type Image } from '@/types';
+import { Gallery, Service, type DaySchedule, type Image } from '@/types';
 import { MapPin } from 'lucide-react';
-
+import BusinessHoursPreview from '@/components/business-hours';
 type MuluCardProps = {
     url: string;
     avatar: Image;
@@ -24,6 +24,7 @@ type MuluCardProps = {
     location: string;
     galleries: Gallery[];
     services: Service[];
+    bussiness_hours: DaySchedule[];
 };
 
 export default function MuluCard({
@@ -42,6 +43,7 @@ export default function MuluCard({
     location,
     galleries,
     services,
+    bussiness_hours,
 }: MuluCardProps) {
     return (
         <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
@@ -80,11 +82,11 @@ export default function MuluCard({
                     {links?.map((link, index) => {
                         const Icon = socialIconMap[link.name.toLowerCase()] || Globe; // Fallback to Globe
                         return (
-                            link.url && ( // Only render if link.url is not empty
+                            link.url && (
                                 <div key={index} className="flex flex-row flex-wrap items-center gap-2 rounded-lg border-none p-0">
                                     <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
                                         <a href={link.url} className="text-xl font-bold text-black">
-                                            <Icon className="h-5 w-5 text-white" /> {/* Replaces size={20} and color="white" */}
+                                            <Icon className="h-5 w-5 text-white" />
                                         </a>
                                     </div>
                                 </div>
@@ -167,6 +169,8 @@ export default function MuluCard({
                         </CardContent>
                     </Card>
                 )}
+
+                <BusinessHoursPreview  bussiness_hours={bussiness_hours} />
 
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
                     <div className="flex items-center justify-center gap-2 p-2">

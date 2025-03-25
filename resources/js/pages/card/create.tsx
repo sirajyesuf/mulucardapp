@@ -48,10 +48,8 @@ export default function CreateCard() {
             timeOptions.push(`${formattedHour}:${formattedMinute}`);
         }
     }
-    // console.log(timeOptions);
     const copyToAllDays = (day: DaySchedule) => {
-        // const daySchedule = schedule[fromDay];
-        // const updatedSchedule = { ...schedule };
+        
         const updatedSchedule = data.business_hours.map((item) => {
             return {
                 ...item,

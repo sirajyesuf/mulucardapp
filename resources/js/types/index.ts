@@ -62,6 +62,7 @@ export interface Card {
     headline: string;
     galleries: Gallery[];
     services: Service[];
+    bussiness_hours: DaySchedule[];
 }
 
 export type DaySchedule = {
@@ -100,9 +101,32 @@ export interface Service {
 
 export interface Plan {
     name: string;
-    price: string;
+    price: number;
     type: string;
     number_of_vcard: string;
     description: string;
     features: string[];
+}
+
+export interface Order {
+    order_number: string;
+    status: string;
+    payment_ref: string;
+}
+
+export type Bank = {
+    id: number;
+    name: string;
+    account_holder: string;
+    account_number: string;
+    logo: string;
+};
+
+export interface Subscription {
+    id: number;
+    renewal_date: string;
+    status: string;
+    start_date: string;
+    order: Order;
+    plan: Plan;
 }

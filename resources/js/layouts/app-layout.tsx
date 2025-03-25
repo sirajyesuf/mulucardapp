@@ -11,7 +11,9 @@ interface AppLayoutProps {
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
     <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
         <Toaster richColors />
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider>
+            <main className="flex-grow">{children}</main>
+        </TooltipProvider>
         <Footer />
     </AppLayoutTemplate>
 );

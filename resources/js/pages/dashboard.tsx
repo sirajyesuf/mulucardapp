@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Gallery, type Image, type Service } from '@/types';
+import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Service } from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
@@ -45,6 +45,7 @@ interface Card {
     galleries: Gallery[];
     address: string;
     location: string;
+    business_hours: DaySchedule[];
 }
 
 type CardList = Card[];
@@ -108,6 +109,7 @@ export default function Dashboard() {
                                 galleries={card.galleries}
                                 address={card.address}
                                 location={card.location}
+                                bussiness_hours={card.business_hours}
                             />
                         </div>
                     </ScrollArea>
