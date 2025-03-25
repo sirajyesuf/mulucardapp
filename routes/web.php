@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HelloController;
 use Inertia\Inertia;
@@ -35,3 +36,5 @@ Route::middleware(['auth'])->group(function(){
 
 Route::get("/hello/{url}",[HelloController::class,"index"])->name("card.hello");
 Route::get('/card/{id}/vcard', [CardController::class, 'downloadVCard'])->name('card.vcard');
+Route::get('/checkout/{plan}',[CheckoutController::class,"index"])->name("checkout");
+Route::post('/checkout/{plan}/order',[CheckoutController::class,"store"])->name("checkout.order");
