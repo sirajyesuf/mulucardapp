@@ -8,11 +8,24 @@ export default function Hello() {
     console.log(card);
 
     function downloadVCard() {
+        // const url = route('card.vcard', { id: card.id });
+        // const link = document.createElement('a');
+        // link.href = url;
+        // link.download = 'contact.vcf';
+        // link.click();
+
         const url = route('card.vcard', { id: card.id });
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'contact.vcf';
-        link.click();
+
+        // Check if the user is on mobile
+        if (/android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+            window.location.href = url; // Opens the vCard file in contacts app
+        } else {
+            // For desktop, proceed with download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${card.first_name}_${card.last_name}.vcf`;
+            link.click();
+        }
     }
     return (
         <>

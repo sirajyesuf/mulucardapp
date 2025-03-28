@@ -192,6 +192,7 @@ class CardController extends Controller
         $vcard->addPhoneNumber($card->phone, 'WORK');
         $vcard->addCompany($card->organization);
         $vcard->addJobtitle($card->job_title);
+        $vcard->addPhoneNumber($card->phone);
         // $vcard->addAddress(null, null, $card->address, $card->location);
 
         // Add social links (optional, non-standard but supported by some clients)
@@ -218,7 +219,13 @@ class CardController extends Controller
         //     'Content-Disposition' => 'attachment; filename="contact.vcf"',
         // ]);
         //
-        return $vcard->download();
+
+        // return $vcard->download();
+
+        return response($vcard->getOutput(), 200, [
+        'Content-Type' => 'text/vcard; charset=utf-8',
+        'Content-Disposition' => 'inline; filename="contact.vcf"',
+        ]);
 
     }
 
