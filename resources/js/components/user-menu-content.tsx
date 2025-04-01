@@ -28,14 +28,14 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
+                    <Link className="block w-full" href={route('settings.subscription')} as="button" prefetch onClick={cleanup}>
                         <CircleDollarSign className="mr-2" />
                         Manage Subscription
                     </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
+                    <Link className="block w-full" href={route('settings.plans')} as="button" prefetch onClick={cleanup}>
                         <CreditCard className="mr-2" />
                         Plans & Pricing
                     </Link>

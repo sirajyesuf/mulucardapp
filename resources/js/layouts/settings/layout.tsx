@@ -12,8 +12,8 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Plan',
-        url: '/settings/plans',
+        title: 'Plans & Pricing',
+        url: '/settings/plansandpricing',
         icon: null,
     },
     {
@@ -21,11 +21,11 @@ const sidebarNavItems: NavItem[] = [
         url: '/settings/subscription',
         icon: null,
     },
-    {
-        title: 'Appearance',
-        url: '/settings/appearance',
-        icon: null,
-    },
+    // {
+    //     title: 'Appearance',
+    //     url: '/settings/appearance',
+    //     icon: null,
+    // },
 ];
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

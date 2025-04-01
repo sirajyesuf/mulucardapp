@@ -5,7 +5,7 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { ChevronsUpDown } from 'lucide-react';
+import { BadgeCheck, ChevronsUpDown } from 'lucide-react';
 
 export function NavUser() {
     const { auth } = usePage<SharedData>().props;
@@ -17,10 +17,21 @@ export function NavUser() {
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group">
-                            <UserInfo user={auth.user} />
-                            <ChevronsUpDown className="ml-auto size-4" />
-                        </SidebarMenuButton>
+                        <div className={`p-1 ${state === 'collapsed' ? '' : 'rounded-xl border-2'}`}>
+                            <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group">
+                                <UserInfo user={auth.user} />
+                                <ChevronsUpDown className="ml-auto size-4" />
+                            </SidebarMenuButton>
+                            {state !== 'collapsed' && (
+                                <>
+                                    <hr />
+                                    <div className="flex flex-row items-center justify-center gap-4 p-1">
+                                        <BadgeCheck color="#6265f1" className="size-6" />
+                                        <p className="text-sm font-bold text-[#6265f1] capitalize">{auth.activePlan.plan.name} plan</p>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                         className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"

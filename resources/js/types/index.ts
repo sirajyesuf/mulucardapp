@@ -2,6 +2,7 @@ import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
     user: User;
+    activePlan: Subscription;
 }
 
 export interface BreadcrumbItem {
@@ -36,10 +37,10 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
 }
 
 export interface Card {
+    id: number;
     url: string;
     cardname: string;
     pausecard: boolean;
@@ -100,6 +101,7 @@ export interface Service {
 }
 
 export interface Plan {
+    id: number;
     name: string;
     price: number;
     type: string;

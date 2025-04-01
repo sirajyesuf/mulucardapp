@@ -62,13 +62,13 @@ const SubscriptionCard = ({ subscription }: { subscription: Subscription }) => {
                             ) : null}
                             <span className="capitalize">{subscription.status}</span>
                         </span>
-                        {subscription.renewal_date && subscription.status === 'active' && (
+                        {/* {subscription.renewal_date && subscription.status === 'active' && (
                             <span className="text-muted-foreground ml-4 text-sm">
                                 Next billing: {new Date(subscription.renewal_date).toLocaleDateString()}
                             </span>
-                        )}
+                        )} */}
                     </div>
-                    <div className="text-muted-foreground text-sm">bank transfer</div>
+                    {/* <div className="text-muted-foreground text-sm">bank transfer</div> */}
                 </div>
             </div>
         </Card>
