@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
+import { type DaySchedule } from '@/types';
 
 export default function BusinessHoursPreview({ bussiness_hours }: { bussiness_hours: DaySchedule[] }) {
     console.log('BusinessHoursPreview');
@@ -36,7 +37,7 @@ export default function BusinessHoursPreview({ bussiness_hours }: { bussiness_ho
 
     // Get a string representation of a day's schedule
     const getScheduleString = (daySchedule?: DaySchedule) => {
-        if (!daySchedule || daySchedule.isOpen == '0') return 'Closed';
+        if (!daySchedule || daySchedule.isOpen == false) return 'Closed';
         return `${daySchedule.open}-${daySchedule.close}`;
     };
 

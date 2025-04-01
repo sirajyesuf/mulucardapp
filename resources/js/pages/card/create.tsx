@@ -37,7 +37,6 @@ interface CardForm {
 
 export default function CreateCard() {
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
-    // const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     const timeOptions = [];
 
@@ -49,7 +48,6 @@ export default function CreateCard() {
         }
     }
     const copyToAllDays = (day: DaySchedule) => {
-        
         const updatedSchedule = data.business_hours.map((item) => {
             return {
                 ...item,
@@ -127,13 +125,13 @@ export default function CreateCard() {
         galleries: [{ id: crypto.randomUUID(), file: null, path: null, description: '' }],
         services: [{ id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }],
         business_hours: [
-            { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '', close: '' },
-            { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '', close: '' },
-            { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '', close: '' },
-            { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '', close: '' },
-            { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '', close: '' },
-            { id: crypto.randomUUID(), day: 'Saturday', isOpen: true, open: '', close: '' },
-            { id: crypto.randomUUID(), day: 'Sunday', isOpen: true, open: '', close: '' },
+            { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '03:00', close: '11:00' },
+            { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '03:00', close: '11:00' },
+            { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '03:00', close: '11:00' },
+            { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '03:00', close: '11:00' },
+            { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '03:00', close: '11:00' },
+            { id: crypto.randomUUID(), day: 'Saturday', isOpen: false, open: '03:00', close: '11:00' },
+            { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '03:00', close: '11:00' },
         ],
     });
 
@@ -324,8 +322,8 @@ export default function CreateCard() {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden h-[820px] rounded-lg border-2 border-red-500 p-2 shadow-xl md:block">
-                        <ScrollArea className="h-[800px] cursor-pointer rounded-md border-4">
+                    <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-xl md:block">
+                        <ScrollArea className="h-[800px] cursor-pointer rounded-md border-1">
                             <MuluCard
                                 avatar={data.avatar}
                                 logo={data.logo}
@@ -343,6 +341,7 @@ export default function CreateCard() {
                                 // business_hours={schedule}
                                 galleries={validItems}
                                 services={ValidServiceItems}
+                                bussiness_hours={data.business_hours}
                             />
                         </ScrollArea>
                     </div>
@@ -693,7 +692,10 @@ export default function CreateCard() {
                                                         </div>
                                                         {errors[`business_hours.${index}.open` as keyof typeof errors] &&
                                                         errors[`business_hours.${index}.close` as keyof typeof errors] ? (
-                                                            <InputError message={`please select both opening and closing time for ${day.day}`} className="mt-2" />
+                                                            <InputError
+                                                                message={`please select both opening and closing time for ${day.day}`}
+                                                                className="mt-2"
+                                                            />
                                                         ) : (
                                                             <>
                                                                 {errors[`business_hours.${index}.open` as keyof typeof errors] && (

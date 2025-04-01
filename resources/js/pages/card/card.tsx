@@ -1,8 +1,8 @@
+import BusinessHoursPreview from '@/components/business-hours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
 import { Gallery, Service, type DaySchedule, type Image } from '@/types';
 import { MapPin } from 'lucide-react';
-import BusinessHoursPreview from '@/components/business-hours';
 type MuluCardProps = {
     url: string;
     avatar: Image;
@@ -76,7 +76,7 @@ export default function MuluCard({
                     </div>
                 </div>
 
-                <div className="font-mute p-2 text-center">{headline}.</div>
+                <div className="font-mute p-2 text-center">{headline}</div>
 
                 <div className="flex flex-row flex-wrap items-start justify-center gap-2 border-none">
                     {links?.map((link, index) => {
@@ -84,7 +84,12 @@ export default function MuluCard({
                         return (
                             link.url && (
                                 <div key={index} className="flex flex-row flex-wrap items-center gap-2 rounded-lg border-none p-0">
-                                    <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
+                                    <div
+                                        className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]"
+                                        style={{
+                                            backgroundColor: banner_color,
+                                        }}
+                                    >
                                         <a href={link.url} className="text-xl font-bold text-black">
                                             <Icon className="h-5 w-5 text-white" />
                                         </a>
@@ -170,7 +175,7 @@ export default function MuluCard({
                     </Card>
                 )}
 
-                <BusinessHoursPreview  bussiness_hours={bussiness_hours} />
+                <BusinessHoursPreview bussiness_hours={bussiness_hours} />
 
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
                     <div className="flex items-center justify-center gap-2 p-2">
