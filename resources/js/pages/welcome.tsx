@@ -1,16 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ChevronRight } from 'lucide-react';
+import { type Plan, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { ArrowRight, ChevronRight, Github, Instagram, Twitter } from 'lucide-react';
 import { useEffect } from 'react';
+import PlanCard from '@/components/plan-card';
 
-// import { Globe, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
-
-import { Github, Instagram, Twitter } from 'lucide-react';
-
-import { EnterprisePlan, FreePlan, MostPopular } from '@/components/plans';
-import { type Plan } from '@/types';
-import { Link } from '@inertiajs/react';
-import { ArrowRight } from 'lucide-react';
+const DEFAULT_REDIRECTS = {
+    billing: '/settings/billing/upgrade',
+    register: '/register',
+};
 
 const Hero = () => {
     return (
@@ -417,7 +416,7 @@ const Features = () => {
 };
 
 function Index({ plans }: { plans: Plan[] }) {
-    console.log(plans);
+    const { auth } = usePage<SharedData>().props;
 
     // Add subtle fade-in effect when the page loads
     useEffect(() => {
@@ -497,7 +496,7 @@ function Index({ plans }: { plans: Plan[] }) {
                         </div>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {[...plans]
+                            {/* {[...plans]
                                 .sort((a, b) => {
                                     if (a.type === 'free' && b.type !== 'free') return -1;
                                     if (b.type === 'free' && a.type !== 'free') return 1;
@@ -515,7 +514,37 @@ function Index({ plans }: { plans: Plan[] }) {
                                             <EnterprisePlan plan={plan} />
                                         ) : null}
                                     </div>
-                                ))}
+                                ))} */}
+
+                            {[...plans]
+                                .sort((a, b) => {
+                                    if (a.type === 'free' && b.type !== 'free') return -1;
+                                    if (b.type === 'free' && a.type !== 'free') return 1;
+                                    if (a.type === 'professional' && b.type === 'enterprise') return -1;
+                                    if (b.type === 'professional' && a.type === 'enterprise') return 1;
+                                    return 0;
+                                })
+                                .map((plan, index) => {
+                                    const isCurrentPlan = plan.id === auth.activePlan?.plan?.id;
+                                    const buttonText = isCurrentPlan
+                                        ? 'Current Plan'
+                                        : false // billing is always true in this context
+                                          ? 'Upgrade Now'
+                                          : plan.type === 'enterprise'
+                                            ? 'Contact Sales'
+                                            : 'Get Started';
+                                    const buttonRedirect = route('checkout', { plan: plan });
+
+                                    return (
+                                        <PlanCard
+                                            key={index}
+                                            plan={plan}
+                                            buttonText={buttonText}
+                                            buttonRedirect={buttonRedirect}
+                                            isButtonDisabled={isCurrentPlan}
+                                        />
+                                    );
+                                })}
                         </div>
                     </div>
                 </section>
