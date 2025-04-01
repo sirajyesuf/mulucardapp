@@ -44,6 +44,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'activePlan'  => $request->user() ? $request->user()->activeSubscription()->with('plan')->first() : null
             ],
         ];
     }

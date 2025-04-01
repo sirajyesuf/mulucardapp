@@ -23,6 +23,12 @@ class OrderObserver
     public function updated(Order $order): void
     {
         if($order->isDirty('status') && $order->status == OrderStatus::PAID){
+
+            //inactive all existing subscriptions first
+            $order->user->subscriptions()->where('status',SubscriptionStatus::ACTIVE)
+            ->update([
+                'status' => SubscriptionStatus::CANCELLED
+            ]);
             // create new subscription entry
             $order->user->subscriptions()->create([
                 "plan_id"=>$order->plan_id,
@@ -31,6 +37,7 @@ class OrderObserver
                 "order_id"=>$order->id,
                 "renewal_date"=>now()->addYear()
             ]);
+
         }
     }
 

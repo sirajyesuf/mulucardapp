@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class SubscriptionController extends Controller
 {
     public function index(){
-        $subscriptions = auth()->user()->subscriptions()->with("plan", "order")->get();
+        $subscriptions = auth()->user()->subscriptions()->with('plan', 'order')->orderBy('created_at', 'desc')->get();
 
         return Inertia::render("settings/subscription",[
             "subscriptions"=>$subscriptions

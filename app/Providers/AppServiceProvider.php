@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Registered;
+use App\Listeners\AssignFreePlanSubscription;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         JsonResource::withoutWrapping();
+        Event::listen(Registered::class,AssignFreePlanSubscription::class);
 
     }
 }

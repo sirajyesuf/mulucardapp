@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\URL;
 use App\Models\Card;
-
+use App\Enums\SubscriptionStatus;
 
 
 
@@ -48,5 +48,11 @@ class User extends Authenticatable
 
     public function subscriptions(){
         return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscription(){
+
+        return $this->subscriptions()->where('status',SubscriptionStatus::ACTIVE);
+
     }
 }

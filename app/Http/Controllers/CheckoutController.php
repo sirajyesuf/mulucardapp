@@ -28,14 +28,12 @@ class CheckoutController extends Controller
             "transactionCode"=>"required",
         ]);
 
-        $order = Auth::user()->orders()->create([
+        Auth::user()->orders()->create([
             "order_number"=>uniqid(),
             "plan_id"=>$plan->id,
             "status"=>"pending",
             "payment_ref"=>$request->transactionCode
         ]);
-
-        dd($order);
 
 
         return redirect()->route("dashboard")->with("success","Order has been placed successfully");
