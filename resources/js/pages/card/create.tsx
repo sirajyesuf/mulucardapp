@@ -15,7 +15,15 @@ import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type L
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
 import { FormEventHandler } from 'react';
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+    { title: 'Create Card', href: '' },
+];
+
 interface CardForm {
     avatar: Image;
     logo: Image;
@@ -311,10 +319,10 @@ export default function CreateCard() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <form onSubmit={submit} className="min-h-screen">
-                <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
-                    <Button variant="destructive" className="cursor-pointer">
+                <div className="m-2 flex flex-row justify-end rounded-lg border-2 p-2 shadow-none">
+                    {/* <Button variant="destructive" className="cursor-pointer">
                         Cancel
-                    </Button>
+                    </Button> */}
 
                     <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}

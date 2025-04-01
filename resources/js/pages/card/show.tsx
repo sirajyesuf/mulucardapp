@@ -19,6 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Dashboard',
         href: '/dashboard',
     },
+    { title: 'Show Card', href: '' },
 ];
 
 export default function ShowCard() {
@@ -65,7 +66,7 @@ export default function ShowCard() {
     };
 
     const deleteCard = () => {
-        get(route('card.delete', { id: card.id }), {
+        post(route('card.delete', { id: card.id }), {
             onFinish: () => {
                 console.log('Upload successful!');
                 // reset();
@@ -194,7 +195,7 @@ export default function ShowCard() {
                                 </CardHeader>
                                 <CardContent className="space-y-8">
                                     <div className="space-y-2 rounded-lg border-2 border-dashed border-gray-400 p-4">
-                                        <Label htmlFor="personalized">Personalized Url</Label>
+                                        <Label htmlFor="personalized">Personalized URL</Label>
                                         <Input
                                             id="personalized"
                                             type="text"
@@ -203,7 +204,7 @@ export default function ShowCard() {
                                             onChange={(e) => setData('personalizedurl', e.target.value)}
                                         />
                                         <span className="text-normal text-sm">
-                                            https://example.com/hi/{data.personalizedurl == '' ? card.url : data.personalizedurl}
+                                            {route('card.hello', { url: data.personalizedurl == '' ? card.url : data.personalizedurl })}
                                         </span>
                                         <InputError message={errors.personalizedurl} className="mt-2" />
                                     </div>
