@@ -22,12 +22,12 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('settings/appearance');
     })->name('appearance');
 
-    Route::get('settings/plans', function () {
+    Route::get('settings/plansandpricing', function () {
         $plans = Plan::all();
         return Inertia::render('settings/plan', [
             'plans' => $plans
         ]);
-    })->name('plans');
+    })->name('settings.plans');
 
-    Route::get('settings/subscription',[SubscriptionController::class,'index'])->name('subscription');
+    Route::get('settings/subscription',[SubscriptionController::class,'index'])->name('settings.subscription');
 });
