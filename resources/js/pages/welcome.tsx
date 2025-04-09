@@ -1,10 +1,10 @@
+import PlanCard from '@/components/plan-card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { type Plan, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, ChevronRight, Github, Instagram, Twitter } from 'lucide-react';
 import { useEffect } from 'react';
-import PlanCard from '@/components/plan-card';
 
 const DEFAULT_REDIRECTS = {
     billing: '/settings/billing/upgrade',
@@ -128,8 +128,8 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="glass animate-fade-in absolute top-full right-0 left-0 p-4 shadow-md md:hidden">
-                    <nav className="flex flex-col gap-4 py-4">
+                <div className="h-screen glass animate-fade-in absolute top-full right-0 left-0 p-4 shadow-md md:hidden bg-gray-50">
+                    <nav className="flex flex-col gap-2 py-4">
                         <a
                             href="#features"
                             className="hover:bg-secondary rounded-md px-4 py-2 text-sm font-medium transition-colors"
@@ -179,7 +179,7 @@ const Footer = () => {
                             </span>
                         </a>
                         <p className="text-muted-foreground mb-4 text-sm">Modern digital business cards for professionals.</p>
-                        <div className="flex space-x-4">
+                        <div className="flex space-x-1">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                                 <Twitter className="h-4 w-4" />
                                 <span className="sr-only">Twitter</span>
@@ -417,6 +417,8 @@ const Features = () => {
 
 function Index({ plans }: { plans: Plan[] }) {
     const { auth } = usePage<SharedData>().props;
+    console.log(auth);
+    console.log(plans);
 
     // Add subtle fade-in effect when the page loads
     useEffect(() => {
