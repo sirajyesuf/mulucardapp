@@ -28,8 +28,9 @@ class CardController extends Controller
         $logoPath = $request->file('logo.file')
             ? Storage::url($request->file('logo.file')->store('logos', 'public'))
             : null;
+
         $url = $this->generateUniqueUrl();
-        $qrCodePath = $this->generateQRCode($url,$request->banner_color);
+        $qrCodePath = $this->generateQRCode(route('card.hello',['url' => $url]),$request->banner_color);
 
         $card = Card::create([
             'url' => $url,
@@ -87,6 +88,8 @@ class CardController extends Controller
         $card = Card::where('url', $url)->with('socialLinks', 'galleries', 'services')->firstOrFail();
         $card = new CardResource($card);
 
+
+
         return Inertia::render('card/show', ['card' => $card]);
     }
 
@@ -139,7 +142,7 @@ class CardController extends Controller
                 'max:255',               // Max length of 255 characters
             ],
 
-            'pausecard' => [
+            'status' => [
                 'nullable',
                 'boolean',               // Must be a boolean
             ],
@@ -149,16 +152,19 @@ class CardController extends Controller
         $card = Card::findOrFail($id);
 
         if(request()->has('personalizedurl') and !empty($validated['personalizedurl'])) {
-
             $card->url = $validated['personalizedurl'];
+            
+            // Regenerate QR code with new URL
+            $qrCodePath = $this->generateQRCode(route('card.hello', ['url' => $validated['personalizedurl']]), $card->banner_color);
+            $card->qr_code = $qrCodePath;
         }
 
         if(request()->has('cardname') and !empty($validated['cardname'])) {
             $card->cardname = $validated['cardname'];
         }
 
-        if(request()->has('pausecard') and !empty($validated['pausecard'])) {
-            $card->pausecard = $validated['pausecard'];
+        if(request()->has('status') and !empty($validated['status'])) {
+            $card->status = $validated['status'];
         }
 
         $card->save();
@@ -180,6 +186,8 @@ class CardController extends Controller
     }
 
     public function downloadVCard($id){
+
+        $this->updateTotalSaves($id);
 
         $card = Card::findOrFail($id);
 
@@ -258,6 +266,12 @@ class CardController extends Controller
 
         return $path;
 
+    }
+
+    protected function updateTotalSaves($url){
+        $card = Card::where('url', $url)->firstOrFail();
+        $card->total_saves++;
+        $card->save();
     }
 
 

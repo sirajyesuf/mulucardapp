@@ -65,6 +65,10 @@ export default function PlanCard({
             <Separator className="my-6" />
 
             <ul className="mb-8 space-y-4">
+                <FeatureItem feature={`${plan.number_of_vcard} number of digital virtual bussiness card`} />
+                <FeatureItem feature={`${plan.number_of_service} number of service`} />
+                <FeatureItem feature={`${plan.number_of_nfc_business_card} number of nfc bussiness card`} />
+                <FeatureItem feature={`${plan.number_of_gallery} number of gallery`} />
                 {plan.features.map((feature, index) => (
                     <FeatureItem key={index} feature={feature} />
                 ))}

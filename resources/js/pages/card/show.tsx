@@ -28,11 +28,12 @@ export default function ShowCard() {
 
     const { props } = usePage();
     const card = props.card as CardType;
+    console.log(card)
 
     const { data, setData, post, errors, reset } = useForm({
         personalizedurl: card.url,
         cardname: card.cardname,
-        pausecard: card.pausecard,
+        status: card.status,
     });
 
     const DownloadQRCode = () => {
@@ -47,20 +48,18 @@ export default function ShowCard() {
         router.get(route('card.edit', { id: card?.id }));
     };
 
-    const settings = (event) => {
+    const settings = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         post(route('card.settings', { id: card.id }), {
             onFinish: () => {
-                console.log('Upload successful!');
-                reset();
                 toast.success('card updated successfully');
             },
             onSuccess: () => {
-                console.log('Upload successful!');
+               //
             },
             onError: (errors) => {
-                console.log('Upload errors:', errors);
+                //
             },
         });
     };
@@ -68,8 +67,7 @@ export default function ShowCard() {
     const deleteCard = () => {
         post(route('card.delete', { id: card.id }), {
             onFinish: () => {
-                console.log('Upload successful!');
-                // reset();
+                reset();
                 toast.success('Card has been deleted');
             },
             onSuccess: () => {
@@ -155,12 +153,12 @@ export default function ShowCard() {
                                 <div className="grid grid-cols-1 gap-4 rounded-sm border-none p-2 md:grid-cols-2">
                                     <Card className="flex flex-col items-center justify-center shadow-none">
                                         <h1 className="text-xl font-bold capitalize">TOTAL VIEWS</h1>
-                                        <p className="text-2xl font-extrabold">100</p>
+                                        <p className="text-2xl font-extrabold">{card.total_views}</p>
                                     </Card>
 
                                     <Card className="flex flex-col items-center justify-center shadow-none">
                                         <h1 className="text-xl font-bold capitalize">TOTAL SAVES</h1>
-                                        <p className="text-xl font-extrabold">100</p>
+                                        <p className="text-xl font-extrabold">{card.total_saves}</p>
                                     </Card>
                                 </div>
                                 <CardContent>
@@ -226,13 +224,13 @@ export default function ShowCard() {
                                             <Switch
                                                 id="airplane-mode"
                                                 className=""
-                                                checked={data.pausecard}
-                                                onCheckedChange={(e) => setData('pausecard', e)}
+                                                checked={data.status}
+                                                onCheckedChange={(v) => setData('status', v)}
                                             />
                                             <Label htmlFor="airplane-mode">Disable this card temporarily</Label>
                                         </div>
                                     </div>
-                                    <div className="flex flex-row items-center justify-between rounded-lg border-4 border-red-400 bg-red-50 px-4 py-4">
+                                    <div className="flex flex-row items-center justify-between rounded-lg border-2 border-red-400 bg-red-50 px-4 py-4">
                                         <div className="flex flex-col">
                                             <p className="font-extrabold">Delete</p>
                                             <p className="text-mute font-normal">Delete this card permanently.</p>

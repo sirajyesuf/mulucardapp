@@ -356,7 +356,7 @@ export default function CreateCard() {
 
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
-                            <TabsList className="flex h-auto w-full flex-row flex-wrap justify-around">
+                            <TabsList className="h- flex h-auto w-full flex-row flex-wrap justify-around">
                                 <TabsTrigger value="display">Display</TabsTrigger>
                                 <TabsTrigger value="personal_information">Information</TabsTrigger>
                                 <TabsTrigger value="links">Social Links</TabsTrigger>

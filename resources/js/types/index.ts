@@ -43,7 +43,6 @@ export interface Card {
     id: number;
     url: string;
     cardname: string;
-    pausecard: boolean;
     avatar: Image;
     logo: Image;
     first_name: string;
@@ -64,6 +63,10 @@ export interface Card {
     galleries: Gallery[];
     services: Service[];
     bussiness_hours: DaySchedule[];
+    total_views?: number;
+    total_saves?: number;
+    qr_code:string;
+    status: boolean;
 }
 
 export type DaySchedule = {
@@ -105,7 +108,10 @@ export interface Plan {
     name: string;
     price: number;
     type: string;
-    number_of_vcard: string;
+    number_of_vcard: number | 'unlimited';
+    number_of_service: number | 'unlimited';
+    number_of_nfc_business_card: number | 'unlimited';
+    number_of_gallery: number | 'unlimited';
     description: string;
     features: string[];
 }

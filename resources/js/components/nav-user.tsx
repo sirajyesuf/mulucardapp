@@ -24,11 +24,15 @@ export function NavUser() {
                             </SidebarMenuButton>
                             {state !== 'collapsed' && (
                                 <>
-                                    <hr />
-                                    <div className="flex flex-row items-center justify-center gap-4 p-1">
-                                        <BadgeCheck color="#6265f1" className="size-6" />
-                                        <p className="text-sm font-bold text-[#6265f1] capitalize">{auth.activePlan.plan.name} plan</p>
-                                    </div>
+                                    {auth.activePlan && (
+                                        <>
+                                            <hr />
+                                            <div className="flex flex-row items-center justify-center gap-4 p-1">
+                                                <BadgeCheck color="#6265f1" className="size-6" />
+                                                <p className="text-sm font-bold text-[#6265f1] capitalize">{auth.activePlan.plan.name} plan</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </>
                             )}
                         </div>
