@@ -11,10 +11,10 @@ class Card extends Model
 {
     protected $guarded = [];
 
-        protected function casts(): array
+    protected function casts(): array
     {
         return [
-            'business_hours' => 'array',
+            'business_hours' => 'array'
         ];
     }
 

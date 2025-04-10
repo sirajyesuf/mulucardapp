@@ -31,10 +31,10 @@ Route::middleware(['auth'])->group(function(){
     Route::get('card/{id}/delete',[CardController::class,"delete"])->name("card.delete");
     Route::post('card/{id}/settings',[CardController::class,"settings"])->name("card.settings");
 
+    Route::get('/checkout/{plan}',[CheckoutController::class,"index"])->name("checkout");
+    Route::post('/checkout/{plan}/order',[CheckoutController::class,"store"])->name("checkout.order");
 });
 
 
 Route::get("/hello/{url}",[HelloController::class,"index"])->name("card.hello");
 Route::get('/card/{id}/vcard', [CardController::class, 'downloadVCard'])->name('card.vcard');
-Route::get('/checkout/{plan}',[CheckoutController::class,"index"])->name("checkout");
-Route::post('/checkout/{plan}/order',[CheckoutController::class,"store"])->name("checkout.order");

@@ -16,7 +16,7 @@ class DashboardController extends Controller
 
         $cardsCollection =  CardResource::collection($cards);
         $activeCards = $cardsCollection->where('status', CardStatus::Active);
-        $inactiveCards = $cardsCollection->where('pausecard', CardStatus::InActive);
+        $inactiveCards = $cardsCollection->where('status', CardStatus::InActive);
 
         $reports = [
             'total_cards' => $cardsCollection->count(),

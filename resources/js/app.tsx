@@ -11,6 +11,7 @@ declare global {
 }
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+console.log(appName)
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

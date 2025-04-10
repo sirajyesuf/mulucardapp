@@ -11,13 +11,14 @@ class HelloController extends Controller
 {
     public function index($url)
     {
-
-        $this->updateTotalViews($url);
-
-        $card = Card::where('url', $url)->with('socialLinks', 'galleries', 'services')->firstOrFail();
-        $card = new CardResource($card);
-
-        return Inertia::render('hello',["url"=>$url,"card"=>$card]);
+        try {
+            $card = Card::where('url', $url)->with('socialLinks', 'galleries', 'services')->firstOrFail();
+            $this->updateTotalViews($url);
+            $card = new CardResource($card);
+            return Inertia::render('hello',["url"=>$url,"card"=>$card]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect('/');
+        }
     }
 
     protected function updateTotalViews($url)

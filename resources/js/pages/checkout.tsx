@@ -1,11 +1,12 @@
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { type Bank, type Plan } from '@/types';
+import { type Bank, type Plan, type SharedData } from '@/types';
 import { Button } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Check, ChevronDown, ChevronUp, ClipboardCopy } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import InputError from '@/components/input-error';
 
 const AccountDetails = ({ name, account_number, account_holder }: Bank) => {
     const [hasCopied, setHasCopied] = useState(false);
@@ -253,6 +254,7 @@ export const TransactionCodeInput: React.FC<TransactionCodeInputProps> = ({ valu
 
 const Index = () => {
     const { props } = usePage();
+    const { auth } = usePage<SharedData>().props;
     const banks = props.banks as Bank[];
     const plan = props.plan as Plan;
 
@@ -261,10 +263,10 @@ const Index = () => {
         transactionCode: string;
         email: string;
     };
-    const { data, setData, post } = useForm<PaymentForm>({
+    const { data, setData, post, errors } = useForm<PaymentForm>({
         bank: banks[0],
         transactionCode: '',
-        email: '',
+        email: auth.user.email,
     });
 
     function onSelectBank(bank: Bank) {
@@ -402,7 +404,7 @@ const Index = () => {
                             type="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
+                            disabled
                         />
                     </div>
 
@@ -435,19 +437,20 @@ const Index = () => {
                             placeholder="Enter your transaction reference code"
                         />
                         <p className="text-xs text-gray-500">Enter the reference code from your bank transfer</p>
+                        <InputError className="mt-2" message={errors.transactionCode} />
                     </div>
 
                     <Button onClick={handlePayment} className="mt-4 w-full rounded-md bg-blue-400 py-4 text-white hover:bg-blue-500">
                         Subscribe
                     </Button>
 
-                    <p className="mt-4 text-center text-xs text-gray-500">
+                    {/* <p className="mt-4 text-center text-xs text-gray-500">
                         By confirming your subscription, you allow Your Company to charge you for future payments in accordance with their terms. You
                         can always cancel your subscription.
-                    </p>
+                    </p> */}
 
                     <div className="mt-4 flex items-center justify-center space-x-2 text-xs text-gray-400">
-                        <span>Powered by Your Company</span>
+                        <span>Powered by Mulucard</span>
                         <span>•</span>
                         <button className="hover:text-gray-600">Terms</button>
                         <span>•</span>

@@ -26,6 +26,7 @@ class CheckoutController extends Controller
         $request->validate([
             "bank"=>"required|array",
             "transactionCode"=>"required",
+            "email"=>"required|email"
         ]);
 
         Auth::user()->orders()->create([

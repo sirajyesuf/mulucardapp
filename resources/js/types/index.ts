@@ -62,7 +62,7 @@ export interface Card {
     headline: string;
     galleries: Gallery[];
     services: Service[];
-    bussiness_hours: DaySchedule[];
+    business_hours: DaySchedule[];
     total_views?: number;
     total_saves?: number;
     qr_code:string;

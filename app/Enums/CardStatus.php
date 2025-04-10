@@ -1,10 +1,10 @@
 <?php
 namespace App\Enums;
 
-enum CardStatus: string
+enum CardStatus:int
 {
-    case Active = 'active';
-    case InActive  = 'inactive';
+    case Active = 1;
+    case InActive  = 0;
 
 
     /**

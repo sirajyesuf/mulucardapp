@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Enums\OrderStatus;
 
 class OrderResource extends Resource
 {
@@ -23,7 +24,16 @@ class OrderResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Select::make('plan_id')
+                    ->relationship('plan', 'name')
+                    ->required(),
+                Forms\Components\Select::make('status')
+                    ->options(OrderStatus::options())
+                    ->required(),
+                Forms\Components\TextInput::make('order_number')
+                    ->required(),
+                Forms\Components\TextInput::make('payment_ref')
+                    ->required(),
             ]);
     }
 

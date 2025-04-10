@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use phpDocumentor\Reflection\PseudoTypes\False_;
 
 return new class extends Migration
 {
@@ -18,7 +17,10 @@ return new class extends Migration
             $table->string('price')->nullable();
             $table->string('type');
             $table->string('description');
-            $table->string("number_of_vcard"); 
+            $table->integer("number_of_vcard")->nullable()->default(0);// Nullable for unlimited
+            $table->integer('number_of_nfc_business_card')->nullable()->default(0);// Nullable for unlimited
+            $table->integer('number_of_gallery')->nullable()->default(0);// Nullable for unlimited
+            $table->integer('number_of_service')->nullable()->default(0);// Nullable for unlimited
             $table->json('features');
             $table->timestamps();
         });

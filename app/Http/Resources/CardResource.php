@@ -18,7 +18,7 @@ class CardResource extends JsonResource
             'id' => $this->id,
             'cardname' => $this->cardname,
             'url' => $this->url,
-            'pausecard' => $this->pausecard,
+            'status' => $this->status,
             'avatar' => [
             'file' => null,
             'path' => $this->avatar
@@ -45,6 +45,8 @@ class CardResource extends JsonResource
             'address' => $this->address,
             'location' => $this->location,
             'business_hours' => $this->business_hours,
+            'total_views' => $this->total_views,
+            'total_saves' => $this->total_saves
         ];
     }
 }

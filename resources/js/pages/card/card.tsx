@@ -24,7 +24,7 @@ type MuluCardProps = {
     location: string;
     galleries: Gallery[];
     services: Service[];
-    bussiness_hours: DaySchedule[];
+    business_hours: DaySchedule[];
 };
 
 export default function MuluCard({
@@ -43,7 +43,7 @@ export default function MuluCard({
     location,
     galleries,
     services,
-    bussiness_hours,
+    business_hours,
 }: MuluCardProps) {
     return (
         <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
@@ -175,7 +175,7 @@ export default function MuluCard({
                     </Card>
                 )}
 
-                <BusinessHoursPreview bussiness_hours={bussiness_hours} />
+                <BusinessHoursPreview business_hours={business_hours} />
 
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
                     <div className="flex items-center justify-center gap-2 p-2">

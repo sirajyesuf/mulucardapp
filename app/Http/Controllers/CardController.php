@@ -164,6 +164,8 @@ class CardController extends Controller
         }
 
         if(request()->has('status') and !empty($validated['status'])) {
+
+            dd($validated['status']);
             $card->status = $validated['status'];
         }
 

@@ -2,9 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 import { type DaySchedule } from '@/types';
 
-export default function BusinessHoursPreview({ bussiness_hours }: { bussiness_hours: DaySchedule[] }) {
+export default function BusinessHoursPreview({ business_hours }: { business_hours: DaySchedule[] }) {
     console.log('BusinessHoursPreview');
-    console.log(bussiness_hours);
+    console.log(business_hours);
     // Format time from 24h to 12h format
     const formatTime = (time: string) => {
         const [hours, minutes] = time.split(':').map(Number);
@@ -15,13 +15,13 @@ export default function BusinessHoursPreview({ bussiness_hours }: { bussiness_ho
 
     // Group days with identical schedules
     const groupedSchedule = () => {
-        if (!bussiness_hours) return []; // Add simple undefined check
+        if (!business_hours) return []; // Add simple undefined check
 
         const groups: { days: string[]; schedule: string }[] = [];
         const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
         daysOfWeek.forEach((day) => {
-            const daySchedule = bussiness_hours.find((schedule) => schedule.day === day);
+            const daySchedule = business_hours.find((schedule) => schedule.day === day);
             const scheduleString = getScheduleString(daySchedule);
 
             const existingGroup = groups.find((group) => group.schedule === scheduleString);
@@ -65,7 +65,7 @@ export default function BusinessHoursPreview({ bussiness_hours }: { bussiness_ho
     };
 
     return (
-        <Card className="w-full">
+        <Card className="w-full border-none shadow-none">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
@@ -82,8 +82,8 @@ export default function BusinessHoursPreview({ bussiness_hours }: { bussiness_ho
                                     'Closed'
                                 ) : (
                                     <div className="flex items-center gap-1">
-                                        {formatTime(bussiness_hours.find((schedule) => schedule.day === group.days[0])!.open)} -{' '}
-                                        {formatTime(bussiness_hours.find((schedule) => schedule.day === group.days[0])!.close)}
+                                        {formatTime(business_hours.find((schedule) => schedule.day === group.days[0])!.open)} -{' '}
+                                        {formatTime(business_hours.find((schedule) => schedule.day === group.days[0])!.close)}
                                     </div>
                                 )}
                             </div>

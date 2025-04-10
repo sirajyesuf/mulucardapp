@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('total_views')->default(0);
             $table->integer('total_saves')->default(0);
             $table->string("cardname")->nullable();
-            $table->string("status")->default(CardStatus::Active);
+            $table->boolean("status")->default(CardStatus::Active->value);
         });
     }
 
