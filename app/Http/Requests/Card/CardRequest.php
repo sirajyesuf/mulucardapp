@@ -24,6 +24,7 @@ class CardRequest extends FormRequest
     {
 
         return [
+                'banner.file' => 'required|image|max:2048|dimensions:max_width=1200,max_height=313',
                 'avatar.file' => 'required|image|max:2048',
                 'logo.file' => 'required|image|max:2048',
                 'first_name' => 'required|string|max:255',
@@ -97,6 +98,10 @@ class CardRequest extends FormRequest
 
 
             return [
+            'banner.file.required' => 'The banner field is required.',
+            'banner.file.image' => 'The banner field must be a valid image file.',
+            'banner.file.max' => 'The banner file size must not exceed 2MB.',
+            'banner.file.dimensions' => 'The banner image dimensions must be 1200x313.',
             'avatar.file.required' => 'The avatar field is required.',
             'avatar.file.image' => 'The avatar field must be a valid image file.',
             'avatar.file.max' => 'The avatar file size must not exceed 2MB.',

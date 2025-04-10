@@ -118,6 +118,7 @@ export default function ShowCard() {
                             services={card?.services}
                             galleries={card?.galleries}
                             business_hours={card.business_hours}
+                            banner={card?.banner}
                         />
                     </ScrollArea>
                 </div>

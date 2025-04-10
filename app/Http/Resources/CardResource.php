@@ -19,6 +19,10 @@ class CardResource extends JsonResource
             'cardname' => $this->cardname,
             'url' => $this->url,
             'status' => $this->status,
+            'banner' => [
+                'file' => null,
+                'path' => $this->banner
+            ],
             'avatar' => [
             'file' => null,
             'path' => $this->avatar

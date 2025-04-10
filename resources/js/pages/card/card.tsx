@@ -5,6 +5,7 @@ import { Gallery, Service, type DaySchedule, type Image } from '@/types';
 import { MapPin } from 'lucide-react';
 type MuluCardProps = {
     url: string;
+    banner:Image;
     avatar: Image;
     logo: Image;
     first_name: string;
@@ -28,6 +29,7 @@ type MuluCardProps = {
 };
 
 export default function MuluCard({
+    banner,
     avatar,
     logo,
     banner_color,
@@ -50,10 +52,12 @@ export default function MuluCard({
             <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
                 <div
                     className="h-[200px] w-full"
-                    style={{
-                        backgroundColor: banner_color,
-                    }}
-                ></div>
+                    // style={{
+                    //     backgroundColor: banner_color,
+                    // }}
+                >
+                    {banner.path && <img src={banner.path} alt="" className="h-full w-full border-none object-cover" />}
+                </div>
                 <div className="relative -mt-14 flex flex-row justify-between border-none px-4">
                     <div className="bordr-white flex h-[100px] w-[100px] items-center justify-center rounded-full border-4 border-gray-500 bg-white">
                         <img src={avatar.path} alt="" className="h-full w-full rounded-full border-none object-contain" />

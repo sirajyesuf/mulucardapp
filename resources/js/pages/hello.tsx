@@ -14,6 +14,7 @@ export default function Hello() {
         id: 456,
         url: 'https://mockcard.com/janedoe',
         cardname: 'JaneDoeProCard',
+        banner: { file: null, path: 'https://via.placeholder.com/150/7722AA/FFFFFF?text=Banner' },
         // Use the Image type structure - path is the important part for display/vCard URL
         avatar: { file: null, path: 'https://via.placeholder.com/150/7722AA/FFFFFF?text=Avatar' },
         logo: { file: null, path: 'https://via.placeholder.com/100/00AA77/FFFFFF?text=Logo' },
@@ -155,6 +156,7 @@ export default function Hello() {
                         services={card?.services}
                         galleries={card?.galleries}
                         business_hours={card?.business_hours}
+                        banner={card?.banner}
                     />
                 </div>
                 <div className="items-top fixed bottom-0 -mb-8 flex h-16 w-xl justify-center self-center rounded-4xl border-none bg-[#9f77e3] pt-2 text-white">

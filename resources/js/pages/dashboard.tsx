@@ -27,6 +27,7 @@ interface SocialLink {
 interface Card {
     id: number;
     url: string;
+    banner: Image;
     avatar: Image;
     logo: Image;
     user_id: number;
@@ -100,6 +101,7 @@ export default function Dashboard() {
                     <ScrollArea className="h-[500px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
                         <div className="" key={index} onClick={() => showCardDetail(card.url)}>
                             <MuluCard
+                             banner={card.banner}
                                 avatar={card.avatar}
                                 logo={card.logo}
                                 first_name={card.first_name}
@@ -115,7 +117,7 @@ export default function Dashboard() {
                                 galleries={card.galleries}
                                 address={card.address}
                                 location={card.location}
-                                bussiness_hours={card.business_hours}
+                                business_hours={card.business_hours}
                             />
                         </div>
                     </ScrollArea>

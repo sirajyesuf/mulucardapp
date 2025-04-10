@@ -25,6 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface CardForm {
+    banner: Image;
     avatar: Image;
     logo: Image;
     first_name: string;
@@ -41,12 +42,13 @@ interface CardForm {
     business_hours: DaySchedule[];
     galleries: Gallery[];
     services: Service[];
+    [key: string]: any; // Add index signature to allow string indexing
 }
 
 export default function CreateCard() {
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
 
-    const timeOptions = [];
+    const timeOptions: string[] = [];
 
     for (let hour = 0; hour < 24; hour++) {
         for (let minute = 0; minute < 60; minute += 30) {
@@ -104,6 +106,10 @@ export default function CreateCard() {
     };
 
     const { data, setData, post, processing, errors } = useForm<CardForm>({
+        banner: {
+            file: null,
+            path: null,
+        },
         avatar: {
             file: null,
             path: null,
@@ -269,8 +275,17 @@ export default function CreateCard() {
     const validItems = data.galleries.filter((item: Gallery) => item.file && item.path);
     const ValidServiceItems = data.services.filter((item: Service) => item.file && item.path);
 
-    const handleFileChange = (field: 'avatar' | 'logo') => (e) => {
+    const handleFileChange = (field: 'avatar' | 'logo'|'banner') => (e) => {
         const file = e.target.files?.[0];
+
+        if(field === 'banner'){
+            const newBanner = {
+                file: file,
+                path: file ? URL.createObjectURL(file) : null,
+            };
+
+            setData('banner', newBanner);
+        }
 
         if (field === 'avatar') {
             const newAvatar = {
@@ -307,11 +322,13 @@ export default function CreateCard() {
         });
     };
 
-    const removeFile = (field: 'avatar' | 'logo') => {
+    const removeFile = (field: 'avatar' | 'logo' | 'banner') => {
         if (field === 'avatar') {
             setData('avatar', { file: null, path: null });
-        } else {
+        } else if (field === 'logo') {
             setData('logo', { file: null, path: null });
+        } else if (field === 'banner') {
+            setData('banner', { file: null, path: null });
         }
     };
 
@@ -350,6 +367,7 @@ export default function CreateCard() {
                                 galleries={validItems}
                                 services={ValidServiceItems}
                                 bussiness_hours={data.business_hours}
+                                banner = {data.banner}
                             />
                         </ScrollArea>
                     </div>
@@ -372,6 +390,43 @@ export default function CreateCard() {
                                         <CardDescription>Make changes to your account here.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
+
+                                        <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
+                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
+                                                Upload Your Banner
+                                            </Label>
+                                            {data.banner.file ? (
+                                                <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
+                                                    <span className="flex-1 truncate">{data.banner.file.name}</span>
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('banner')}>
+                                                        <X className="h-4 w-4" />
+                                                        <span className="sr-only">Remove file</span>
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center">
+                                                    <Input
+                                                        id="banner-upload"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={handleFileChange('banner')}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => document.getElementById('banner-upload')?.click()}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <Upload className="h-4 w-4" />
+                                                        Select Image
+                                                    </Button>
+                                                </div>
+                                            )}
+
+                                            <InputError message={errors['banner.file']} className="mt-2" />
+                                        </div>
+                                        {/* banner end */}
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
                                                 Upload Your Avatar
@@ -410,7 +465,7 @@ export default function CreateCard() {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Logo Your Avatar
+                                                Upload Your Logo
                                             </Label>
                                             {data.logo.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">

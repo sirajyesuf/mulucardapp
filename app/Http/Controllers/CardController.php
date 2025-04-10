@@ -22,6 +22,10 @@ class CardController extends Controller
 
         $validated = $request->validated();
 
+        $bannerPath = $request->file('banner.file')
+            ? Storage::url($request->file('banner.file')->store('banners', 'public'))
+            : null;
+
         $avatarPath = $request->file('avatar.file')
             ? Storage::url($request->file('avatar.file')->store('avatars', 'public'))
             : null;
@@ -34,6 +38,7 @@ class CardController extends Controller
 
         $card = Card::create([
             'url' => $url,
+            'banner' => $bannerPath,
             'avatar' => $avatarPath,
             'logo' => $logoPath,
             'first_name' => $request->first_name,
