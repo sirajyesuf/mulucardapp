@@ -42,6 +42,7 @@ export interface User {
 export interface Card {
     id: number;
     url: string;
+    banner: Image;
     cardname: string;
     avatar: Image;
     logo: Image;

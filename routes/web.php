@@ -30,11 +30,11 @@ Route::middleware(['auth'])->group(function(){
     Route::post('card/{id}/update',[CardController::class,"update"])->name("card.update");
     Route::get('card/{id}/delete',[CardController::class,"delete"])->name("card.delete");
     Route::post('card/{id}/settings',[CardController::class,"settings"])->name("card.settings");
-
+    
     Route::get('/checkout/{plan}',[CheckoutController::class,"index"])->name("checkout");
     Route::post('/checkout/{plan}/order',[CheckoutController::class,"store"])->name("checkout.order");
 });
 
 
+Route::post('card/{id}/updatetotalsaves',[CardController::class,"updateTotalSaves"])->name("card.updatetotalsaves");
 Route::get("/hello/{url}",[HelloController::class,"index"])->name("card.hello");
-Route::get('/card/{id}/vcard', [CardController::class, 'downloadVCard'])->name('card.vcard');

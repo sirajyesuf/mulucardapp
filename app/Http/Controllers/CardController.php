@@ -192,6 +192,8 @@ class CardController extends Controller
         return redirect()->route('card.create');
     }
 
+
+
     public function downloadVCard($id){
 
         $this->updateTotalSaves($id);
@@ -275,10 +277,12 @@ class CardController extends Controller
 
     }
 
-    protected function updateTotalSaves($url){
-        $card = Card::where('url', $url)->firstOrFail();
+    public function updateTotalSaves($id){
+        $card = Card::where('id', $id)->firstOrFail();
         $card->total_saves++;
         $card->save();
+        
+        return response()->json(['success' => true]);
     }
 
 
