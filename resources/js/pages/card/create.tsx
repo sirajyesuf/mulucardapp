@@ -470,7 +470,7 @@ export default function CreateCard() {
                                             {data.logo.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
                                                     <span className="flex-1 truncate">{data.logo.file.name}</span>
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('avatar')}>
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('logo')}>
                                                         <X className="h-4 w-4" />
                                                         <span className="sr-only">Remove file</span>
                                                     </Button>
