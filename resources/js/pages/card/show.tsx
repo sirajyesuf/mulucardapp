@@ -30,6 +30,7 @@ export default function ShowCard() {
     const card = props.card as CardType;
     console.log(card)
 
+    const [modifiedFields, setModifiedFields] = useState<Set<string>>(new Set());
     const { data, setData, post, errors, reset } = useForm({
         personalizedurl: card.url,
         cardname: card.cardname,
@@ -51,15 +52,27 @@ export default function ShowCard() {
     const settings = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        // Check if any field has been modified
+        const hasChanges = [
+            data.personalizedurl !== card.url,
+            data.cardname !== card.cardname,
+            data.status !== card.status
+        ].some(Boolean);
+
+        if (!hasChanges) {
+            toast.info('No changes to save');
+            return;
+        }
+
         post(route('card.settings', { id: card.id }), {
-            onFinish: () => {
-                toast.success('card updated successfully');
-            },
+            preserveScroll: true,
             onSuccess: () => {
-               //
+                toast.success('Card updated successfully');
+            
             },
-            onError: (errors) => {
-                //
+            onError: (errors: Record<string, string>) => {
+                toast.error('Failed to update card settings');
+                console.error('Update errors:', errors);
             },
         });
     };
@@ -200,7 +213,7 @@ export default function ShowCard() {
                                             type="text"
                                             name="personalized_url"
                                             value={data.personalizedurl}
-                                            onChange={(e) => setData('personalizedurl', e.target.value)}
+                                            onChange = { (e) => setData('personalizedurl', e.target.value)}
                                         />
                                         <span className="text-normal text-sm">
                                             {route('card.hello', { url: data.personalizedurl == '' ? card.url : data.personalizedurl })}
@@ -215,7 +228,7 @@ export default function ShowCard() {
                                             type="text"
                                             name="cardname"
                                             value={data.cardname}
-                                            onChange={(e) => setData('cardname', e.target.value)}
+                                            onChange = { (e) => setData('cardname', e.target.value)}
                                         />
                                         <InputError message={errors.cardname} className="mt-2" />
                                     </div>
@@ -224,11 +237,13 @@ export default function ShowCard() {
                                         <div className="flex items-center space-x-2">
                                             <Switch
                                                 id="airplane-mode"
-                                                className=""
+                                                className={`${data.status ? 'bg-green-500' : 'bg-red-500'} hover:bg-green-400 data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-red-500`}
                                                 checked={data.status}
-                                                onCheckedChange={(v) => setData('status', v)}
+                                                onCheckedChange={ (v) => setData('status', v)}
                                             />
-                                            <Label htmlFor="airplane-mode">Disable this card temporarily</Label>
+                                            <Label htmlFor="airplane-mode" className={data.status ? 'text-green-700' : 'text-red-700'}>
+                                                {data.status ? 'Card is active and visible' : 'Card is currently disabled'}
+                                            </Label>
                                         </div>
                                     </div>
                                     <div className="flex flex-row items-center justify-between rounded-lg border-2 border-red-400 bg-red-50 px-4 py-4">

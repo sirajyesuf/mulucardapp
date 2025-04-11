@@ -133,54 +133,54 @@ class CardController extends Controller
 
     public function settings($id){
 
+        $card = Card::findOrFail($id);
+
         $validated = request()->validate([
             'personalizedurl' => [
-                'nullable',
+                'required',
                 'string',                // Must be a string
                 'max:255',               // Max length of 255 characters
-                'unique:cards,url',      // Must be unique in the 'url' column of the 'cards' table
+                'unique:cards,url,' . $card->id,
                 'regex:/^[a-zA-Z0-9]+$/' // Only letters (a-z, A-Z) and numbers (0-9), no spaces or special characters
             ],
             'cardname' => [
-                'nullable',
+                'required',
                 'string',                // Must be a string
                 'max:255',               // Max length of 255 characters
             ],
 
             'status' => [
-                'nullable',
+                'required',
                 'boolean',               // Must be a boolean
             ],
         ]);
 
 
-        $card = Card::findOrFail($id);
-
-        if(request()->has('personalizedurl') and !empty($validated['personalizedurl'])) {
-            $card->url = $validated['personalizedurl'];
-            
-            // Regenerate QR code with new URL
+        if($card->url !== $validated['personalizedurl']){
             $qrCodePath = $this->generateQRCode(route('card.hello', ['url' => $validated['personalizedurl']]), $card->banner_color);
             $card->qr_code = $qrCodePath;
+            $card->url = $validated['personalizedurl'];
         }
 
-        if(request()->has('cardname') and !empty($validated['cardname'])) {
+        if($card->cardname !== $validated['cardname']){
             $card->cardname = $validated['cardname'];
         }
 
-        if(request()->has('status') and !empty($validated['status'])) {
-
-            dd($validated['status']);
+        if($card->status !== $validated['status']){
             $card->status = $validated['status'];
         }
 
-        $card->save();
-
-
+        if($card->isDirty()){
+            $card->save();
+        }   
 
         return to_route('card.show', $card->url);
-
     }
+
+
+
+
+    
 
 
     public function delete($id) {

@@ -14,6 +14,8 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
+
+
 // Type for individual social link
 interface SocialLink {
     id: number;
@@ -49,6 +51,12 @@ interface Card {
     business_hours: DaySchedule[];
 }
 
+type Reports = {
+    active_cards: number;
+    inactive_cards: number;
+    total_cards: number;
+}
+
 type CardList = Card[];
 
 export default function Dashboard() {
@@ -58,7 +66,7 @@ export default function Dashboard() {
 
     const { props } = usePage();
     const cards = props.cards as CardList;
-    const reports = props.reports;
+    const reports = props.reports as Reports;
     console.log(reports);
 
     // active_cards: 50;

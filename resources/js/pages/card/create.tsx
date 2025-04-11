@@ -366,7 +366,7 @@ export default function CreateCard() {
                                 // business_hours={schedule}
                                 galleries={validItems}
                                 services={ValidServiceItems}
-                                bussiness_hours={data.business_hours}
+                                business_hours={data.business_hours}
                                 banner = {data.banner}
                             />
                         </ScrollArea>
