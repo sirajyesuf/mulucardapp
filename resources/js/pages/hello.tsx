@@ -3,8 +3,10 @@ import { Head, usePage } from '@inertiajs/react';
 import { Contact, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
-import SocialShare from '@/components/social-share';
+import ShareButton from '@/components/share-button';
 import MuluCard from './card/card';
+
+
 export default function Hello() {
 
     const { props } = usePage();
@@ -105,10 +107,41 @@ export default function Hello() {
         URL.revokeObjectURL(url);
     }
 
+    // Ensure card data exists before accessing properties
+    const pageTitle = card?.first_name && card?.last_name
+        ? `${card.first_name} ${card.last_name} | MuluCard`
+        : 'MuluCard';
+
+    const description = card ? `${card.job_title} at ${card.organization}` : 'MuluCard';
+    const ogtitle = card ? `${card.first_name} ${card.last_name}` : 'MuluCard';
+    const ogdescription = card ? description : 'MuluCard';
+    const ogimage = card ? `${import.meta.env.VITE_APP_URL}${card.avatar.path}` : 'MuluCard';
+    const ogurl = card ? `${import.meta.env.VITE_APP_URL}/hello/${card.url}` : 'MuluCard';  
+    const twitterTitle = card ? `${card.first_name} ${card.last_name}` : 'MuluCard';  
+    const twitterDescription = card ? description : 'MuluCard';  
+    const twitterImage = card ? `${import.meta.env.VITE_APP_URL}${card.avatar.path}` : 'MuluCard';  
+    const twitterUrl = card ? `${import.meta.env.VITE_APP_URL}/hello/${card.url}` : 'MuluCard';   
 
     return (
         <>
-            <Head title="mulucard" />
+            <Head>
+                <title>{pageTitle}</title>
+                <meta name="description" content={description} />
+                <meta property="og:title" content={ogtitle} />
+                <meta property="og:description" content={ogdescription} />
+                <meta property="og:image" content={ogimage} />
+                <meta property="og:url" content={ogurl} />
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="MuluCard" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@MuluCard" />
+                <meta name="twitter:title" content={twitterTitle} />
+                <meta name="twitter:description" content={twitterDescription} />
+                <meta name="twitter:image" content={twitterImage} />
+                <meta name="twitter:url" content={twitterUrl} />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="canonical" href={ogurl} />
+            </Head>
             <div className="flex min-h-svh flex-col justify-between gap-4 bg-white p-1">
                 <div className="mx-auto mt-0 mb-24 md:mb-10 rounded-lg md:border-4 border-none p-1 md:w-[500px]">
                     <MuluCard
@@ -138,19 +171,18 @@ export default function Hello() {
             </div>
             <div className="fixed bottom-0 h-24  w-full border-none p-0">
                 <div className="flex w-full flex-row justify-between p-2">
-                    <div className="relative">
-                        <SocialShare
-                            isOpen={showSocialShare}
-                            onClose={() => setShowSocialShare(false)}
-                            url={window.location.href}
-                            title={`${card.first_name} ${card.last_name}'s Digital Card`}
+                    <div className="">
+                        <ShareButton
+                            title="Check out this awesome content!"
+                            description="I found this really interesting article that I thought you might enjoy."
                         />
-                        <div
+
+                        {/* <div
                             className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-gray-400 hover:bg-gray-500"
                             onClick={() => setShowSocialShare(!showSocialShare)}
                         >
                             <Share2 size={30} color="white" />
-                        </div>
+                        </div> */}
                     </div>
                     <div
                         className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-gray-400 hover:bg-gray-500"
