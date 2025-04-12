@@ -60,8 +60,8 @@ type Reports = {
 type CardList = Card[];
 
 export default function Dashboard() {
-    function showCardDetail(url: string) {
-        router.get(route('card.show', { url: url }));
+    function showCardDetail(id: number) {
+        router.get(route('card.show', { id: id }));
     }
 
     const { props } = usePage();
@@ -107,7 +107,7 @@ export default function Dashboard() {
             <div className="flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-none p-4">
                 {cards.map((card, index) => (
                     <ScrollArea className="h-[500px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
-                        <div className="" key={index} onClick={() => showCardDetail(card.url)}>
+                        <div className="" key={index} onClick={() => showCardDetail(card.id)}>
                             <MuluCard
                              banner={card.banner}
                                 avatar={card.avatar}

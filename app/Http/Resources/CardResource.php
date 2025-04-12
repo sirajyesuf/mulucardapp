@@ -14,22 +14,25 @@ class CardResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Get the app URL using config helper - more reliable than env()
+        //$appUrl = config('app.url');
+        
         return [
             'id' => $this->id,
             'cardname' => $this->cardname,
-            'url' => $this->url,
+            'url' => url(route('card.hello', $this->url)),
             'status' => $this->status,
             'banner' => [
                 'file' => null,
-                'path' => $this->banner
+                'path' => $this->banner ? url($this->banner) : null
             ],
             'avatar' => [
-            'file' => null,
-            'path' => $this->avatar
+                'file' => null,
+                'path' => $this->avatar ? url($this->avatar) : null
             ],
             'logo' => [
-            'file' => null,
-            'path' => $this->logo
+                'file' => null,
+                'path' => $this->logo ? url($this->logo) : null
             ],
             'user_id' => $this->user_id,
             'first_name' => $this->first_name,
@@ -43,8 +46,23 @@ class CardResource extends JsonResource
             'updated_at' => $this->updated_at,
             'links' => $this->socialLinks,
             'headline' => $this->headline,
-            'services' => $this->services,
-            'galleries' => $this->galleries,
+            'services' => $this->services->map(function ($service) {
+                return [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'description' => $service->description,
+                    'file' => null,
+                    'path' => $service->path ? url($service->path) : null
+                ];
+            }),
+            'galleries' => $this->galleries->map(function ($gallery) {
+                return [
+                    'id' => $gallery->id,
+                    'description' => $gallery->description,
+                    'file' => null,
+                    'path' => $gallery->path ? url($gallery->path) : null
+                ];
+            }),
             'qr_code' => $this->qr_code,
             'address' => $this->address,
             'location' => $this->location,

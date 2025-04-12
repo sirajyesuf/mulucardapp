@@ -11,7 +11,7 @@ export default function Hello() {
 
     const { props } = usePage();
     const card = props.card as Card;
-    const [showSocialShare, setShowSocialShare] = useState(false);
+    console.log(card)
 
     // Function to generate vCard content string based on Card type
     function generateVCardContent(cardData: Card): string {
@@ -60,13 +60,13 @@ export default function Hello() {
         // vCard standard: PHOTO;VALUE=URI:<url>
         if (cardData.avatar && cardData.avatar.path) {
         
-            lines.push(`PHOTO;VALUE=URI:${import.meta.env.VITE_APP_URL}${cardData.avatar.path}`);
+            lines.push(`PHOTO;VALUE=URI:${cardData.avatar.path}`);
         }
 
         // Logo URL (using the path property)
         // vCard standard: LOGO;VALUE=URI:<url>
         if (cardData.logo && cardData.logo.path) {
-            lines.push(`LOGO;VALUE=URI:${import.meta.env.VITE_APP_URL}${cardData.logo.path}`);
+            lines.push(`LOGO;VALUE=URI:${cardData.logo.path}`);
         }
 
         // Business Hours - Add to NOTE field (optional, as no standard vCard field exists)
@@ -115,12 +115,12 @@ export default function Hello() {
     const description = card ? `${card.job_title} at ${card.organization}` : 'MuluCard';
     const ogtitle = card ? `${card.first_name} ${card.last_name}` : 'MuluCard';
     const ogdescription = card ? description : 'MuluCard';
-    const ogimage = card ? `${import.meta.env.VITE_APP_URL}${card.avatar.path}` : 'MuluCard';
-    const ogurl = card ? `${import.meta.env.VITE_APP_URL}/hello/${card.url}` : 'MuluCard';  
+    const ogimage = card ? card.avatar.path : 'MuluCard';
+    const ogurl = card ? card.url : 'MuluCard';  
     const twitterTitle = card ? `${card.first_name} ${card.last_name}` : 'MuluCard';  
     const twitterDescription = card ? description : 'MuluCard';  
-    const twitterImage = card ? `${import.meta.env.VITE_APP_URL}${card.avatar.path}` : 'MuluCard';  
-    const twitterUrl = card ? `${import.meta.env.VITE_APP_URL}/hello/${card.url}` : 'MuluCard';   
+    const twitterImage = card?.avatar?.path ?? 'MuluCard';  
+    const twitterUrl = card ? card.url : 'MuluCard';   
 
     return (
         <>

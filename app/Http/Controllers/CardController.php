@@ -88,13 +88,10 @@ class CardController extends Controller
         return redirect()->route('dashboard')->with('success', 'Card created successfully!');
     }
 
-    public function show($url)
+    public function show($id)
     {
-        $card = Card::where('url', $url)->with('socialLinks', 'galleries', 'services')->firstOrFail();
+        $card = Card::findOrFail($id)->with('socialLinks', 'galleries', 'services')->firstOrFail();
         $card = new CardResource($card);
-
-
-
         return Inertia::render('card/show', ['card' => $card]);
     }
 
