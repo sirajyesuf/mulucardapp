@@ -5,8 +5,9 @@ import { Button } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Check, ChevronDown, ChevronUp, ClipboardCopy } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import InputError from '@/components/input-error';
+import { Link } from '@inertiajs/react'
 
 const AccountDetails = ({ name, account_number, account_holder }: Bank) => {
     const [hasCopied, setHasCopied] = useState(false);
@@ -24,6 +25,7 @@ const AccountDetails = ({ name, account_number, account_holder }: Bank) => {
 
     return (
         <div className="bg-secondary/50 space-y-4 rounded-xl p-4">
+            
             <h3 className="text-muted-foreground text-sm font-medium">Transfer to this account</h3>
 
             <div className="space-y-3">
@@ -303,7 +305,7 @@ const Index = () => {
     const handlePayment = () => {
         post(route('checkout.order', { plan: plan }), {
             onSuccess: () => {
-                toast.success('Payment successful!');
+                toast.success('Payment successful. wait for approval');
             },
             onError: (error) => {
                 toast.error(error.message);
@@ -313,17 +315,18 @@ const Index = () => {
 
     return (
         <div className="container mx-auto flex min-h-screen flex-col bg-white md:flex-row">
-            {/* Left column - Company and subscription info */}
+            <Toaster richColors  />
+            {/* Left column - Company and subscription info */}         
             <div className="flex flex-col bg-white p-6 md:w-1/2 md:p-12">
                 <div className="mb-8">
-                    <button className="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                    <Link className="flex items-center text-sm text-gray-500 hover:text-gray-700" href="/dashboard">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         <span>MuluCard</span>
-                    </button>
+                    </Link>
                 </div>
 
                 <div className="mt-4">
-                    <h2 className="mb-1 text-lg font-medium">Subscribe to {paymentAmount}</h2>
+                    <h2 className="mb-1 text-lg font-medium">Subscribe to {plan.name} Plan</h2>
                     <div className="flex items-baseline">
                         <span className="text-3xl font-bold">Birr {paymentAmount}</span>
                         <span className="ml-2 text-sm text-gray-500">per year</span>
@@ -393,7 +396,7 @@ const Index = () => {
             </div>
 
             {/* Right column - Payment form */}
-            <div className="flex flex-col bg-gray-50 p-6 md:w-1/2 md:p-12">
+            <div className="flex flex-col bg-gray-50 p-6 md:w-1/2 md:p-12 border-none">
                 <h1 className="mb-6 text-xl font-semibold">Pay with bank transfer</h1>
 
                 <div className="space-y-6">

@@ -37,7 +37,8 @@ class CheckoutController extends Controller
         ]);
 
 
-        return redirect()->route("dashboard")->with("success","Order has been placed successfully");
+        // return redirect()->route("dashboard")->with("success","Order has been placed successfully");
+        return  redirect()->back();
 
     }
 }

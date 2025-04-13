@@ -35,7 +35,7 @@ const SubscriptionCard = ({ subscription }: { subscription: Subscription }) => {
 
     return (
         <Card
-            className="animate-fade-up overflow-hidden border-gray-200 bg-white/90 p-6 shadow-none backdrop-blur-sm transition-all duration-300 hover:bg-white/95"
+            className="animate-fade-up overflow-hidden border-gray-200 bg-white/90 p-6 shadow-none backdrop-blur-sm transition-all duration-300 hover:bg-white/95 "
             style={{
                 animationDelay: '0.1s',
             }}
