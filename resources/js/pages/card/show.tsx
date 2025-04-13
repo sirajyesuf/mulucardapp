@@ -30,9 +30,8 @@ export default function ShowCard() {
     const card = props.card as CardType;
     console.log(card)
 
-    const [modifiedFields, setModifiedFields] = useState<Set<string>>(new Set());
     const { data, setData, post, errors, reset } = useForm({
-        personalizedurl: card.url,
+        personalizedurl: card.url.split('/').pop(),
         cardname: card.cardname,
         status: card.status,
     });

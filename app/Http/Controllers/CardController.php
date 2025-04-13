@@ -141,7 +141,7 @@ class CardController extends Controller
                 'regex:/^[a-zA-Z0-9]+$/' // Only letters (a-z, A-Z) and numbers (0-9), no spaces or special characters
             ],
             'cardname' => [
-                'required',
+                'nullable',
                 'string',                // Must be a string
                 'max:255',               // Max length of 255 characters
             ],
@@ -171,7 +171,7 @@ class CardController extends Controller
             $card->save();
         }   
 
-        return to_route('card.show', $card->url);
+        return to_route('card.show', $card->id);
     }
 
 
