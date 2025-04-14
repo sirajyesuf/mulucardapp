@@ -94,7 +94,7 @@ export default function ShowCard() {
     const handleCopy = async () => {
         try {
             // Replace with your actual link to copy
-            const linkToCopy = route('card.hello', { url: card.url });
+            const linkToCopy = card.url
             await navigator.clipboard.writeText(linkToCopy);
             setIsCopied(true);
 
