@@ -139,7 +139,7 @@ export default function ShowCard() {
 
                 <div className="col-span-2 flex flex-col justify-between rounded-lg border-none p-4">
                     <Tabs defaultValue="share" className="w-full" onValueChange={(value) => setActiveTab(value)}>
-                        <TabsList className="flex h-16 w-full flex-row justify-between px-4">
+                        <TabsList className="flex h-24 w-full flex-row justify-between px-4">
                             <div className="space-x-4">
                                 <TabsTrigger value="share" className="font-bold">
                                     Share
