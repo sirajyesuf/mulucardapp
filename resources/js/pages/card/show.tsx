@@ -13,6 +13,7 @@ import { Check, Copy, Download, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import MuluCard from './card';
+import NFCCardPreview from '@/components/nfc-card-preview';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -114,6 +115,7 @@ export default function ShowCard() {
                 <div className="col-span-1 hidden rounded-sm border-2 p-0 md:block">
                     <ScrollArea className="h-[800px] pr-2">
                         <MuluCard
+                            url={card?.url}
                             avatar={card?.avatar}
                             logo={card?.logo}
                             first_name={card?.first_name}
@@ -144,6 +146,9 @@ export default function ShowCard() {
                                 </TabsTrigger>
                                 <TabsTrigger value="settings" className="font-bold">
                                     Settings
+                                </TabsTrigger>
+                                <TabsTrigger value="nfc" className="font-bold">
+                                    NFC Card
                                 </TabsTrigger>
                             </div>
 
@@ -259,6 +264,23 @@ export default function ShowCard() {
                                             Delete Card
                                         </Button>
                                     </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="nfc">
+                            <Card className="shadow-none">
+                                <CardHeader>
+                                    <CardTitle>NFC Card</CardTitle>
+                                    <CardDescription>NFC card preview</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-8">
+                                    <NFCCardPreview
+                                        logo={card?.logo}
+                                        brandColor={card?.banner_color}
+                                        qrcode={card?.qr_code}
+                                        side="front"
+                                    />
                                 </CardContent>
                             </Card>
                         </TabsContent>
