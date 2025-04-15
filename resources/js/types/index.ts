@@ -108,14 +108,20 @@ export interface Service {
 export interface Plan {
     id: number;
     name: string;
-    price: number;
-    type: string;
-    number_of_vcard: number | 'unlimited';
-    number_of_service: number | 'unlimited';
-    number_of_nfc_business_card: number | 'unlimited';
-    number_of_gallery: number | 'unlimited';
     description: string;
     features: string[];
+    price: number;
+    number_of_digital_business_card: number;
+    number_of_nfc_business_card: number;
+    number_of_gallery: number;
+    number_of_service: number;
+    most_popular: boolean;
+    custom_url: boolean;
+    deleted_at?: string | null;
+    created_at: string;
+    updated_at: string;
+    button_text: string;
+    redirect_url: string;
 }
 
 export interface Order {

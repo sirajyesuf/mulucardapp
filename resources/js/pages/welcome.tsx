@@ -520,30 +520,14 @@ function Index({ plans }: { plans: Plan[] }) {
 
                             {[...plans]
                                 .sort((a, b) => {
-                                    if (a.type === 'free' && b.type !== 'free') return -1;
-                                    if (b.type === 'free' && a.type !== 'free') return 1;
-                                    if (a.type === 'professional' && b.type === 'enterprise') return -1;
-                                    if (b.type === 'professional' && a.type === 'enterprise') return 1;
                                     return 0;
                                 })
                                 .map((plan, index) => {
-                                    const isCurrentPlan = plan.id === auth.activePlan?.plan?.id;
-                                    const buttonText = isCurrentPlan
-                                        ? 'Current Plan'
-                                        : false // billing is always true in this context
-                                          ? 'Upgrade Now'
-                                          : plan.type === 'enterprise'
-                                            ? 'Contact Sales'
-                                            : 'Get Started';
-                                    const buttonRedirect = route('checkout', { plan: plan });
-
                                     return (
                                         <PlanCard
                                             key={index}
                                             plan={plan}
-                                            buttonText={buttonText}
-                                            buttonRedirect={buttonRedirect}
-                                            isButtonDisabled={isCurrentPlan}
+                                          
                                         />
                                     );
                                 })}

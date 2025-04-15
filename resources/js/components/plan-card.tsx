@@ -5,14 +5,11 @@ import { Link } from '@inertiajs/react';
 
 interface PlanCardProps {
     plan: Plan;
-    isMostPopular?: boolean;
-    buttonText: string;
-    buttonRedirect: string;
     isButtonDisabled?: boolean;
 }
 
-const MOST_POPULAR_PLAN = 'professional';
-const ANIMATION_DELAY = '0.2s'; // Single fixed animation delay
+const ANIMATION_DELAY = '0.2s'; 
+
 
 const MostPopularBadge = () => (
     <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
@@ -22,8 +19,12 @@ const MostPopularBadge = () => (
 
 const PricingDisplay = ({ plan }: { plan: Plan }) => (
     <div className="mt-4">
-        <span className="text-4xl font-bold">{plan.type === 'free' ? 'Free' : `$${plan.price}`}</span>
-        <span className="text-muted-foreground ml-2">{plan.type === 'free' ? 'forever' : '/ year'}</span>
+        <span className="text-4xl font-bold">
+            {plan.price < 0 ? 'Custom Pricing' : plan.price === 0 ? 'Free' : `Birr ${plan.price}`}
+        </span>
+        <span className="text-muted-foreground ml-2">
+            {plan.price === 0 ? 'forever' : plan.price < 0 ? '' : '/ year'}
+        </span>
     </div>
 );
 
@@ -42,19 +43,16 @@ const FeatureItem = ({ feature }: { feature: string }) => (
 
 export default function PlanCard({
     plan,
-    isMostPopular = plan.type === MOST_POPULAR_PLAN,
-    buttonText,
-    buttonRedirect,
     isButtonDisabled = false,
 }: PlanCardProps) {
     return (
         <div
             className={`animate-fade-in relative rounded-xl border bg-white p-8 shadow-sm ${
-                isMostPopular ? 'border-brand-purple border-2 shadow-md' : 'border-border'
+                plan.most_popular ? 'border-brand-purple border-2 shadow-md' : 'border-border'
             }`}
             style={{ animationDelay: ANIMATION_DELAY }}
         >
-            {isMostPopular && <MostPopularBadge />}
+            {/* {plan.most_popular && <MostPopularBadge />} */}
 
             <div className="mb-6">
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
@@ -65,7 +63,7 @@ export default function PlanCard({
             <Separator className="my-6" />
 
             <ul className="mb-8 space-y-4">
-                <FeatureItem feature={`${plan.number_of_vcard} number of digital virtual bussiness card`} />
+                <FeatureItem feature={`${plan.number_of_digital_business_card} number of digital virtual bussiness card`} />
                 <FeatureItem feature={`${plan.number_of_service} number of service`} />
                 <FeatureItem feature={`${plan.number_of_nfc_business_card} number of nfc bussiness card`} />
                 <FeatureItem feature={`${plan.number_of_gallery} number of gallery`} />
@@ -76,16 +74,16 @@ export default function PlanCard({
 
             {isButtonDisabled ? (
                 <Button className="w-full" variant="secondary" disabled>
-                    {buttonText}
+                    {plan.button_text}
                 </Button>
             ) : (
                 <Button
                     asChild
-                    className={`w-full ${isMostPopular ? 'bg-brand-purple hover:bg-brand-purple-dark' : ''}`}
-                    variant={isMostPopular ? 'default' : 'outline'}
+                    className={`w-full ${plan.most_popular ? 'bg-brand-purple hover:bg-brand-purple-dark' : ''}`}
+                    variant={plan.most_popular ? 'default' : 'outline'}
                     disabled
                 >
-                    <Link href={buttonRedirect}>{buttonText}</Link>
+                    <Link href={plan.redirect_url}>{plan.button_text}</Link>
                 </Button>
             )}
         </div>
