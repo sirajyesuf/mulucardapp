@@ -20,42 +20,13 @@ class Plan extends Model
         ];
     }
 
-    // protected $appends = [
-    //         'number_of_vcard',
-    //         'number_of_nfc_business_card',
-    //         'number_of_gallery',
-    //         'number_of_service',
-    // ];
+    
+
+    
 
 
-    protected  function NumberOfVcard(): Attribute
-    {
 
-        return Attribute::make(
-        get: fn ($value) => is_null($value) ? 'unlimited' : $value,
-        );
-    }
-
-    protected  function NumberOfNfcBusinessCard(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => is_null($value) ? 'unlimited' : $value,
-        );
-    }
-
-    protected  function NumberOfGallery(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => is_null($value) ? 'unlimited' : $value,
-        );
-    }
-
-    protected  function NumberOfService(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => is_null($value) ? 'unlimited' : $value,
-        );
-    }
+    
 
 
 }

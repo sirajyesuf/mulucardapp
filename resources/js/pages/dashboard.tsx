@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Service } from '@/types';
+import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Service, type SharedData } from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
@@ -60,6 +60,9 @@ type Reports = {
 type CardList = Card[];
 
 export default function Dashboard() {
+    const { auth } = usePage<SharedData>().props;
+    const permissions = auth.permissions;
+
     function showCardDetail(id: number) {
         router.get(route('card.show', { id: id }));
     }
@@ -67,26 +70,33 @@ export default function Dashboard() {
     const { props } = usePage();
     const cards = props.cards as CardList;
     const reports = props.reports as Reports;
-    console.log(reports);
-
-    // active_cards: 50;
-    // inactive_cards: 50;
-    // total_cards;
+    console.log(reports)
+    console.log(permissions)
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex flex-row justify-end rounded-xl border-none p-2">
-                <Link
-                    className="flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 p-0 text-black shadow-none hover:bg-gray-100"
-                    href="card/create"
-                >
-                    <Button size="lg" className="bg-brand-purple hover:bg-brand-purple-dark group transition-colors">
-                        <span>Create New Card</span>
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                </Link>
-            </div>
+
+            {
+                permissions.card.create && (
+                    <div className="flex flex-row justify-end rounded-xl border-none p-2">
+                    <Link
+                        className="flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 p-0 text-black shadow-none hover:bg-gray-100"
+                        href="card/create"
+                    >
+                        <Button size="lg" className="bg-brand-purple hover:bg-brand-purple-dark group transition-colors">
+                            <span>Create New Card</span>
+                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </Button>
+                    </Link>
+                </div>
+                )
+            }
+
+
+
+
+
 
             <div className="grid grid-cols-1 gap-4 rounded-sm border-none p-2 md:grid-cols-3">
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">

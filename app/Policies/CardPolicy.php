@@ -4,7 +4,9 @@ namespace App\Policies;
 
 use App\Models\Card;
 use App\Models\User;
+use App\Models\Subscription;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\DB;
 
 class CardPolicy
 {
@@ -13,7 +15,7 @@ class CardPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,15 +23,43 @@ class CardPolicy
      */
     public function view(User $user, Card $card): bool
     {
-        return false;
+        return $user->id === $card->user_id;
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return false;
+        // Get user's active subscription
+        $subscription = Subscription::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->first();
+
+        if (!$subscription) {
+            return Response::deny('You need an active subscription to create digital business cards.');
+        }
+
+        // Get the number of cards already created
+        $existingCardsCount = Card::where('user_id', $user->id)->count();
+
+        // Get the plan limit
+        $planLimit = $subscription->plan->number_of_digital_business_card;
+
+        // If planLimit is negative, it means unlimited
+        if ($planLimit < 0) {
+            return Response::allow();
+        }
+
+        // Check if user has reached their plan limit
+        if ($existingCardsCount >= $planLimit) {
+            return Response::deny(
+                "You've reached your plan's limit of {$planLimit} digital business cards. "
+                . "Please upgrade your plan to create more cards."
+            );
+        }
+
+        return Response::allow();
     }
 
     /**

@@ -4,6 +4,11 @@ export interface Auth {
     user: User;
     activePlan: Subscription;
     unReadNotifications: Notification[];
+    permissions: {
+        card: {
+            create: boolean;
+        };
+    };
 }
 
 export interface BreadcrumbItem {

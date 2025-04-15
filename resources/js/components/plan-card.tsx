@@ -6,14 +6,17 @@ import { Link } from '@inertiajs/react';
 interface PlanCardProps {
     plan: Plan;
     isButtonDisabled?: boolean;
+    billing?: boolean;
 }
 
 const ANIMATION_DELAY = '0.2s'; 
 
 
 const MostPopularBadge = () => (
-    <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-        <div className="bg-brand-purple rounded-full px-4 py-1 text-xs font-medium text-white">Most Popular</div>
+    <div className="absolute -top-3 right-8 transform">
+        <div className="bg-brand-purple rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm">
+            Most Popular
+        </div>
     </div>
 );
 
@@ -44,6 +47,7 @@ const FeatureItem = ({ feature }: { feature: string }) => (
 export default function PlanCard({
     plan,
     isButtonDisabled = false,
+    billing = false,
 }: PlanCardProps) {
     return (
         <div
@@ -52,7 +56,7 @@ export default function PlanCard({
             }`}
             style={{ animationDelay: ANIMATION_DELAY }}
         >
-            {/* {plan.most_popular && <MostPopularBadge />} */}
+            {plan.most_popular && <MostPopularBadge />}
 
             <div className="mb-6">
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
@@ -63,27 +67,36 @@ export default function PlanCard({
             <Separator className="my-6" />
 
             <ul className="mb-8 space-y-4">
-                <FeatureItem feature={`${plan.number_of_digital_business_card} number of digital virtual bussiness card`} />
-                <FeatureItem feature={`${plan.number_of_service} number of service`} />
-                <FeatureItem feature={`${plan.number_of_nfc_business_card} number of nfc bussiness card`} />
-                <FeatureItem feature={`${plan.number_of_gallery} number of gallery`} />
-                {plan.features.map((feature, index) => (
+                <FeatureItem 
+                    feature={`${plan.number_of_digital_business_card <= 0 ? (plan.number_of_digital_business_card < 0 ? 'Unlimited' : 'No') : plan.number_of_digital_business_card} digital business card${plan.number_of_digital_business_card === 1 ? '' : 's'}`} 
+                />
+                <FeatureItem 
+                    feature={`${plan.number_of_service <= 0 ? (plan.number_of_service < 0 ? 'Unlimited' : 'No') : plan.number_of_service} service${plan.number_of_service === 1 ? '' : 's'}`} 
+                />
+                <FeatureItem 
+                    feature={`${plan.number_of_nfc_business_card <= 0 ? (plan.number_of_nfc_business_card < 0 ? 'Unlimited' : 'No') : plan.number_of_nfc_business_card} NFC business card${plan.number_of_nfc_business_card === 1 ? '' : 's'}`} 
+                />
+                <FeatureItem 
+                    feature={`${plan.number_of_gallery <= 0 ? (plan.number_of_gallery < 0 ? 'Unlimited' : 'No') : plan.number_of_gallery} galler${plan.number_of_gallery === 1 ? 'y' : 'ies'}`} 
+                />
+                {plan.features?.map((feature, index) => (
                     <FeatureItem key={index} feature={feature} />
                 ))}
             </ul>
 
             {isButtonDisabled ? (
                 <Button className="w-full" variant="secondary" disabled>
-                    {plan.button_text}
+                    {plan.price < 0 ? 'Contact Sales' : 'Get Started'}
                 </Button>
             ) : (
                 <Button
                     asChild
                     className={`w-full ${plan.most_popular ? 'bg-brand-purple hover:bg-brand-purple-dark' : ''}`}
                     variant={plan.most_popular ? 'default' : 'outline'}
-                    disabled
                 >
-                    <Link href={plan.redirect_url}>{plan.button_text}</Link>
+                    <Link href={plan.price < 0 ? '/contact-sales' : billing ? route('checkout', { plan: plan.id }) : route('register')}>
+                        {plan.price < 0 ? 'Contact Sales' : billing ? 'Upgrade Now' : 'Get Started'}
+                    </Link>
                 </Button>
             )}
         </div>

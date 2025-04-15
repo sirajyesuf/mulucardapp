@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('price')->nullable();
-            $table->string('type');
             $table->string('description');
-            $table->integer("number_of_vcard")->nullable()->default(0);// Nullable for unlimited
-            $table->integer('number_of_nfc_business_card')->nullable()->default(0);// Nullable for unlimited
-            $table->integer('number_of_gallery')->nullable()->default(0);// Nullable for unlimited
-            $table->integer('number_of_service')->nullable()->default(0);// Nullable for unlimited
             $table->json('features');
+            $table->string('price');
+            $table->integer("number_of_digital_business_card");
+            $table->integer('number_of_nfc_business_card');
+            $table->integer('number_of_gallery');
+            $table->integer('number_of_service');
+            $table->boolean('most_popular')->default(false);
+            $table->boolean('custom_url')->default(false);
+            $table->softDeletes('deleted_at');
             $table->timestamps();
         });
     }

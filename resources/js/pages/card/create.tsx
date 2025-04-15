@@ -11,8 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
+import { Head, useForm,usePage } from '@inertiajs/react';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -46,6 +46,12 @@ interface CardForm {
 }
 
 export default function CreateCard() {
+
+    const auth = usePage<SharedData>().props.auth;
+    const activePlan = auth.activePlan;
+    const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
+    const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
+
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
 
     const timeOptions: string[] = [];
@@ -337,9 +343,7 @@ export default function CreateCard() {
             <Head title="Dashboard" />
             <form onSubmit={submit} className="min-h-screen">
                 <div className="m-2 flex flex-row justify-end rounded-lg border-2 p-2 shadow-none">
-                    {/* <Button variant="destructive" className="cursor-pointer">
-                        Cancel
-                    </Button> */}
+                  
 
                     <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
@@ -350,6 +354,7 @@ export default function CreateCard() {
                     <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-xl md:block">
                         <ScrollArea className="h-[800px] cursor-pointer rounded-md border-1">
                             <MuluCard
+                                url={data.url}
                                 avatar={data.avatar}
                                 logo={data.logo}
                                 first_name={data.first_name}
@@ -895,17 +900,33 @@ export default function CreateCard() {
                                                 </Card>
                                             ))}
 
-                                            <div className="flex flex-col gap-4 sm:flex-row">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={addMoreServiceItem}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <PlusCircle className="h-5 w-5" />
-                                                    Add More
-                                                </Button>
-                                            </div>
+                                            {
+                                                data.services.length >= serviceLimit && (
+                                                    <InputError
+                                                        message={`Your plan allows up to ${serviceLimit} services`}
+                                                        className="mt-2"
+                                                    />
+                                                )
+                                            }
+
+                                            {
+                                                data.services.length < serviceLimit && (
+
+                                                    <div className="flex flex-col gap-4 sm:flex-row">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={addMoreServiceItem}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <PlusCircle className="h-5 w-5" />
+                                                        Add More
+                                                    </Button>
+                                                </div>
+
+                                                )
+                                            }
+
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -917,8 +938,8 @@ export default function CreateCard() {
                             <TabsContent value="gallery">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Location</CardTitle>
-                                        <CardDescription>Enter your address and location details.</CardDescription>
+                                        <CardTitle>Gallery</CardTitle>
+                                        <CardDescription>enter your pictures</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                         <div className="space-y-6">
@@ -1008,12 +1029,32 @@ export default function CreateCard() {
                                                 </Card>
                                             ))}
 
-                                            <div className="flex flex-col gap-4 sm:flex-row">
-                                                <Button type="button" variant="outline" onClick={addMoreItem} className="flex items-center gap-2">
-                                                    <PlusCircle className="h-5 w-5" />
-                                                    Add More
-                                                </Button>
-                                            </div>
+{
+                                                data.galleries.length >= galleryLimit && (
+                                                    <InputError
+                                                        message={`Your plan allows up to ${galleryLimit} galleries`}
+                                                        className="mt-2"
+                                                    />
+                                                )
+                                            }
+
+                                            {
+                                                data.galleries.length < galleryLimit && (
+
+                                                    <div className="flex flex-col gap-4 sm:flex-row">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={addMoreItem}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <PlusCircle className="h-5 w-5" />
+                                                        Add More
+                                                    </Button>
+                                                </div>
+
+                                                )
+                                            }
                                         </div>
                                     </CardContent>
                                 </Card>

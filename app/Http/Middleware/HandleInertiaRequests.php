@@ -46,6 +46,11 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'activePlan'  => $request->user() ? $request->user()->activeSubscription()->with('plan')->first() : null,
                 'unReadNotifications' => $request->user() ? $request->user()->unreadNotifications->toArray() : [],
+                'permissions' => [
+                    'card' => [
+                        'create' => $request->user() ? $request->user()->can('create', Card::class) : false,
+                    ]
+                ]
             ],
         ];
     }
