@@ -27,7 +27,7 @@ export default function NFCCardPreview({ logo, brandColor, qrcode }: NFCCardPrev
         <TabsTrigger value="back">Back Side</TabsTrigger>
       </TabsList>
       <TabsContent value="front" className="flex justify-center items-center p-2">
-          <div className="w-[600px] h-[400px] flex items-center justify-center  rounded-lg border-none" style={{ backgroundColor: brandColor }}>
+          <div className="w-[600px] h-[300px] flex items-center justify-center  rounded-lg border-none" style={{ backgroundColor: brandColor }}>
 
             <img src={logo.path} alt="" className="w-[250px] h-[250px] rounded-md overflow-hidden flex items-center justify-center border-4 object-cover" 
             style={{
@@ -39,16 +39,22 @@ export default function NFCCardPreview({ logo, brandColor, qrcode }: NFCCardPrev
           </div>
       </TabsContent>
       <TabsContent value="back" className="flex justify-center items-center">
-        <div className="w-[600px] h-[400px] flex  flex-col items-center justify-center  rounded-lg border-none p-1" style={{ backgroundColor: brandColor }}>
-        <div className="self-end border-none">
-            <Wifi size={80} color="white" />
-        </div>
+        <div className="w-[600px] h-[300px] grid grid-cols-4 rounded-lg border-none p-1 gap-2" style={{ backgroundColor: brandColor }}>
+        
+            <div className="col-span-3 border-none border-red-400 flex justify-end items-center">
 
-        <img src={`/storage/${qrcode}`} alt="" className="w-[250px] h-[250px] rounded-md overflow-hidden flex items-center justify-center border-4 object-cover"
-        style={{
-            borderColor: brandColor
-        }}
-        />
+                <img src={`/storage/${qrcode}`} alt="" className="w-[250px] h-[250px] border-4 border-yellow-400 rounded-md overflow-hidden flex items-center justify-center object-cover"
+                style={{
+                    borderColor: brandColor
+                }}
+                />
+
+            </div>
+
+
+            <div className="col-span-1 border-none flex justify-end">
+                <Wifi size={80} color="white" />
+            </div>
 
         </div>
       </TabsContent>
