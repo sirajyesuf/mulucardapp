@@ -903,14 +903,14 @@ export default function CreateCard() {
                                             {
                                                 data.services.length >= serviceLimit && (
                                                     <InputError
-                                                        message={`Your plan allows up to ${serviceLimit} services`}
+                                                        message={errors.services}
                                                         className="mt-2"
                                                     />
                                                 )
                                             }
 
                                             {
-                                                data.services.length < serviceLimit && (
+                                               data.services.length < serviceLimit && (
 
                                                     <div className="flex flex-col gap-4 sm:flex-row">
                                                     <Button
@@ -1032,7 +1032,7 @@ export default function CreateCard() {
 {
                                                 data.galleries.length >= galleryLimit && (
                                                     <InputError
-                                                        message={`Your plan allows up to ${galleryLimit} galleries`}
+                                                        message={errors.galleries}
                                                         className="mt-2"
                                                     />
                                                 )

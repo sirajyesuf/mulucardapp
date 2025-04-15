@@ -15,7 +15,7 @@ class CardController extends Controller
 {
     public function create(){
 
-
+    
         if (auth()->user()->cannot('create', Card::class)) {
             return redirect()->back();
         }

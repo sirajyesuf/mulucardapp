@@ -23,6 +23,9 @@ class CardRequest extends FormRequest
     public function rules(): array
     {
 
+        $serviceLimit = request()->user()->activeSubscription()->with('plan')->first()->plan->number_of_service;
+        $galleryLimit = request()->user()->activeSubscription()->with('plan')->first()->plan->number_of_gallery;
+
         return [
                 'banner.file' => 'required|image|max:2048|dimensions:max_width=1200,max_height=313',
                 'avatar.file' => 'required|image|max:2048',
@@ -45,10 +48,26 @@ class CardRequest extends FormRequest
                 'business_hours.*.isOpen' => 'required|boolean',
                 'business_hours.*.open' => 'required|date_format:H:i',
                 'business_hours.*.close' => 'required|date_format:H:i',
-                'galleries' => 'required|array',
+                'galleries' => [
+                    'required',
+                    'array',
+                    function($attribute, $value, $fail)  use ($galleryLimit){
+                        if ($galleryLimit >= 0 && count($value) > $galleryLimit) {
+                            $fail("Your plan allows up to {$galleryLimit} galleries.");
+                        }
+                    }
+                ],
                 'galleries.*.file' => 'required|image|max:2048',
                 'galleries.*.description' => 'required|string|max:500',
-                'services' => 'required|array',
+                'services' => [
+                    'required',
+                    'array',
+                    function($attribute, $value, $fail) use($serviceLimit) {
+                        if ($serviceLimit >= 0 && count($value) > $serviceLimit) {
+                            $fail("Your plan allows up to {$serviceLimit} services.");
+                        }
+                    }
+                ],
                 'services.*.file' => 'required|image|max:2048',
                 'services.*.name' => 'required|string',
                 'services.*.description' => 'required|string|max:500'
