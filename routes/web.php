@@ -23,6 +23,10 @@ Route::middleware(['auth'])->group(function(){
 
     Route::get('dashboard',[DashboardController::class,"index"])->name("dashboard");
 
+    //notification
+    Route::post('/dashboard/mark-notification-as-read/{id}', [DashboardController::class, "markNotificationAsRead"])->name("dashboard.marknotificationasread");
+    Route::post('/dashboard/mark-all-as-read', [DashboardController::class, "markAllNotificationAsRead"])->name("dashboard.markallasread");
+
     Route::get('card/create',[CardController::class,"create"])->name("card.create");
     Route::post('card/create',[CardController::class,"store"])->name("card.store");
     Route::get('card/{id}',[CardController::class,"show"])->name("card.show");

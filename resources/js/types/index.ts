@@ -3,6 +3,7 @@ import { LucideIcon } from 'lucide-react';
 export interface Auth {
     user: User;
     activePlan: Subscription;
+    unReadNotifications: Notification[];
 }
 
 export interface BreadcrumbItem {
@@ -138,4 +139,18 @@ export interface Subscription {
     start_date: string;
     order: Order;
     plan: Plan;
+}
+
+
+export interface Notification {
+    id: string; // UUID
+    type: string; // Fully qualified class name, e.g. "App\\Notifications\\OrderCreatedNotification"
+    notifiable_type: string; // Usually "App\\Models\\User"
+    notifiable_id: string | number; // Could be either depending on your user ID type
+    data: {
+      [key: string]: any; // You can strongly type this based on your actual notification structure below
+    };
+    read_at: string | null;
+    created_at: string;
+    updated_at: string;
 }

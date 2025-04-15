@@ -3,81 +3,36 @@ import { Bell, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
+import  {router, usePage } from '@inertiajs/react';
+import { SharedData } from "@/types"
+import { usePoll } from '@inertiajs/react'
 
-type Notification = {
-  id: string
-  title: string
-  description: string
-  details: string
-  time: string
-  read: boolean
-}
 
 export default function NotificationPanel() {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      title: "New message",
-      description: "You have received a new message from John Doe",
-      details:
-        "John Doe sent you a message regarding the project proposal. He's asking about the timeline and budget estimates for the next phase. You can reply directly from your inbox.",
-      time: "2 minutes ago",
-      read: false,
-    },
-    {
-      id: "2",
-      title: "Payment successful",
-      description: "Your payment of $199.00 has been processed successfully",
-      details:
-        "Transaction ID: TXN123456789. The payment was processed through your saved Visa card ending in 4242. This payment covers your subscription for the next month. A receipt has been sent to your email.",
-      time: "1 hour ago",
-      read: false,
-    },
-    {
-      id: "3",
-      title: "Account update",
-      description: "Your account details have been updated",
-      details:
-        "Your profile information was updated successfully. This includes your new phone number and updated address. If you didn't make these changes, please contact support immediately.",
-      time: "5 hours ago",
-      read: true,
-    },
-    {
-      id: "4",
-      title: "New feature available",
-      description: "Check out our new dashboard features",
-      details:
-        "We've added new analytics tools to your dashboard. Now you can track user engagement, view conversion rates, and export custom reports. Visit the dashboard to explore these new features.",
-      time: "1 day ago",
-      read: true,
-    },
-  ])
-
+  usePoll(10000)
+  const page = usePage<SharedData>();
+  const { auth } = page.props;
+  const unReadNotifications  = auth.unReadNotifications
+  const unreadCount =  unReadNotifications.length
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const unreadCount = notifications.filter((notification) => !notification.read).length
 
   const removeNotification = (id: string) => {
-    setNotifications(notifications.filter((notification) => notification.id !== id))
+    router.post(route('dashboard.marknotificationasread', { id:id }))
   }
 
   const markAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        read: true,
-      })),
-    )
+
+    const notificationIds = unReadNotifications.map(notification => notification.id)
+    router.post(route('dashboard.markallasread'), {
+      notificationsIds: notificationIds
+    })
+
   }
 
   const toggleNotification = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
-    // Mark as read when expanded
-    if (expandedId !== id) {
-      setNotifications(
-        notifications.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)),
-      )
-    }
+
   }
 
   return (
@@ -96,20 +51,20 @@ export default function NotificationPanel() {
         <SheetHeader className="mb-4">
           <SheetTitle>Notifications</SheetTitle>
           <SheetDescription className="flex justify-between items-center">
-            <span>You have {notifications.length} notifications</span>
+            <span>You have {unreadCount} notifications</span>
             {unreadCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+              <Button variant="ghost" size="sm" onClick={() => markAllAsRead()}>
                 Mark all as read
               </Button>
             )}
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-4 mt-4 max-h-[80vh] overflow-y-auto pr-2">
-          {notifications.length > 0 ? (
-            notifications.map((notification) => (
+          {unreadCount > 0 ? (
+            unReadNotifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`relative p-4 border rounded-lg ${notification.read ? "bg-background" : "bg-muted"} transition-all`}
+                className={`relative p-4 border rounded-lg ${notification.read_at ? "bg-background" : "bg-muted"} transition-all`}
               >
                 <Button
                   variant="ghost"
@@ -124,13 +79,13 @@ export default function NotificationPanel() {
                   <span className="sr-only">Remove</span>
                 </Button>
                 <div className="pr-6 cursor-pointer" onClick={() => toggleNotification(notification.id)}>
-                  <h4 className="font-medium">{notification.title}</h4>
-                  <p className="text-sm text-muted-foreground mt-1">{notification.description}</p>
-                  <p className="text-xs text-muted-foreground mt-2">{notification.time}</p>
+                  <h4 className="font-medium">{notification.data.subject}</h4>
+                  {/* <p className="text-sm text-muted-foreground mt-1">{notification.data.body}</p> */}
+                  <p className="text-xs text-muted-foreground mt-2">{notification.created_at}</p>
 
                   {expandedId === notification.id && (
                     <div className="mt-4 pt-4 border-t text-sm animate-in fade-in-50 duration-200">
-                      <p>{notification.details}</p>
+                      <p>{notification.data.body}</p>
                     </div>
                   )}
                 </div>

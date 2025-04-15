@@ -14,6 +14,8 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use App\Enums\OrderStatus;
 use App\Models\Order;
+use App\Notifications\OrderCreatedNotification;
+
 class ViewOrder extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
@@ -56,10 +58,20 @@ protected function getHeaderActions(): array
     ->action(function (array $data, Order $record): void {
         $record->status = $data['status'];
         $record->save();
+        $record->user->notify(new OrderCreatedNotification($record));
     })
 
     ];
 }
+
+
+// protected function updateStatus(array $data,Order $record): array   {
+
+//     $record->status = $data['status'];
+//     $record->save();
+
+
+// }
 
 
 }
