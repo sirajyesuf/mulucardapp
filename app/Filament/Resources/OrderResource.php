@@ -13,27 +13,35 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Enums\OrderStatus;
+use App\Filament\Resources\OrderResource\Widgets\StatsOverview;
+use Filament\Tables\Filters\SelectFilter;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Subscription Management';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->label('Customer'),
                 Forms\Components\Select::make('plan_id')
                     ->relationship('plan', 'name')
-                    ->required(),
-                Forms\Components\Select::make('status')
-                    ->options(OrderStatus::options())
-                    ->required(),
-                Forms\Components\TextInput::make('order_number')
-                    ->required(),
+                    ->required()
+                    ->label('Subscription Plan'),
                 Forms\Components\TextInput::make('payment_ref')
-                    ->required(),
+                    ->label('Payment Reference')
+                    ->required()
+                    ->placeholder('Enter payment reference number'),
+                Forms\Components\Hidden::make('order_number'),
             ]);
     }
 
@@ -43,16 +51,21 @@ class OrderResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('order_number')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user.name'),
-                Tables\Columns\TextColumn::make('plan.name'),
+                Tables\Columns\TextColumn::make('user.name')
+                ->searchable(),
+                Tables\Columns\TextColumn::make('plan.name')
+                ->searchable(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('payment_ref'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
-                    ->searchable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->options(OrderStatus::options())
+                    ->label('Order Status')
+                    ->placeholder('All Statuses')
+                    ->indicator('Status'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -72,6 +85,19 @@ class OrderResource extends Resource
             //
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            StatsOverview::class
+        ];
+    }
+
+
+    public static function getNavigationBadge(): ?string
+    {
+    return static::getModel()::count();
+}
 
     public static function getPages(): array
     {

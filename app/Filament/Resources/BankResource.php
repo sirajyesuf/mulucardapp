@@ -19,6 +19,7 @@ class BankResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-s-credit-card';
     protected static ?string $modelLabel = 'Bank';
+    protected static ?string $navigationGroup = 'Settings';
 
     public static function form(Form $form): Form
     {
@@ -34,12 +35,6 @@ class BankResource extends Resource
                 Forms\Components\TextInput::make('account_holder')
                     ->label('Account Holder')
                     ->required(),
-                Forms\Components\FileUpload::make('logo')
-                    ->label('Logo')
-                    ->directory('bankinformationlogos')
-                    ->image()
-                    ->required()
-                    ->columnSpanFull(),
             ]);
     }
 
@@ -56,7 +51,6 @@ class BankResource extends Resource
                 Tables\Columns\TextColumn::make('account_holder')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('logo')
             ])
             ->filters([
                 //
