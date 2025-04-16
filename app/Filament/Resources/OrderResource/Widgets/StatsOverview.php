@@ -15,9 +15,7 @@ class StatsOverview extends BaseWidget
             Stat::make('Total Order', Order::count()),
             Stat::make('Paid Order', Order::where('status', OrderStatus::PAID->value)->count()),
             Stat::make('Pending Order', Order::where('status', OrderStatus::PENDING->value)->count()),
-            Stat::make('Failed Order', Order::where('status', OrderStatus::FAILED->value)->count()),
             Stat::make('Cancelled Order', Order::where('status', OrderStatus::CANCELLED->value)->count()),
-            Stat::make('Refunded Order', Order::where('status', OrderStatus::REFUNDED->value)->count()),
         ];
     }
 

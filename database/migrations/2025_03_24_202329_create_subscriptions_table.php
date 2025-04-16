@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('status');
             $table->string('order_id');
             $table->foreign('order_id')->references('id')->on('orders');
-            $table->timestamp('start_date');
-            $table->timestamp('renewal_date');
+            $table->date('start_date');
+            $table->date('renewal_date');
             $table->timestamps();
         });
     }

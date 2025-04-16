@@ -12,8 +12,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\TextColumn;
 use App\Enums\Role;
+use App\Enums\OrderStatus;
+use App\Enums\SubscriptionStatus;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use App\Filament\Resources\CustomerResource\RelationManagers;
 
 class CustomerResource extends Resource
 {
@@ -23,11 +26,6 @@ class CustomerResource extends Resource
     protected static ?string $navigationGroup = 'Customer Management';
     protected static ?int $navigationSort = 1;
     protected static ?string $navigationLabel = 'Customers';
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->where('role', Role::CUSTOMER);
-    }
 
     public static function form(Form $form): Form
     {
@@ -63,7 +61,7 @@ class CustomerResource extends Resource
                     ->copyMessageDuration(1500),
                 TextColumn::make('created_at')
                     ->label('Registered At')
-                    ->dateTime()
+                    ->date()
                     ->sortable()
                     ->toggleable(),
             ])
@@ -82,9 +80,11 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\SubscriptionsRelationManager::class,
         ];
     }
+
 
     public static function getPages(): array
     {
@@ -94,5 +94,10 @@ class CustomerResource extends Resource
             'view' => Pages\ViewCustomer::route('/{record}'),
             'edit' => Pages\EditCustomer::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('role', Role::CUSTOMER);
     }
 }

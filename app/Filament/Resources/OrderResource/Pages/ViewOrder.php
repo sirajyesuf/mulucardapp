@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Notifications\OrderCreatedNotification;
+use App\Notifications\OrderStatusUpdatedNotification;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
 use Filament\Support\Enums\FontWeight;
@@ -41,8 +42,6 @@ class ViewOrder extends ViewRecord
                                     ->color(fn (OrderStatus $state): string => match ($state) {
                                         OrderStatus::PENDING => 'warning',
                                         OrderStatus::PAID => 'success',
-                                        OrderStatus::FAILED => 'danger',
-                                        OrderStatus::REFUNDED => 'info',
                                         OrderStatus::CANCELLED => 'gray',
                                         default => 'gray',
                                     }),
@@ -81,20 +80,6 @@ class ViewOrder extends ViewRecord
                                     ->columnSpanFull(),
                             ]),
                     ]),
-
-                // Section::make('Payment Information')
-                //     ->icon('heroicon-o-credit-card')
-                //     ->schema([
-                //         Grid::make(2)
-                //             ->schema([
-                //                 TextEntry::make('payment_ref')
-                //                     ->label('Payment Reference')
-                //                     ->copyable(),
-                //                 TextEntry::make('updated_at')
-                //                     ->label('Last Updated')
-                //                     ->dateTime(),
-                //             ]),
-                //     ]),
             ]);
     }
 
@@ -111,15 +96,58 @@ class ViewOrder extends ViewRecord
                         ->options(OrderStatus::class)
                         ->required(),
                 ])
-                ->action(function (array $data, Order $record): void {
-                    $record->status = $data['status'];
-                    $record->save();
-                    $record->user->notify(new OrderCreatedNotification($record));
-                    Notification::make()
-                        ->title('Saved successfully')
-                        ->success()
-                        ->send();
+                ->visible(function (Order $record): bool {
+                    return $record->status->value === OrderStatus::PENDING->value;
                 })
+                ->action(function (array $data, Order $record): void {
+                    $this->updateStatus($data, $record);
+                }),
+            
         ];
+    }
+
+
+    protected function updateStatus(array $data, Order $order): void
+    {
+
+        // dump($data['status']);
+        // dump($order->status->value);
+        // dump(OrderStatus::PAID->value);
+        // dump(OrderStatus::CANCELLED->value);
+        // dd("yes");
+
+        //update the order status from pending to paid
+        if($order->status->value === OrderStatus::PENDING->value and $data['status'] === OrderStatus::PAID->value) {
+            $this->updateStatusToPaid($order);
+        }
+
+        //update the order status from pending to cancelled
+        if($order->status->value === OrderStatus::PENDING->value and $data['status'] === OrderStatus::CANCELLED->value) {
+            $this->updateStatusToCancelled($order);
+        }
+   
+    } 
+    
+    
+    protected function updateStatusToPaid(Order $order): void
+    {
+        $order->status = OrderStatus::PAID->value;
+        $order->save();
+        // create subscription
+
+        // send notification to the database
+        $order->user->notify(new OrderStatusUpdatedNotification($order,
+            'Order Status Updated',
+            'Your order status has been updated to PAID. and '.$order->plan->name .'Plan  has been created.'));
+    }
+
+    protected function updateStatusToCancelled(Order $order): void
+    {
+        $order->status = OrderStatus::CANCELLED->value;
+        $order->save();
+        // send notification to the database
+        $order->user->notify(new OrderStatusUpdatedNotification($order,
+            'Order Status Updated',
+            'Your order status has been updated to CANCELLED.'));
     }
 }

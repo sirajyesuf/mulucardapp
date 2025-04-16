@@ -5,8 +5,6 @@ enum OrderStatus: string
 {
     case PENDING = 'pending';
     case PAID = 'paid';
-    case FAILED = 'failed';
-    case REFUNDED = 'refunded';
     case CANCELLED = 'cancelled';
 
     /**
@@ -25,9 +23,8 @@ enum OrderStatus: string
         return [
             self::PENDING->value => 'Pending',
             self::PAID->value => 'Paid',
-            self::FAILED->value => 'Failed',
-            self::REFUNDED->value => 'Refunded',
             self::CANCELLED->value => 'Cancelled',
+            
         ];
     }
 }

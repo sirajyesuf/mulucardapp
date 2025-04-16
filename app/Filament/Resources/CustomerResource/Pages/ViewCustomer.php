@@ -28,44 +28,23 @@ class ViewCustomer extends ViewRecord
                                     ->copyable()
                                     ->copyMessage('Email copied')
                                     ->copyMessageDuration(1500),
-                                TextEntry::make('phone')
-                                    ->label('Phone Number')
-                                    ->copyable(),
-                                TextEntry::make('email_verified_at')
-                                    ->label('Email Verified')
-                                    ->date()
-                                    ->placeholder('Not verified'),
                             ]),
                     ]),
 
-                Section::make('Subscription Information')
+                Section::make('Active Subscription')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                              
                                 TextEntry::make('subscriptions.plan.name')
-                                    ->label('Current Plan'),
+                                    ->label('Plan'),
                                 TextEntry::make('subscriptions.start_date')
                                     ->label('Start Date')
-                                    ->date(),
-                                TextEntry::make('subscriptions.end_date')
-                                    ->label('End Date')
-                                    ->date(),
+                                    ->formatStateUsing(fn ($state) => $state ? date('Y-m-d', strtotime($state)) : null),
+                                TextEntry::make('subscriptions.renewal_date')
+                                    ->label('Renewal Date')
+                                    ->formatStateUsing(fn ($state) => $state ? date('Y-m-d', strtotime($state)) : null),
                             ]),
                     ]),
-
-                Section::make('System Information')
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextEntry::make('created_at')
-                                    ->label('Registered At')
-                                    ->dateTime(),
-                                TextEntry::make('updated_at')
-                                    ->label('Last Updated')
-                                    ->dateTime(),
-                            ]),
-                    ])->collapsed(),
             ]);
     }
 
