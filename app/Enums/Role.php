@@ -4,8 +4,8 @@ namespace App\Enums;
 
 enum Role:string
 {
-    case Admin = 'admin';
-    case Customer = 'customer';
+    case ADMIN = 'admin';
+    case CUSTOMER = 'customer';
 
     /**
      * Get all enum values as an array for Filament Select
@@ -21,24 +21,8 @@ enum Role:string
     public static function options(): array
     {
         return [
-            self::Admin->value => 'Administrator',
-            self::Customer->value => 'Customer',
+            self::ADMIN->value => 'Administrator',
+            self::CUSTOMER->value => 'Customer',
         ];
-    }
-
-    /**
-     * Check if the role is admin
-     */
-    public static function isAdmin(string $role): bool
-    {
-        return $role === self::Admin->value;
-    }
-
-    /**
-     * Check if the role is customer
-     */
-    public static function isCustomer(string $role): bool
-    {
-        return $role === self::Customer->value;
     }
 }

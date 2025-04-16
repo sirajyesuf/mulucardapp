@@ -60,6 +60,6 @@ class PlanDistributionWidget extends BaseWidget
                 ->color('gray')
         );
 
-        return $planStats;
+        return [];
     }
 }
