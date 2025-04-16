@@ -66,9 +66,11 @@ import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
+
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { auth } = usePage<SharedData>().props;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -110,14 +112,33 @@ const Navbar = () => {
                         </a>
                     </nav>
 
-                    <div className="hidden items-center gap-4 md:flex">
+                    {
+                        auth.user ? (
+                            <div className="hidden items-center gap-4 md:flex">
+                                <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
+                                    <Link href={route('dashboard')}>Dashboard</Link>
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="hidden items-center gap-4 md:flex">
+                                <Button variant="ghost" className="font-medium">
+                                    <Link href={route('login')}>Log in</Link>
+                                </Button>
+                                <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
+                                    <Link href={route('register')}>Get Started</Link>
+                                </Button>
+                            </div>
+                        )
+                    }
+
+                    {/* <div className="hidden items-center gap-4 md:flex">
                         <Button variant="ghost" className="font-medium">
                             <Link href={route('login')}>Log in</Link>
                         </Button>
                         <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
                             <Link href={route('register')}>Get Started</Link>
                         </Button>
-                    </div>
+                    </div> */}
 
                     {/* Mobile Menu Button */}
                     <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>

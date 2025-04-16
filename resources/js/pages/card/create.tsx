@@ -351,7 +351,7 @@ export default function CreateCard() {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-xl md:block">
+                    <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-none md:block">
                         <ScrollArea className="h-[800px] cursor-pointer rounded-md border-1">
                             <MuluCard
                                 url={data.url}

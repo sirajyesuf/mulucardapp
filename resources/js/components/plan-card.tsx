@@ -56,7 +56,7 @@ export default function PlanCard({
             }`}
             style={{ animationDelay: ANIMATION_DELAY }}
         >
-            {plan.most_popular && <MostPopularBadge />}
+            {plan.most_popular === true && <MostPopularBadge />}
 
             <div className="mb-6">
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
