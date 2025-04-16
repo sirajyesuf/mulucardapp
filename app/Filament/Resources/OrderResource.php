@@ -56,7 +56,9 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('plan.name')
                 ->searchable(),
                 Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\TextColumn::make('payment_ref'),
+                Tables\Columns\TextColumn::make('payment_ref')
+                ->label('Payment Reference')
+                ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
             ])

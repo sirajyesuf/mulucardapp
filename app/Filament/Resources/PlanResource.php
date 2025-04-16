@@ -29,114 +29,6 @@ class PlanResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // return $form
-        //     ->schema([
-        //         Forms\Components\TextInput::make('name'),
-        //         Forms\Components\TextInput::make('description'),
-        //         Forms\Components\Section::make([
-        //             Forms\Components\Select::make('type')
-        //             ->options([
-        //                 'free' => 'Free',
-        //                 'professional' => 'Professional',
-        //                 'enterprise' => 'Enterprise'
-        //             ])
-        //             ->live(),
-        //             Forms\Components\TextInput::make('price')
-        //             ->visible(fn (Get $get): bool =>  $get('type') != 'free'),
-
-        //         ]),
-
-        //         Forms\Components\Section::make("limit")
-        //         ->description('Prevent abuse by limiting the number of requests per period')
-        //         ->schema([
-
-        //         // Number of VCards
-        //         Forms\Components\Section::make('VCard Limit')
-        //             ->schema([
-        //                 Checkbox::make('unlimited_vcard')
-        //                     ->label('Unlimited VCard')
-        //                     ->live()
-        //                     ->afterStateUpdated(function ($state, callable $set) {
-        //                         if ($state) {
-        //                             $set('number_of_vcard', null); // Set to NULL for unlimited
-        //                         }
-        //                     }),
-        //                 TextInput::make('number_of_vcard')
-        //                     ->numeric()
-        //                     ->minValue(0)
-        //                     ->default(0)
-        //                     ->disabled(fn ($get) => $get('unlimited_vcard'))
-        //                     ->dehydrated(fn ($get) => !$get('unlimited_vcard')), // Only save if not unlimited
-        //             ]),
-        //         // Number of Galleries
-        //         Forms\Components\Section::make('Gallery Limit')
-        //             ->schema([
-        //                 Checkbox::make('unlimited_gallery')
-        //                     ->label('Unlimited Galleries')
-        //                     ->live()
-        //                     ->afterStateUpdated(function ($state, callable $set) {
-        //                         if ($state) {
-        //                             $set('number_of_gallery', null); // Set to NULL for unlimited
-        //                         }
-        //                     }),
-        //                 TextInput::make('number_of_gallery')
-        //                     ->numeric()
-        //                     ->minValue(0)
-        //                     ->default(0)
-        //                     ->disabled(fn ($get) => $get('unlimited_gallery'))
-        //                     ->dehydrated(fn ($get) => !$get('unlimited_gallery')), // Only save if not unlimited
-        //             ]),
-
-        //         // number of services
-        //         Forms\Components\Section::make('Service Limit')
-        //             ->schema([
-        //                 Checkbox::make('unlimited_service')
-        //                     ->label('Unlimited Services')
-        //                     ->live()
-        //                     ->afterStateUpdated(function ($state, callable $set) {
-        //                         if ($state) {
-        //                             $set('number_of_service', null); // Set to NULL for unlimited
-        //                         }
-        //                     }),
-        //                 TextInput::make('number_of_service')
-        //                     ->numeric()
-        //                     ->minValue(0)
-        //                     ->default(0)
-        //                     ->disabled(fn ($get) => $get('unlimited_service'))
-        //                     ->dehydrated(fn ($get) => !$get('unlimited_service')), // Only save if not unlimited
-        //             ]),
-        //         // number of nfc business cards
-        //         Forms\Components\Section::make('NFC Business Card Limit')
-        //             ->schema([
-        //                 Checkbox::make('unlimited_nfc_business_card')
-        //                     ->label('Unlimited NFC Business Cards')
-        //                     ->live()
-        //                     ->afterStateUpdated(function ($state, callable $set) {
-        //                         if ($state) {
-        //                             $set('number_of_nfc_business_card', null); // Set to NULL for unlimited
-        //                         }
-        //                     }),
-        //                 TextInput::make('number_of_nfc_business_card')
-        //                     ->numeric()
-        //                     ->minValue(0)
-        //                     ->default(0)
-        //                     ->disabled(fn ($get) => $get('unlimited_nfc_business_card'))
-        //                     ->dehydrated(fn ($get) => !$get('unlimited_nfc_business_card')), // Only save if not unlimited
-        //             ]),
-        //         ])
-        //             ->collapsible()
-        //             ->persistCollapsed()
-        //             ->compact(),
-
-        //         Forms\Components\Section::make([
-        //             Repeater::make('features')
-        //             ->simple(
-        //                 TextInput::make('feature')->required()
-        //             )
-        //             ->addActionLabel('Add Feature')
-        //         ])
-
-        //     ]);
         return $form
         ->schema([
             Forms\Components\Group::make()
@@ -157,65 +49,6 @@ class PlanResource extends Resource
                     )
                     ->addActionLabel('Add Feature')
                     ]),
-
-                    // Forms\Components\Section::make('Pricing')
-                    //     ->schema([
-                    //         Forms\Components\TextInput::make('price')
-                    //             ->numeric()
-                    //             ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
-                    //             ->required(),
-
-                    //         Forms\Components\TextInput::make('old_price')
-                    //             ->label('Compare at price')
-                    //             ->numeric()
-                    //             ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
-                    //             ->required(),
-
-                    //         Forms\Components\TextInput::make('cost')
-                    //             ->label('Cost per item')
-                    //             ->helperText('Customers won\'t see this price.')
-                    //             ->numeric()
-                    //             ->rules(['regex:/^\d{1,6}(\.\d{0,2})?$/'])
-                    //             ->required(),
-                    //     ])
-                    //     ->columns(2),
-                    // Forms\Components\Section::make('Inventory')
-                    //     ->schema([
-                    //         Forms\Components\TextInput::make('sku')
-                    //             ->label('SKU (Stock Keeping Unit)')
-                    //             ->unique(Product::class, 'sku', ignoreRecord: true)
-                    //             ->maxLength(255)
-                    //             ->required(),
-
-                    //         Forms\Components\TextInput::make('barcode')
-                    //             ->label('Barcode (ISBN, UPC, GTIN, etc.)')
-                    //             ->unique(Product::class, 'barcode', ignoreRecord: true)
-                    //             ->maxLength(255)
-                    //             ->required(),
-
-                    //         Forms\Components\TextInput::make('qty')
-                    //             ->label('Quantity')
-                    //             ->numeric()
-                    //             ->rules(['integer', 'min:0'])
-                    //             ->required(),
-
-                    //         Forms\Components\TextInput::make('security_stock')
-                    //             ->helperText('The safety stock is the limit stock for your products which alerts you if the product stock will soon be out of stock.')
-                    //             ->numeric()
-                    //             ->rules(['integer', 'min:0'])
-                    //             ->required(),
-                    //     ])
-                    //     ->columns(2),
-
-                    // Forms\Components\Section::make('Shipping')
-                    //     ->schema([
-                    //         Forms\Components\Checkbox::make('backorder')
-                    //             ->label('This product can be returned'),
-
-                    //         Forms\Components\Checkbox::make('requires_shipping')
-                    //             ->label('This product will be shipped'),
-                    //     ])
-                    //     ->columns(2),
                 ])
                 ->columnSpan(['lg' => 2]),
 
@@ -321,7 +154,11 @@ class PlanResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('price')
                     ->sortable()
-                    ->money('ETB')
+                    ->formatStateUsing(fn (int $state): string => match(true) {
+                        $state === 0 => 'Free',
+                        $state < 0 => 'Custom Price',
+                        default => 'ETB ' . number_format($state)
+                    })
                     ->alignment('center'),
                 Tables\Columns\IconColumn::make('most_popular')
                     ->boolean()
@@ -344,6 +181,52 @@ class PlanResource extends Resource
                     ->falseIcon('heroicon-o-eye')
                     ->getStateUsing(fn ($record): bool => $record->deleted_at !== null)
                     ->alignCenter(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created At')
+                    ->dateTime()
+                    ->sortable()
+                    ->alignCenter(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated At')
+                    ->dateTime()
+                    ->sortable()
+                    ->alignCenter(),
+                Tables\Columns\TextColumn::make('number_of_nfc_business_card')
+                    ->label('NFC Business Cards')
+                    ->sortable()
+                    ->alignCenter()
+                    ->formatStateUsing(fn (int $state): string => match(true) {
+                        $state === 0 => 'No',
+                        $state < 0 => 'Unlimited',
+                        default => $state   
+                    }),
+                Tables\Columns\TextColumn::make('number_of_digital_business_card')
+                    ->label('Digital Business Cards')
+                    ->sortable()
+                    ->alignCenter()
+                    ->formatStateUsing(fn (int $state): string => match(true) {
+                        $state === 0 => 'No',
+                        $state < 0 => 'Unlimited',
+                        default => $state
+                    }),
+                Tables\Columns\TextColumn::make('number_of_gallery')
+                    ->label('Galleries')
+                    ->sortable()
+                    ->alignCenter()
+                    ->formatStateUsing(fn (int $state): string => match(true) {
+                        $state === 0 => 'No',
+                        $state < 0 => 'Unlimited',
+                        default => $state
+                    }),
+                Tables\Columns\TextColumn::make('number_of_service')
+                    ->label('Services')
+                    ->sortable()
+                    ->alignCenter()
+                    ->formatStateUsing(fn (int $state): string => match(true) {
+                        $state === 0 => 'No',
+                        $state < 0 => 'Unlimited',
+                        default => $state
+                    }),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('deleted_at')
@@ -368,7 +251,7 @@ class PlanResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -379,6 +262,6 @@ class PlanResource extends Resource
             'index' => Pages\ListPlans::route('/'),
             'create' => Pages\CreatePlan::route('/create'),
             'edit' => Pages\EditPlan::route('/{record}/edit'),
-        ];
-    }
+    ];
+}
 }

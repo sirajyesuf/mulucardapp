@@ -46,9 +46,9 @@ class ViewOrder extends ViewRecord
                                         OrderStatus::CANCELLED => 'gray',
                                         default => 'gray',
                                     }),
-                                TextEntry::make('created_at')
-                                    ->label('Order Date')
-                                    ->dateTime()
+                                TextEntry::make('payment_ref')
+                                    ->label('Payment Reference')
+                                    ->copyable()
                             ]),
                     ]),
 
@@ -76,28 +76,25 @@ class ViewOrder extends ViewRecord
                                 TextEntry::make('plan.price')
                                     ->label('Price')
                                     ->money('ETB'),
-                                TextEntry::make('plan.duration')
-                                    ->label('Duration')
-                                    ->suffix(' days'),
                                 TextEntry::make('plan.description')
                                     ->label('Description')
                                     ->columnSpanFull(),
                             ]),
                     ]),
 
-                Section::make('Payment Information')
-                    ->icon('heroicon-o-credit-card')
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextEntry::make('payment_ref')
-                                    ->label('Payment Reference')
-                                    ->copyable(),
-                                TextEntry::make('updated_at')
-                                    ->label('Last Updated')
-                                    ->dateTime(),
-                            ]),
-                    ]),
+                // Section::make('Payment Information')
+                //     ->icon('heroicon-o-credit-card')
+                //     ->schema([
+                //         Grid::make(2)
+                //             ->schema([
+                //                 TextEntry::make('payment_ref')
+                //                     ->label('Payment Reference')
+                //                     ->copyable(),
+                //                 TextEntry::make('updated_at')
+                //                     ->label('Last Updated')
+                //                     ->dateTime(),
+                //             ]),
+                //     ]),
             ]);
     }
 
