@@ -9,11 +9,11 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-        <script
+        {{-- <script
         crossorigin="anonymous"
         src="https://cdn.jsdelivr.net/npm/meta-scan/dist/auto.global.js"
         data-auto-enable="true"
-      ></script>
+      ></script> --}}
         @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])

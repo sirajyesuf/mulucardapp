@@ -95,7 +95,7 @@ class CardController extends Controller
 
     public function show($id)
     {
-        $card = Card::findOrFail($id)->with('socialLinks', 'galleries', 'services')->firstOrFail();
+        $card = Card::where('id', $id)->with('socialLinks', 'galleries', 'services')->first();
         $card = new CardResource($card);
         return Inertia::render('card/show', ['card' => $card]);
     }

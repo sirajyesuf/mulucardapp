@@ -14,9 +14,6 @@ class CardResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Get the app URL using config helper - more reliable than env()
-        //$appUrl = config('app.url');
-        
         return [
             'id' => $this->id,
             'cardname' => $this->cardname,

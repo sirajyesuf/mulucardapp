@@ -7,6 +7,8 @@ import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type S
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import MuluCard from './card/card';
+import { Input } from '@/components/ui/input';
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -64,6 +66,7 @@ export default function Dashboard() {
     const permissions = auth.permissions;
 
     function showCardDetail(id: number) {
+        console.log("show card detail", id)
         router.get(route('card.show', { id: id }));
     }
 
@@ -114,12 +117,17 @@ export default function Dashboard() {
                     <p className="text-2xl font-extrabold">{reports.inactive_cards}</p>
                 </Card>
             </div>
+
+            <div className='border-none border-gray-300 p-2 rounded-sm flex justify-end items-center'>
+            <Input type="text" className='w-[50%]'/>
+            </div>
+
             <div className="flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-none p-4">
                 {cards.map((card, index) => (
                     <ScrollArea className="h-[500px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
                         <div className="" key={index} onClick={() => showCardDetail(card.id)}>
                             <MuluCard
-                             banner={card.banner}
+                                banner={card.banner}
                                 avatar={card.avatar}
                                 logo={card.logo}
                                 first_name={card.first_name}

@@ -29,7 +29,7 @@ export default function NFCCardPreview({ logo, brandColor, qrcode }: NFCCardPrev
       <TabsContent value="front" className="flex justify-center items-center p-2">
           <div className="w-[400px] h-[200px] md:w-[600px] md:h-[300px] flex items-center justify-center  rounded-lg border-none" style={{ backgroundColor: brandColor }}>
 
-            <img src={logo.path} alt="" className="w-[100px] h-[100px] md:w-[250px] md:h-[250px] rounded-md overflow-hidden flex items-center justify-center border-4 object-cover" 
+            <img src={logo.path} alt="" className="w-[100px] h-[100px] md:w-[250px] md:h-[250px] rounded-md overflow-hidden flex items-center justify-center border-4 object-contain" 
             style={{
                 borderColor: brandColor
             }}
