@@ -31,31 +31,11 @@ const Hero = () => {
 
                         <div className="flex flex-wrap gap-4">
                             <Button size="lg" className="bg-brand-purple hover:bg-brand-purple-dark group transition-colors">
-                                <span>Create Your Card</span>
+                                <Link href={route('register')}>Create Your Card</Link>
                                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </Button>
-                            <Button variant="outline" size="lg">
-                                View Templates
-                            </Button>
                         </div>
-
-                        {/* <div className="pt-4">
-                            <p className="text-muted-foreground text-sm font-medium">Trusted by professionals from companies like</p>
-                            <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-4 opacity-70">
-                                <span className="font-semibold">Google</span>
-                                <span className="font-semibold">Microsoft</span>
-                                <span className="font-semibold">Apple</span>
-                                <span className="font-semibold">Amazon</span>
-                            </div>
-                        </div> */}
                     </div>
-
-                    {/* <div className="animate-fade-in-right relative">
-                        <div className="from-brand-purple/20 animate-float absolute inset-0 -z-10 rounded-3xl bg-gradient-to-tr to-transparent blur-3xl"></div>
-                        <div className="mx-auto w-full max-w-md lg:ml-auto">
-                            <CardPreview />
-                        </div>
-                    </div> */}
                 </div>
             </div>
         </section>
@@ -131,15 +111,6 @@ const Navbar = () => {
                         )
                     }
 
-                    {/* <div className="hidden items-center gap-4 md:flex">
-                        <Button variant="ghost" className="font-medium">
-                            <Link href={route('login')}>Log in</Link>
-                        </Button>
-                        <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
-                            <Link href={route('register')}>Get Started</Link>
-                        </Button>
-                    </div> */}
-
                     {/* Mobile Menu Button */}
                     <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -191,7 +162,7 @@ const Footer = () => {
     return (
         <footer className="relative border-t bg-white">
             <div className="container mx-auto max-w-7xl px-4 py-12">
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-12">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
                     <div className="md:col-span-1">
                         <a href="/" className="mb-4 inline-block">
                             <span className="flex items-center text-xl font-semibold">
@@ -217,32 +188,6 @@ const Footer = () => {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-semibold">Product</h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Features
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Templates
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Pricing
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    FAQ
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
                         <h3 className="mb-4 font-semibold">Company</h3>
                         <ul className="space-y-3">
                             <li>
@@ -252,17 +197,12 @@ const Footer = () => {
                             </li>
                             <li>
                                 <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Careers
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                                     Blog
                                 </a>
                             </li>
                             <li>
                                 <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Contact
+                                    Contact Us
                                 </a>
                             </li>
                         </ul>
@@ -279,11 +219,6 @@ const Footer = () => {
                             <li>
                                 <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                                     Terms of Service
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Cookies
                                 </a>
                             </li>
                         </ul>
@@ -307,67 +242,6 @@ const Footer = () => {
     );
 };
 
-// const CardPreview = () => {
-//     return (
-//         <div className="relative">
-//             <div className="business-card glass animate-float p-6">
-//                 <div className="from-brand-purple to-brand-purple-light absolute top-0 right-0 left-0 h-24 rounded-t-xl bg-gradient-to-r"></div>
-
-//                 <div className="relative flex h-full flex-col">
-//                     <div className="mb-6 flex items-start justify-between">
-//                         <Avatar className="h-20 w-20 border-4 border-white shadow-sm">
-//                             <img
-//                                 src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80"
-//                                 alt="Profile"
-//                             />
-//                         </Avatar>
-
-//                         <div className="mt-2">
-//                             <h3 className="text-muted-foreground text-xs tracking-wider uppercase">mulucard</h3>
-//                         </div>
-//                     </div>
-
-//                     <div className="space-y-2">
-//                         <h2 className="text-xl font-bold">Alexander Thompson</h2>
-//                         <p className="text-muted-foreground text-sm">Product Designer at Design Co.</p>
-//                     </div>
-
-//                     <div className="mt-6 flex-grow space-y-3">
-//                         <div className="flex items-center gap-3">
-//                             <Phone className="text-brand-purple h-4 w-4" />
-//                             <span className="text-sm">(555) 123-4567</span>
-//                         </div>
-//                         <div className="flex items-center gap-3">
-//                             <Mail className="text-brand-purple h-4 w-4" />
-//                             <span className="text-sm">alex.thompson@example.com</span>
-//                         </div>
-//                         <div className="flex items-center gap-3">
-//                             <Globe className="text-brand-purple h-4 w-4" />
-//                             <span className="text-sm">www.alexthompson.com</span>
-//                         </div>
-//                         <div className="flex items-center gap-3">
-//                             <MapPin className="text-brand-purple h-4 w-4" />
-//                             <span className="text-sm">San Francisco, CA</span>
-//                         </div>
-//                     </div>
-
-//                     <div className="mt-6 flex items-center gap-2">
-//                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0077B5]">
-//                             <Linkedin className="h-3.5 w-3.5 text-white" />
-//                         </div>
-//                         <div className="bg-muted h-1.5 w-1.5 rounded-full"></div>
-//                         <div className="ml-auto">
-//                             <span className="text-muted-foreground text-xs">Scan or tap to connect</span>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-
-//             {/* Card Shadow */}
-//             <div className="absolute right-4 -bottom-2 left-4 h-[10px] rounded-full bg-black/10 blur-md"></div>
-//         </div>
-//     );
-// };
 
 import { Palette, Repeat, Share2, Shield, Smartphone, Zap } from 'lucide-react';
 
@@ -380,7 +254,7 @@ const features = [
     {
         icon: <Share2 className="text-brand-purple h-6 w-6" />,
         title: 'Instant Sharing',
-        description: 'Share your digital card via QR code, tap, link, or email with a single click.',
+        description: 'Share your digital card via QR code, and tap.',
     },
     {
         icon: <Zap className="text-brand-purple h-6 w-6" />,
@@ -438,8 +312,6 @@ const Features = () => {
 
 function Index({ plans }: { plans: Plan[] }) {
     const { auth } = usePage<SharedData>().props;
-    console.log(auth);
-    console.log(plans);
 
     // Add subtle fade-in effect when the page loads
     useEffect(() => {
@@ -547,7 +419,7 @@ function Index({ plans }: { plans: Plan[] }) {
                                 Join thousands of professionals who are already using mulucard to make connections that matter.
                             </p>
                             <Button size="lg" variant="secondary" className="text-brand-purple bg-white hover:bg-white/90">
-                                Create Your Free Card
+                                <Link href={route('register')}>Create Your Free Card</Link>
                             </Button>
                         </div>
                     </div>

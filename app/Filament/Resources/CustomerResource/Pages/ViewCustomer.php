@@ -9,6 +9,7 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Grid;
+use App\Filament\Resources\CustomerResource\Widgets\StatsOverview;
 
 class ViewCustomer extends ViewRecord
 {
@@ -31,20 +32,20 @@ class ViewCustomer extends ViewRecord
                             ]),
                     ]),
 
-                Section::make('Active Subscription')
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextEntry::make('subscriptions.plan.name')
-                                    ->label('Plan'),
-                                TextEntry::make('subscriptions.start_date')
-                                    ->label('Start Date')
-                                    ->formatStateUsing(fn ($state) => $state ? date('Y-m-d', strtotime($state)) : null),
-                                TextEntry::make('subscriptions.renewal_date')
-                                    ->label('Renewal Date')
-                                    ->formatStateUsing(fn ($state) => $state ? date('Y-m-d', strtotime($state)) : null),
-                            ]),
-                    ]),
+                // Section::make('Active Subscription')
+                //     ->schema([
+                //         Grid::make(2)
+                //             ->schema([
+                //                 TextEntry::make('subscriptions.plan.name')
+                //                     ->label('Plan'),
+                //                 TextEntry::make('subscriptions.start_date')
+                //                     ->label('Start Date')
+                //                     ->formatStateUsing(fn ($state) => $state ? date('Y-m-d', strtotime($state)) : null),
+                //                 TextEntry::make('subscriptions.renewal_date')
+                //                     ->label('Renewal Date')
+                //                     ->formatStateUsing(fn ($state) => $state ? date('Y-m-d', strtotime($state)) : null),
+                //             ]),
+                //     ]),
             ]);
     }
 
@@ -55,4 +56,13 @@ class ViewCustomer extends ViewRecord
                 ->icon('heroicon-m-pencil-square'),
         ];
     }
+
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            StatsOverview::class
+        ];
+    }
+
 }

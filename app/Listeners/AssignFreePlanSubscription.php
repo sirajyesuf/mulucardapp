@@ -28,7 +28,11 @@ class AssignFreePlanSubscription
     {
         $user = $event->user;
 
+        // dump($user);
+
         $freePlan = Plan::where("price",0)->first();
+
+        // dump($freePlan);
 
         $order =  $user->orders()->create([
             'order_number' => uniqid(),
@@ -36,6 +40,10 @@ class AssignFreePlanSubscription
             'status' => OrderStatus::PAID,
             'payment_ref' => 'FREE AUTHOMATICALLY ASSIGNED DURING REGISTRATION'
         ]);
+
+        // dump($order);
+
+    
 
         $user->subscriptions()->create([
             'plan_id' => $freePlan->id,

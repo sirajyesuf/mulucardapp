@@ -19,8 +19,8 @@ class PlanSeeder extends Seeder
                 'description' => 'Perfect for Individuals and Freelancers',
                 'number_of_digital_business_card' => 2,
                 'number_of_nfc_business_card' => 0,
-                'number_of_gallery' => 2,
-                'number_of_service' => 2,
+                'number_of_gallery' => 1,
+                'number_of_service' => 1,
                 'most_popular' => false,
                 'features' => [
                     'Personal Information',
@@ -31,7 +31,6 @@ class PlanSeeder extends Seeder
                     'Basic Analytics',
                     '24/7 Email Support',
                     'Mobile-Friendly Design',
-                    
                 ]
 
             ],
@@ -39,10 +38,10 @@ class PlanSeeder extends Seeder
                 'name' => 'Professional',
                 'price' => 2499,
                 'description' => 'Ideal for Small Businesses and Teams',
-                'number_of_digital_business_card' => 5,
+                'number_of_digital_business_card' => 4,
                 'number_of_nfc_business_card' => 1,
-                'number_of_gallery' => 15,
-                'number_of_service' => 10,
+                'number_of_gallery' => 3,
+                'number_of_service' => 3,
                 'most_popular' => true,
                 'features' => [
                     'Personal Information',

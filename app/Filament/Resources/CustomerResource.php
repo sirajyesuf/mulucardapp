@@ -51,19 +51,14 @@ class CustomerResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
+                    
                 TextColumn::make('email')
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->copyMessage('Email address copied')
-                    ->copyMessageDuration(1500),
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Registered At')
                     ->date()
-                    ->sortable()
-                    ->toggleable(),
+                
             ])
             ->filters([])
             ->actions([
@@ -80,10 +75,12 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\CardsRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
             RelationManagers\SubscriptionsRelationManager::class,
         ];
     }
+
 
 
     public static function getPages(): array
