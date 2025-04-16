@@ -16,13 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->json('features');
-            $table->string('price');
-            $table->integer("number_of_digital_business_card");
-            $table->integer('number_of_nfc_business_card');
-            $table->integer('number_of_gallery');
-            $table->integer('number_of_service');
+            $table->integer('price');
+            $table->integer("number_of_digital_business_card")->nullable();
+            $table->integer('number_of_nfc_business_card')->nullable();
+            $table->integer('number_of_gallery')->nullable();
+            $table->integer('number_of_service')->nullable();
             $table->boolean('most_popular')->default(false);
-            $table->boolean('custom_url')->default(false);
             $table->softDeletes('deleted_at');
             $table->timestamps();
         });

@@ -67,18 +67,34 @@ export default function PlanCard({
             <Separator className="my-6" />
 
             <ul className="mb-8 space-y-4">
-                <FeatureItem 
-                    feature={`${plan.number_of_digital_business_card <= 0 ? (plan.number_of_digital_business_card < 0 ? 'Unlimited' : 'No') : plan.number_of_digital_business_card} digital business card${plan.number_of_digital_business_card === 1 ? '' : 's'}`} 
-                />
-                <FeatureItem 
-                    feature={`${plan.number_of_service <= 0 ? (plan.number_of_service < 0 ? 'Unlimited' : 'No') : plan.number_of_service} service${plan.number_of_service === 1 ? '' : 's'}`} 
-                />
-                <FeatureItem 
-                    feature={`${plan.number_of_nfc_business_card <= 0 ? (plan.number_of_nfc_business_card < 0 ? 'Unlimited' : 'No') : plan.number_of_nfc_business_card} NFC business card${plan.number_of_nfc_business_card === 1 ? '' : 's'}`} 
-                />
-                <FeatureItem 
-                    feature={`${plan.number_of_gallery <= 0 ? (plan.number_of_gallery < 0 ? 'Unlimited' : 'No') : plan.number_of_gallery} galler${plan.number_of_gallery === 1 ? 'y' : 'ies'}`} 
-                />
+                {
+                    plan.number_of_digital_business_card !== null && (
+                        <FeatureItem 
+                            feature={`${plan.number_of_digital_business_card <= 0 ? (plan.number_of_digital_business_card < 0 ? 'Unlimited' : 'No') : plan.number_of_digital_business_card} digital business card${plan.number_of_digital_business_card === 1 ? '' : 's'}`} 
+                        />
+                    )
+                }
+                {
+                    plan.number_of_service !== null && (
+                        <FeatureItem 
+                            feature={`${plan.number_of_service <= 0 ? (plan.number_of_service < 0 ? 'Unlimited' : 'No') : plan.number_of_service} service${plan.number_of_service === 1 ? '' : 's'}`} 
+                        />
+                    )
+                }
+                {
+                    plan.number_of_nfc_business_card !== null && (
+                        <FeatureItem 
+                            feature={`${plan.number_of_nfc_business_card <= 0 ? (plan.number_of_nfc_business_card < 0 ? 'Unlimited' : 'No') : plan.number_of_nfc_business_card} NFC business card${plan.number_of_nfc_business_card === 1 ? '' : 's'}`} 
+                        />
+                    )
+                }
+                {
+                    plan.number_of_gallery !== null && (
+                        <FeatureItem 
+                            feature={`${plan.number_of_gallery <= 0 ? (plan.number_of_gallery < 0 ? 'Unlimited' : 'No') : plan.number_of_gallery} galler${plan.number_of_gallery === 1 ? 'y' : 'ies'}`} 
+                        />
+                    )
+                }
                 {plan.features?.map((feature, index) => (
                     <FeatureItem key={index} feature={feature} />
                 ))}

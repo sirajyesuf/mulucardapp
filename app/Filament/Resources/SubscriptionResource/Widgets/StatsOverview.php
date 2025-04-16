@@ -3,40 +3,44 @@
 namespace App\Filament\Resources\SubscriptionResource\Widgets;
 
 use App\Models\Subscription;
+use App\Models\Plan;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Enums\SubscriptionStatus;
+use Illuminate\Support\Collection;
 
 class StatsOverview extends BaseWidget
 {
     protected function getStats(): array
     {
         $totalSubscriptions = Subscription::count();
-        $activeSubscriptions = Subscription::where('is_active', true)->count();
-        $inactiveSubscriptions = Subscription::where('is_active', false)->count();
-        $expiringThisMonth = Subscription::whereMonth('end_date', now()->month)
-            ->whereYear('end_date', now()->year)
-            ->count();
+        $activeSubscriptions = Subscription::where('status', SubscriptionStatus::ACTIVE->value)->with('plan')->get();
+        $planStats = [
+
+        ];
+        foreach(Plan::all() as $plan){
+            $totalSubscribers =  $activeSubscriptions->where('plan_id', $plan->id)->count();
+            $stat = Stat::make($plan->name, $totalSubscribers)
+                    ->description('Active users')
+                    ->descriptionIcon('heroicon-m-users')
+                    ->color('info');
+            $stats[] = $stat;   
+        }
+
+
+
 
         return [
             Stat::make('Total Subscriptions', $totalSubscriptions)
                 ->description('All time subscriptions')
-                ->descriptionIcon('heroicon-m-chart-bar')
+                ->descriptionIcon('heroicon-m-users')
                 ->color('gray'),
 
-            Stat::make('Active Subscriptions', $activeSubscriptions)
-                ->description(number_format(($activeSubscriptions / max(1, $totalSubscriptions)) * 100, 1) . '% of total')
+            Stat::make('Active Subscriptions', $activeSubscriptions->count())
+                ->description(number_format(($activeSubscriptions->count() / max(1, $totalSubscriptions)) * 100, 1) . '% of total')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
-
-            Stat::make('Inactive Subscriptions', $inactiveSubscriptions)
-                ->description(number_format(($inactiveSubscriptions / max(1, $totalSubscriptions)) * 100, 1) . '% of total')
-                ->descriptionIcon('heroicon-m-arrow-trending-down')
-                ->color('danger'),
-
-            Stat::make('Expiring This Month', $expiringThisMonth)
-                ->description('Subscriptions ending soon')
-                ->descriptionIcon('heroicon-m-clock')
-                ->color('warning'),
+            ...$stats,
         ];
     }
 }

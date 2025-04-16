@@ -10,12 +10,15 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Columns\BadgeColumn;
+use App\Enums\SubscriptionStatus;
+use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Get;
 use Illuminate\Support\HtmlString;
 
 
@@ -69,64 +72,85 @@ class PlanResource extends Resource
                                 }),
                         ]),
                     Forms\Components\Section::make('Limit')
-                    ->description('use any negative number for unlimited')
+                        ->description(fn (Get $get): string => $get('price') < 0 
+                            ? new HtmlString('⚠️ For custom price, below form fields are not applicable')
+                            : 'Use any negative number for unlimited')
                         ->schema([
-                        //hind for all the 4 fiels and display up to  and the input tag value 
                             Forms\Components\TextInput::make('number_of_digital_business_card')
-                                ->numeric()
                                 ->required()
+                                ->numeric()
                                 ->live()
-                                ->helperText(function ($state) {
-                                    if ($state === null) return '';
-                                    if ($state < 0) return new HtmlString('<strong>Unlimited</strong> digital business cards');
-                                    if ($state === 0) return new HtmlString('<strong>No</strong> digital business cards allowed');
-                                    return new HtmlString('Up to <strong>' . $state . '</strong> digital business ' . ($state === 1 ? 'card' : 'cards'));
+                                ->disabled(fn (Get $get): bool => $get('price') < 0)
+                                ->default(null)
+                                ->helperText(function ($state, Get $get) {
+                                    if ($get('price') < 0) return '';
+                                    else{
+                                        if($state === null) return '';
+                                        if ($state < 0) return new HtmlString('<strong>Unlimited</strong> digital business cards');
+                                        if ($state == 0) return new HtmlString('<strong>No</strong> digital business cards allowed');
+                                        return new HtmlString('Up to <strong>' . $state . '</strong> digital business ' . ($state === 1 ? 'card' : 'cards'));
+                                    }
                                 }),
-                            
                             Forms\Components\TextInput::make('number_of_gallery')
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->helperText(function ($state) {
-                                    if ($state === null) return '';
-                                    if ($state < 0) return new HtmlString('<strong>Unlimited</strong> galleries');
-                                    if ($state === 0) return new HtmlString('<strong>No</strong> galleries allowed');
-                                    return new HtmlString('Up to <strong>' . $state . '</strong> ' . ($state === 1 ? 'gallery' : 'galleries'));
+                                ->disabled(fn (Get $get): bool => $get('price') < 0)
+                                ->default(null)
+                                ->helperText(function ($state, Get $get) {
+                                    if ($get('price') < 0) return '';
+                                    else {
+                                        if($state === null) return '';
+                                        if ($state < 0) return new HtmlString('<strong>Unlimited</strong> galleries');
+                                        if ($state == 0) return new HtmlString('<strong>No</strong> galleries allowed');
+                                        return new HtmlString('Up to <strong>' . $state . '</strong> ' . ($state === 1 ? 'gallery' : 'galleries'));
+                                    }
+
                                 }),
                             Forms\Components\TextInput::make('number_of_service')
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->helperText(function ($state) {
-                                    if ($state === null) return '';
-                                    if ($state < 0) return new HtmlString('<strong>Unlimited</strong> services');
-                                    if ($state === 0) return new HtmlString('<strong>No</strong> services allowed');
-                                    return new HtmlString('Up to <strong>' . $state . '</strong> ' . ($state === 1 ? 'service' : 'services'));
+                                ->disabled(fn (Get $get): bool => $get('price') < 0)
+                                ->default(null)
+                                ->helperText(function ($state, Get $get) {
+                                    if ($get('price') < 0) return '';
+                                    else{
+
+                                        if($state === null) return '';
+                                        if ($state < 0) return new HtmlString('<strong>Unlimited</strong> services');
+                                        if ($state == 0) return new HtmlString('<strong>No</strong> services allowed');
+                                        return new HtmlString('Up to <strong>' . $state . '</strong> ' . ($state === 1 ? 'service' : 'services'));
+                                    }
                                 }),
                             Forms\Components\TextInput::make('number_of_nfc_business_card')
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->helperText(function ($state) {
-                                    if ($state === null) return '';
-                                    if ($state < 0) return new HtmlString('<strong>Unlimited</strong> NFC business cards');
-                                    if ($state === 0) return new HtmlString('<strong>No</strong> NFC business cards allowed');
-                                    return new HtmlString('Up to <strong>' . $state . '</strong> NFC business ' . ($state === 1 ? 'card' : 'cards'));
+                                ->disabled(fn (Get $get): bool => $get('price') < 0)
+                                ->default(null)
+                                ->helperText(function ($state, Get $get) {
+                                    if ($get('price') < 0) return '';
+                                    else{
+                                        if($state === null) return '';
+                                        if ($state < 0) return new HtmlString('<strong>Unlimited</strong> NFC business cards');
+                                        if ($state == 0) return new HtmlString('<strong>No</strong> NFC business cards allowed');
+                                        return new HtmlString('Up to <strong>' . $state . '</strong> NFC business ' . ($state === 1 ? 'card' : 'cards'));
+                                    }
                                 }),
                         ]),
 
                     Forms\Components\Section::make('Most Popular')
+                    ->description(fn (Get $get): string => $get('price') < 0 
+                        ? new HtmlString('⚠️ For custom price, below form fields are not applicable')
+                        : '')
                         ->schema([
-
                             Forms\Components\Checkbox::make('most_popular')
                                 ->label('Most Popular')
                                 ->helperText('Mark this plan as the most popular option')
-                                ->default(false),
-                                
-                            Forms\Components\Checkbox::make('custom_url')
-                                ->label('Custom URL')
-                                ->helperText(new HtmlString('Allow customers to use custom URLs like mulucard.com/hello/<strong>tamrat</strong>'))
-                                ->default(false)
+                                ->disabled(fn (Get $get): bool => $get('price') < 0)
+                                ->default(false),                                
+
                         ]),
                 ])
                 ->columnSpan(['lg' => 1]),
@@ -198,6 +222,7 @@ class PlanResource extends Resource
                     ->formatStateUsing(fn (int $state): string => match(true) {
                         $state === 0 => 'No',
                         $state < 0 => 'Unlimited',
+                        is_null($state) => 'N/A',
                         default => $state   
                     }),
                 Tables\Columns\TextColumn::make('number_of_digital_business_card')
@@ -229,17 +254,7 @@ class PlanResource extends Resource
                     }),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('deleted_at')
-                    ->label('Visibility')
-                    ->placeholder('All Plans')
-                    ->trueLabel('Hidden Plans')
-                    ->falseLabel('Visible Plans')
-                    ->queries(
-                        true: fn (Builder $query) => $query->onlyTrashed(),
-                        false: fn (Builder $query) => $query->withoutTrashed(),
-                        // null: fn (Builder $query) => $query->withTrashed()
-                    )
-            ])
+])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),

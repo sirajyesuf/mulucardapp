@@ -26,7 +26,7 @@ class CustomerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', Role::Customer);
+        return parent::getEloquentQuery()->where('role', Role::CUSTOMER);
     }
 
     public static function form(Form $form): Form
@@ -41,12 +41,8 @@ class CustomerResource extends Resource
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('phone')
-                            ->tel()
-                            ->maxLength(255),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
-                            ->label('Email Verified At'),
+                            ->maxLength(255)
+                            ->unique(),
                     ])
                     ->columns(2),
             ]);
@@ -65,43 +61,13 @@ class CustomerResource extends Resource
                     ->copyable()
                     ->copyMessage('Email address copied')
                     ->copyMessageDuration(1500),
-                TextColumn::make('phone')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('subscriptions_count')
-                    ->counts('subscriptions')
-                    ->label('Active Subscriptions')
-                    ->sortable(),
-                TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
                 TextColumn::make('created_at')
+                    ->label('Registered At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
             ])
-            ->filters([
-                TernaryFilter::make('email_verified_at')
-                    ->label('Email Verified')
-                    ->placeholder('All Customers')
-                    ->trueLabel('Verified Customers')
-                    ->falseLabel('Unverified Customers')
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
-                        false: fn (Builder $query) => $query->whereNull('email_verified_at'),
-                    ),
-                SelectFilter::make('subscription_status')
-                    ->label('Subscription Status')
-                    ->relationship('subscriptions', 'id')
-                    ->multiple()
-                    ->preload()
-                    ->options([
-                        'active' => 'Has Active Subscription',
-                        'expired' => 'Has Expired Subscription',
-                        'none' => 'No Subscription',
-                    ])
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),

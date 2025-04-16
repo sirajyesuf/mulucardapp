@@ -14,60 +14,64 @@ class PlanSeeder extends Seeder
 
         $plans = [
             [
-                'name' => 'free',
-                'price' => null,
-                'type' => 'free',
+                'name' => 'Free',
+                'price' => 0,
                 'description' => 'Perfect for Individuals and Freelancers',
-                'number_of_vcard' => 2,
+                'number_of_digital_business_card' => 2,
                 'number_of_nfc_business_card' => 0,
-                'number_of_gallery' => 5,
-                'number_of_service' => 5,
+                'number_of_gallery' => 2,
+                'number_of_service' => 2,
+                'most_popular' => false,
                 'features' => [
-                    'Essential Digital Business Card Features',
                     'Personal Information',
+                    'Avatar, Logo and Banner Images',
+                    'Essential Digital Business Card Features',
                     'Social Media Links Integration',
                     'QR Code Sharing',
                     'Basic Analytics',
                     '24/7 Email Support',
                     'Mobile-Friendly Design',
-                    'Custom URL'
+                    
                 ]
+
             ],
             [
-                'name' => 'professional',
+                'name' => 'Professional',
                 'price' => 2499,
-                'type' => 'professional',
                 'description' => 'Ideal for Small Businesses and Teams',
-                'number_of_vcard' => 5,
+                'number_of_digital_business_card' => 5,
                 'number_of_nfc_business_card' => 1,
                 'number_of_gallery' => 15,
                 'number_of_service' => 10,
+                'most_popular' => true,
                 'features' => [
-                    'All Basic Features',
-                    'Priority Support',
-                    'Advanced Analytics',
-                    'Custom Branding',
-                    'Team Management',
-                    'Multiple Payment Links',
-                    'Lead Generation Tools',
-                    'Premium Templates'
+                    'Personal Information',
+                    'Avatar, Logo and Banner Images',
+                    'Essential Digital Business Card Features',
+                    'Social Media Links Integration',
+                    'QR Code Sharing',
+                    'Basic Analytics',
+                    '24/7 Email Support',
+                    'Mobile-Friendly Design',
+                    'more nfc business card on additional payment'
                 ]
             ],
             [
                 'name' => 'Enterprise',
-                'price' => 4999,
-                'type' => 'enterprise',
+                'price' => -1, // for custome price
                 'description' => 'For Large Organizations and Corporations',
-                'number_of_vcard' => null,
+                'number_of_digital_business_card' => null,
                 'number_of_nfc_business_card' => null,
                 'number_of_gallery' => null,
                 'number_of_service' => null,
+                'most_popular' => false,
                 'features' => [
                     'Everything in Professional Plan',
-                    '2 NFC Business Cards',
+                    'NFC Business Cards',
                     'Unlimited Service Images & Additional Videos',
                     'Custom Themes & Dynamic Colors',
                     'Priority Support',
+                    'Custom Themes',
                     'Custom Branding'
                 ]
             ],

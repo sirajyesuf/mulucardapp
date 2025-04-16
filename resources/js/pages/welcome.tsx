@@ -498,25 +498,7 @@ function Index({ plans }: { plans: Plan[] }) {
                         </div>
 
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {/* {[...plans]
-                                .sort((a, b) => {
-                                    if (a.type === 'free' && b.type !== 'free') return -1;
-                                    if (b.type === 'free' && a.type !== 'free') return 1;
-                                    if (a.type === 'professional' && b.type === 'enterprise') return -1;
-                                    if (b.type === 'professional' && a.type === 'enterprise') return 1;
-                                    return 0;
-                                })
-                                .map((plan, index) => (
-                                    <div key={index}>
-                                        {plan.type === 'free' ? (
-                                            <FreePlan plan={plan} billing={false} />
-                                        ) : plan.type === 'professional' ? (
-                                            <MostPopular plan={plan} billing={false} />
-                                        ) : plan.type === 'enterprise' ? (
-                                            <EnterprisePlan plan={plan} />
-                                        ) : null}
-                                    </div>
-                                ))} */}
+
 
                             {[...plans]
                                 .sort((a, b) => {

@@ -6,7 +6,6 @@ use App\Filament\Resources\SubscriptionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\SubscriptionResource\Widgets\StatsOverview;
-use App\Filament\Widgets\PlanDistributionWidget;
 
 class ListSubscriptions extends ListRecords
 {
@@ -14,18 +13,13 @@ class ListSubscriptions extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\CreateAction::make()
-                ->icon('heroicon-o-plus')
-                ->label('New Subscription'),
-        ];
+        return [];
     }
 
     protected function getHeaderWidgets(): array
     {
         return [
             StatsOverview::class,
-            PlanDistributionWidget::class,
         ];
     }
 }

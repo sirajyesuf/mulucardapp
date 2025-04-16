@@ -116,12 +116,11 @@ export interface Plan {
     description: string;
     features: string[];
     price: number;
-    number_of_digital_business_card: number;
-    number_of_nfc_business_card: number;
-    number_of_gallery: number;
-    number_of_service: number;
+    number_of_digital_business_card: number | null;
+    number_of_nfc_business_card: number | null;
+    number_of_gallery: number | null;
+    number_of_service: number | null;
     most_popular: boolean;
-    custom_url: boolean;
     deleted_at?: string | null;
     created_at: string;
     updated_at: string;

@@ -42,9 +42,7 @@ class ViewCustomer extends ViewRecord
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                TextEntry::make('subscriptions_count')
-                                    ->label('Total Subscriptions')
-                                    ->counts('subscriptions'),
+                              
                                 TextEntry::make('subscriptions.plan.name')
                                     ->label('Current Plan'),
                                 TextEntry::make('subscriptions.start_date')
