@@ -1,33 +1,46 @@
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useEffect } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-// import AuthLayout from '@/layouts/auth/auth-card-layout';
 import AuthLayout from '@/layouts/auth-layout';
 
 import { toast } from 'sonner';
 
 interface LoginForm {
     email: string;
+    [key: string]: string | File | null | undefined;
 }
 
-export default function MagicLogin() {
+export default function MagicLogin({ status }: { status?: string }) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
     });
+
+    // Display success or error toasts based on status or errors
+    useEffect(() => {
+        if (status) {
+            toast.success(status);
+            reset(); // Clear form after success
+        }
+    }, [status, reset]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         post(route('login'), {
-            onFinish: () => {
-                reset();
-                toast.success('Login Magic Link Sent to Your Email Address.');
+            onSuccess: () => {
+                // Success handling is now managed via the `status` prop
+            },
+            onError: (errors) => {
+                // Handle non-validation errors (e.g., server issues)
+                if (errors.email && !errors.email.includes('required')) {
+                    toast.error(errors.email);
+                }
             },
         });
     };

@@ -1,5 +1,4 @@
-<?php
-
+<?
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -9,6 +8,8 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\MagicLinkMail;
+use Illuminate\Validation\ValidationException;
+
 class MagicLoginController extends Controller
 {
     public function show()
@@ -16,16 +17,44 @@ class MagicLoginController extends Controller
         return Inertia::render('auth/magic-login');
     }
 
-    public function  send(Request $request){
+    public function send(Request $request)
+    {
+        try {
+            // Validate the request
+            $validated = $request->validate([
+                'email' => 'required|email|exists:users,email',
+            ]);
 
-        $request->validate(['email' => 'required|email|exists:users,email']);
-        $user = User::where('email', $request->email)->first();
-        $url = $user->generateLoginUrl();
+            // Find the user
+            $user = User::where('email', $validated['email'])->first();
 
-        Mail::to($user->email)->send(new MagicLinkMail($url));
+            // Generate the magic link URL
+            $url = $user->generateLoginUrl();
 
-        return redirect()->back();
+            // Send the magic link email
+            Mail::to($user->email)->send(new MagicLinkMail($url));
 
+            // Return a success response for Inertia
+            return Inertia::render('auth/magic-login')->with([
+                'status' => 'Magic link has been sent to your email.',
+            ]);
+
+        } catch (ValidationException $e) {
+            // Return validation errors to Inertia
+            return back()->withErrors($e->errors())->withInput();
+
+        } catch (\Swift_TransportException $e) {
+            // Handle email sending failure
+            return back()->withErrors([
+                'email' => 'Failed to send the magic link email. Please try again later.',
+            ]);
+
+        } catch (\Exception $e) {
+            // Handle any other unexpected errors
+            return back()->withErrors([
+                'email' => 'An unexpected error occurred. Please try again.',
+            ]);
+        }
     }
 
     public function verify(Request $request, $user)
@@ -42,6 +71,4 @@ class MagicLoginController extends Controller
 
         return redirect()->route('dashboard');
     }
-
-
 }
