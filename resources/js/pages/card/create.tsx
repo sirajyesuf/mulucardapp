@@ -13,7 +13,7 @@ import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
 import { Head, useForm,usePage } from '@inertiajs/react';
-import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
+import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X ,ShieldAlert} from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,6 +51,7 @@ export default function CreateCard() {
     const activePlan = auth.activePlan;
     const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
     const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
+
 
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
 
@@ -154,6 +155,37 @@ export default function CreateCard() {
             { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '03:00', close: '11:00' },
         ],
     });
+
+
+    const hasTabError = (prefixes: string[], errors: Partial<Record<string, string>>) => {
+        return Object.keys(errors).some(key =>
+            prefixes.some(prefix => key.startsWith(prefix))
+        );
+    };
+
+    const DisplayError = hasTabError(['avatar.file', 'banner.file', 'logo.file'], errors);
+
+    
+    const personalInformationError = hasTabError(
+        ['first_name', 'last_name', 'organization', 'job_title', 'email', 'phone','headline'],
+        errors
+    );
+    
+    const linksError = hasTabError(
+        ['links.0', 'links.1', 'links.2', 'links.3', 'links.4', 'links.5'],
+        errors
+    );
+    
+    const locationError = hasTabError(['address', 'location'], errors);
+    
+    const galleryError = hasTabError(['galleries.0', 'galleries.1', 'galleries.2'], errors);
+    
+    const serviceError = hasTabError(['services.0', 'services.1', 'services.2'], errors);
+    
+    const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
+    
+
+    console.log("personalInformationError", personalInformationError)
 
     const handleGalleryFileChange = (id: string, file: File | null) => {
         const newGallery = data.galleries.map((item: Gallery) => {
@@ -368,7 +400,6 @@ export default function CreateCard() {
                                 address={data.address}
                                 location={data.location}
                                 headline={data.headline}
-                                // business_hours={schedule}
                                 galleries={validItems}
                                 services={ValidServiceItems}
                                 business_hours={data.business_hours}
@@ -380,13 +411,90 @@ export default function CreateCard() {
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
                             <TabsList className="h- flex h-auto w-full flex-row flex-wrap justify-around">
-                                <TabsTrigger value="display">Display</TabsTrigger>
-                                <TabsTrigger value="personal_information">Information</TabsTrigger>
-                                <TabsTrigger value="links">Social Links</TabsTrigger>
-                                <TabsTrigger value="location">Location</TabsTrigger>
-                                <TabsTrigger value="business_hours">Business Hours</TabsTrigger>
-                                <TabsTrigger value="service">Services</TabsTrigger>
-                                <TabsTrigger value="gallery">Galleries</TabsTrigger>
+                                <TabsTrigger value="display">
+                                    {
+                                        DisplayError ? (
+                                            <span className="text-red-500">
+                                                Display
+                                                </span>
+                                        ) : (
+                                            <span className="">Display</span>
+                                        )
+                                    }
+
+                                </TabsTrigger>
+                                <TabsTrigger value="personal_information">
+                                    
+                                    {
+                                        personalInformationError ? (
+                                            <span className="text-red-500">
+                                                Information
+                                                </span>
+                                        ) : (
+                                            <span className=""> Information</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="links">
+                                    
+                                    {
+                                        linksError ? (
+                                            <span className="text-red-500">
+                                                Social Links
+                                                </span>
+                                        ) : (
+                                            <span className=""> Social Links</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="location">
+                                    
+                                    {
+                                        locationError ? (
+                                            <span className="text-red-500">
+                                                Location
+                                                </span>
+                                        ) : (
+                                            <span className=""> Location</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="business_hours">
+                                    
+                                    {
+                                        businessHoursError ? (
+                                            <span className="text-red-500">
+                                                Business Hours
+                                                </span>
+                                        ) : (
+                                            <span className=""> Business Hours</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="service">
+                                    
+                                    {
+                                        serviceError ? (
+                                            <span className="text-red-500">
+                                                Services
+                                                </span>
+                                        ) : (
+                                            <span className=""> Services</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="gallery">
+                                    
+                                    {
+                                        galleryError ? (
+                                            <span className="text-red-500">
+                                                Galleries
+                                                </span>
+                                        ) : (
+                                            <span className=""> Galleries</span>
+                                        )
+                                    }
+                                </TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
                                 <Card>
