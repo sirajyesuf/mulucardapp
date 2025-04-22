@@ -130,7 +130,7 @@ export const BankSelector: React.FC<BankSelectorProps> = ({ banks, selectedBank,
                         <BankLogo bankName={selectedBank.name} />
                         <div>
                             <p className="font-medium">{selectedBank.name}</p>
-                            <p className="text-muted-foreground text-sm">Account ending in {selectedBank.account_number}</p>
+                            <p className="text-muted-foreground text-sm">Account ending in {selectedBank.account_number.slice(-4)}</p>
                         </div>
                     </div>
                 ) : (
@@ -157,7 +157,7 @@ export const BankSelector: React.FC<BankSelectorProps> = ({ banks, selectedBank,
                                 <BankLogo bankName={bank.name} />
                                 <div className="flex-1">
                                     <p className="font-medium">{bank.name}</p>
-                                    <p className="text-muted-foreground text-sm">Account ending in {bank.account_number}</p>
+                                    <p className="text-muted-foreground text-sm">Account ending in {bank.account_number.slice(-4)}</p>
                                 </div>
                                 {selectedBank?.account_number === bank.account_number && <Check className="text-primary h-5 w-5" />}
                             </button>
@@ -344,12 +344,12 @@ const Index = () => {
                     </div>
                 </div>
 
-                <Separator className="my-6" />
+                {/* <Separator className="my-6" /> */}
 
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                     <span className="font-medium">Subtotal</span>
-                    <span className="font-medium">${baseAmount}</span>
-                </div>
+                    <span className="font-medium">Birr {baseAmount}</span>
+                </div> */}
                 {/*
                 {discount > 0 && (
                     <div className="mt-2 flex items-center justify-between text-green-600">
@@ -386,22 +386,17 @@ const Index = () => {
 
                 <div className="flex items-center justify-between font-medium">
                     <span>Total due today</span>
-                    <span>${paymentAmount}</span>
+                    <span>Birr {paymentAmount}</span>
                 </div>
-
-                {/* Add supported banks section */}
-                {/* <div className="mt-8">
-                    <SupportedBanks />
-                </div> */}
             </div>
 
             {/* Right column - Payment form */}
             <div className="flex flex-col bg-gray-50 p-6 md:w-1/2 md:p-12 border-none">
-                <h1 className="mb-6 text-xl font-semibold">Pay with bank transfer</h1>
+                <h1 className="mb-6 text-xl font-semibold">Pay with Bank Transfer</h1>
 
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">Email Address</Label>
                         <Input
                             id="email"
                             type="email"
@@ -439,7 +434,7 @@ const Index = () => {
                             onChange={(e) => setData('transactionCode', e.target.value)}
                             placeholder="Enter your transaction reference code"
                         />
-                        <p className="text-xs text-gray-500">Enter the reference code from your bank transfer</p>
+                        <p className="text-xs text-gray-500">Enter the transaction reference code from your bank transfer.</p>
                         <InputError className="mt-2" message={errors.transactionCode} />
                     </div>
 
