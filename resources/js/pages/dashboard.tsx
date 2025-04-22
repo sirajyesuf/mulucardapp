@@ -7,8 +7,6 @@ import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type S
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import MuluCard from './card/card';
-import { Input } from '@/components/ui/input';
-
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,7 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
-
 
 // Type for individual social link
 interface SocialLink {
@@ -57,7 +54,7 @@ type Reports = {
     active_cards: number;
     inactive_cards: number;
     total_cards: number;
-}
+};
 
 type CardList = Card[];
 
@@ -66,23 +63,48 @@ export default function Dashboard() {
     const permissions = auth.permissions;
 
     function showCardDetail(id: number) {
-        console.log("show card detail", id)
+        console.log('show card detail', id);
         router.get(route('card.show', { id: id }));
     }
 
     const { props } = usePage();
     const cards = props.cards as CardList;
     const reports = props.reports as Reports;
-    console.log(reports)
-    console.log(permissions)
+    console.log(reports);
+    console.log(permissions);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
-            {
-                permissions.card.create && (
-                    <div className="flex flex-row justify-end rounded-xl border-none p-2">
+            
+
+            {reports.total_cards === 0 && (
+            <div className="flex flex-col items-center justify-center gap-4 rounded-xl border-none p-2">
+                
+            
+                <div className="flex flex-col items-center justify-center gap-4 rounded-xl border-none p-2">
+                    <h1 className="text-xl font-bold capitalize">No cards found</h1>
+                    <p className="text-gray-500">You have no cards. Create one now.</p>
+                </div>
+
+                <Link
+                    className="flex flex-row items-center justify-center gap-4 rounded-lg p-0 text-black shadow-none hover:bg-gray-100"
+                    href="card/create"
+                >
+                    <Button size="lg" className="bg-brand-purple hover:bg-brand-purple-dark group transition-colors">
+                        <span>Create New Card</span>
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                </Link>
+            </div>
+            )}
+
+
+            {reports.total_cards > 0 && (
+            <>
+            {permissions.card.create && (
+                <div className="flex flex-row justify-end rounded-xl border-none p-2">
                     <Link
                         className="flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 p-0 text-black shadow-none hover:bg-gray-100"
                         href="card/create"
@@ -93,15 +115,9 @@ export default function Dashboard() {
                         </Button>
                     </Link>
                 </div>
-                )
-            }
+            )}
 
-
-
-
-
-
-            <div className="grid grid-cols-1 gap-4 rounded-sm border-none p-2 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 rounded-none border-none p-2 md:grid-cols-3">
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
                     <h1 className="text-xl font-bold capitalize">Number of cards</h1>
                     <p className="text-2xl font-extrabold">{reports.total_cards}</p>
@@ -118,9 +134,6 @@ export default function Dashboard() {
                 </Card>
             </div>
 
-            <div className='border-none border-gray-300 p-2 rounded-sm flex justify-end items-center'>
-            <Input type="text" className='w-[50%]'/>
-            </div>
 
             <div className="flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-none p-4">
                 {cards.map((card, index) => (
@@ -149,6 +162,11 @@ export default function Dashboard() {
                     </ScrollArea>
                 ))}
             </div>
+            </>
+            )}
+        
+
+
         </AppLayout>
     );
 }
