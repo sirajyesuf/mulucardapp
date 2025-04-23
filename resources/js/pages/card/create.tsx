@@ -13,7 +13,7 @@ import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
 import { Head, useForm,usePage } from '@inertiajs/react';
-import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X ,ShieldAlert} from 'lucide-react';
+import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X ,ShieldAlert,Globe} from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,6 +51,12 @@ export default function CreateCard() {
     const activePlan = auth.activePlan;
     const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
     const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
+    const cardSocialLinks = usePage<SharedData>().props.cardSocialLinks;
+    const links =  cardSocialLinks.map((link) => ({
+        name: link,
+        url: '',
+        placeholder: `https://${link.toLowerCase()}.com/your-profile`,
+    }));
 
 
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
@@ -112,7 +118,7 @@ export default function CreateCard() {
         setData('business_hours', updatedSchedule);
     };
 
-    const { data, setData, post, processing, errors } = useForm<CardForm>({
+    const { data, setData, post, processing, errors ,transform} = useForm<CardForm>({
         banner: {
             file: null,
             path: null,
@@ -132,19 +138,15 @@ export default function CreateCard() {
         phone: '',
         email: '',
         banner_color: colors[0],
-        links: [
-            { name: 'website', url: '', placeholder: 'https://example.com' },
-            { name: 'facebook', url: '', placeholder: 'https://facebook.com/example' },
-            { name: 'twitter', url: '', placeholder: 'https://twitter.com/example' },
-            { name: 'instagram', url: '', placeholder: 'https://instagram.com/example' },
-            { name: 'linkedin', url: '', placeholder: 'https://linkedin.com/example' },
-            { name: 'youtube', url: '', placeholder: 'https://youtube.com/example' },
-        ],
+        // constract the links from cardSocialLinks
+        links: links,
         address: '',
         location: '',
         headline: '',
         galleries: [{ id: crypto.randomUUID(), file: null, path: null, description: '' }],
-        services: [{ id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }],
+        services: [
+            { id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }
+        ],
         business_hours: [
             { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '03:00', close: '11:00' },
             { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '03:00', close: '11:00' },
@@ -155,6 +157,9 @@ export default function CreateCard() {
             { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '03:00', close: '11:00' },
         ],
     });
+
+
+    // console.log(data.links)
 
 
     const hasTabError = (prefixes: string[], errors: Partial<Record<string, string>>) => {
@@ -268,22 +273,22 @@ export default function CreateCard() {
         setData('services', [...data.services, { id: crypto.randomUUID(), file: null, name: '', path: null, description: '' }]);
     };
 
-    const removeItem = (id: string) => {
-        if (data.galleries.length > 1) {
+    const removeGalleryItem = (id: string) => {
+        // if (data.galleries.length > 1) {
             setData(
                 'galleries',
                 data.galleries.filter((item: Gallery) => item.id !== id),
             );
-        }
+        // }
     };
 
     const removeServiceItem = (id: string) => {
-        if (data.services.length > 1) {
+        // if (data.services.length > 1) {
             setData(
                 'services',
                 data.services.filter((item: Service) => item.id !== id),
             );
-        }
+// }
     };
 
     const removeGalleryFile = (id: string) => {
@@ -910,7 +915,7 @@ export default function CreateCard() {
                                             {data.services.map((item, index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
-                                                        {data.services.length > 1 && (
+                                                        {/* {data.services.length > 1 && ( */}
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
@@ -921,7 +926,7 @@ export default function CreateCard() {
                                                                 <X className="h-5 w-5" />
                                                                 <span className="sr-only">Remove</span>
                                                             </Button>
-                                                        )}
+                                                        {/* )} */}
 
                                                         <div className="space-y-4">
                                                             <div>
@@ -1017,7 +1022,7 @@ export default function CreateCard() {
                                                 )
                                             }
 
-                                            {
+                                            {/* {
                                                data.services.length < serviceLimit && (
 
                                                     <div className="flex flex-col gap-4 sm:flex-row">
@@ -1033,7 +1038,26 @@ export default function CreateCard() {
                                                 </div>
 
                                                 )
-                                            }
+                                            } */}
+
+                                            <div className="flex flex-col gap-4 sm:flex-row">
+                                            <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={addMoreServiceItem}
+                                            className="flex items-center gap-2"
+                                            disabled={data.services.length >= serviceLimit}
+                                            >
+                                            <PlusCircle className="h-5 w-5" />
+                                            Add More
+                                            </Button>
+                                            {data.services.length >= serviceLimit && (
+                                            <div className="flex items-center gap-2 text-yellow-600">
+                                            <ShieldAlert className="h-8 w-8" />
+                                            <span>Service limit reached. Upgrade your plan to add more services.</span>
+                                            </div>
+                                            )}
+                                            </div>
 
                                         </div>
                                     </CardContent>
@@ -1054,18 +1078,18 @@ export default function CreateCard() {
                                             {data.galleries.map((item, index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
-                                                        {data.galleries.length > 1 && (
+                                                        {/* {data.galleries.length > 1 && ( */}
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="absolute top-2 right-2"
-                                                                onClick={() => removeItem(item.id)}
+                                                                onClick={() => removeGalleryItem(item.id)}
                                                             >
                                                                 <X className="h-5 w-5" />
                                                                 <span className="sr-only">Remove</span>
                                                             </Button>
-                                                        )}
+                                                        {/* )} */}
 
                                                         <div className="space-y-4">
                                                             <div>
@@ -1146,7 +1170,7 @@ export default function CreateCard() {
                                                 )
                                             }
 
-                                            {
+                                            {/* {
                                                 data.galleries.length < galleryLimit && (
 
                                                     <div className="flex flex-col gap-4 sm:flex-row">
@@ -1162,7 +1186,26 @@ export default function CreateCard() {
                                                 </div>
 
                                                 )
-                                            }
+                                            } */}
+
+                                            <div className="flex flex-col gap-4 sm:flex-row">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={addMoreItem}
+                                                    className="flex items-center gap-2"
+                                                    disabled={data.galleries.length >= galleryLimit}
+                                                >
+                                                    <PlusCircle className="h-5 w-5" />
+                                                    Add More
+                                                </Button>
+                                                {data.galleries.length >= galleryLimit && (
+                                                    <div className="flex items-center gap-2 text-yellow-600">
+                                                        <ShieldAlert className="h-6 w-6" />
+                                                        <span>Gallery limit reached. Upgrade your plan to add more images.</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </CardContent>
                                 </Card>

@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Resources\CardResource;
 use JeroenDesloovere\VCard\VCard;
+use App\Enums\CardSocialLinks;
+
 class CardController extends Controller
 {
     public function create(){
@@ -21,6 +23,42 @@ class CardController extends Controller
         }
 
         return Inertia::render('card/create');
+    }
+
+    protected function storeCardService($services, $card){
+
+        foreach($services as $service) {
+
+            $path = Storage::disk('public')->putFile('services', $service['file']);
+            $card->services()->create([
+                'path' => Storage::url($path),
+                'name' => $service['name'],
+                'description' => $service['description']
+            ]);
+        }
+    }
+
+    protected function storeCardGallery($galleries, $card){
+
+        foreach ($galleries as $gallery) {
+
+            $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
+            $card->galleries()->create([
+                'path' => Storage::url($path),
+                'description' => $gallery['description'],
+            ]);
+        }
+    }
+
+    protected function storeCardLinks($links, $card){
+
+        foreach ($links as $link) {
+
+            $card->socialLinks()->create([
+                'name' => $link['name'],
+                'url' => $link['url'],
+            ]);
+    }
     }
 
     public function  store(Request $request){
@@ -39,6 +77,7 @@ class CardController extends Controller
             : null;
 
         $url = $this->generateUniqueUrl();
+
         $qrCodePath = $this->generateQRCode(route('card.hello',['url' => $url]),$request->banner_color);
 
         $card = Card::create([
@@ -61,33 +100,16 @@ class CardController extends Controller
             'business_hours' => $request->business_hours,
         ]);
 
-
-        foreach ($validated['links'] as $link) {
-            $card->socialLinks()->create([
-                'name' => $link['name'],
-                'url' => $link['url'],
-            ]);
+        if(isset($validated['links'])){
+            $this->storeCardLinks($validated['links'], $card);
         }
 
-
-        foreach ($validated['galleries'] as $gallery) {
-
-                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
-                $card->galleries()->create([
-                    'path' => Storage::url($path),
-                    'description' => $gallery['description'],
-                ]);
-
+        if(isset($request->galleries)){
+            $this->storeCardGallery($validated['galleries'], $card);
         }
 
-        foreach($validated['services'] as $service) {
-
-            $path = Storage::disk('public')->putFile('services', $service['file']);
-            $card->services()->create([
-                'path' => Storage::url($path),
-                'name' => $service['name'],
-                'description' => $service['description']
-            ]);
+        if(isset($request->services)){
+            $this->storeCardService($validated['services'], $card);
         }
 
         return redirect()->route('dashboard')->with('success', 'Card created successfully!');
@@ -109,27 +131,131 @@ class CardController extends Controller
         return Inertia::render('card/edit', ['card' => $card]);
     }
 
-    public function update(UpdateRequest $request,$id)
-    {       $validated = $request->validated();
+    public function update(UpdateRequest $request, $id)
+    {     
 
-            // dd($validated);
+        $validated = $request->validated();
+        $card = Card::findOrFail($id);
 
-            // $card = Card::findOrFail($id);
 
-            // Update the card with validated data
-            // $card->update($validated);
 
-            // Handle file uploads if present
-            // if ($request->hasFile('avatar')) {
-            //     $card->avatar = $request->file('avatar')->store('avatars', 'public');
-            // }
-            // if ($request->hasFile('logo')) {
-            //     $card->logo = $request->file('logo')->store('logos', 'public');
-            // }
+        // Handle file uploads
+        $bannerPath = $card->banner;
+        if ($request->hasFile('banner.file')) {
+            // Delete old banner if it exists
+            if ($card->banner) {
+                $this->deleteOldImage($card->banner);
+            }
+            $bannerPath = Storage::url($request->file('banner.file')->store('banners', 'public'));
+        }
 
-            // $card->save();
+        $avatarPath = $card->avatar;
+        if ($request->hasFile('avatar.file')) {
+            // Delete old avatar if it exists
+            if ($card->avatar) {
+                $this->deleteOldImage($card->avatar);
+            }
+            $avatarPath = Storage::url($request->file('avatar.file')->store('avatars', 'public'));
+        }
 
-            return redirect()->route('card.show', $card->id)->with('success', 'Card updated successfully');
+        $logoPath = $card->logo;
+        if ($request->hasFile('logo.file')) {
+            // Delete old logo if it exists
+            if ($card->logo) {
+                $this->deleteOldImage($card->logo);
+            }
+            $logoPath = Storage::url($request->file('logo.file')->store('logos', 'public'));
+        }
+
+        // Update card basic information
+        $card->update([
+            'banner' => $bannerPath,
+            'avatar' => $avatarPath,
+            'logo' => $logoPath,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'job_title' => $request->job_title,
+            'organization' => $request->organization,
+            'banner_color' => $request->banner_color,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'headline' => $request->headline,
+            'address' => $request->address,
+            'location' => $request->location,
+            'business_hours' => $request->business_hours,
+        ]);
+
+
+        //update social links for the card
+        $this->updateSocialLinks($card, $validated);
+
+        // // Update galleries
+        // if (isset($validated['galleries'])) {
+        //     // Remove galleries that are not in the new set
+        //     $existingGalleryIds = collect($validated['galleries'])
+        //         ->filter(fn($gallery) => isset($gallery['id']) && !isset($gallery['file']))
+        //         ->pluck('id');
+        //     $card->galleries()->whereNotIn('id', $existingGalleryIds)->delete();
+
+        //     foreach ($validated['galleries'] as $gallery) {
+        //         if (isset($gallery['file'])) {
+        //             $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
+        //             $card->galleries()->create([
+        //                 'path' => Storage::url($path),
+        //                 'description' => $gallery['description'],
+        //             ]);
+        //         } elseif (isset($gallery['id'])) {
+        //             $card->galleries()->where('id', $gallery['id'])->update([
+        //                 'description' => $gallery['description']
+        //             ]);
+        //         }
+        //     }
+        // }
+
+        // // Update services
+        // if (isset($validated['services'])) {
+        //     // Remove services that are not in the new set
+        //     $existingServiceIds = collect($validated['services'])
+        //         ->filter(fn($service) => isset($service['id']) && !isset($service['file']))
+        //         ->pluck('id');
+        //     $card->services()->whereNotIn('id', $existingServiceIds)->delete();
+
+        //     foreach ($validated['services'] as $service) {
+        //         if (isset($service['file'])) {
+        //             $path = Storage::disk('public')->putFile('services', $service['file']);
+        //             $card->services()->create([
+        //                 'path' => Storage::url($path),
+        //                 'name' => $service['name'],
+        //                 'description' => $service['description']
+        //             ]);
+        //         } elseif (isset($service['id'])) {
+        //             $card->services()->where('id', $service['id'])->update([
+        //                 'name' => $service['name'],
+        //                 'description' => $service['description']
+        //             ]);
+        //         }
+        //     }
+        // }
+
+        // return redirect()->route('dashboard')->with('success', 'Card updated successfully!');
+        return redirect()->back();
+    }
+
+    protected function updateSocialLinks($card, $validated){
+        $links = CardSocialLinks::links();
+        $validatedLinks = [];
+        foreach($validated['links'] as $link){
+            $validatedLinks[$link['name']] = $link['url'];
+        }
+
+        foreach($links as $link){
+            $card->socialLinks()->updateOrCreate([
+                'name' => $link
+            ], [
+                'url' => $validatedLinks[$link] ?? null
+            ]);
+        }
+   
     }
 
 
@@ -277,6 +403,16 @@ class CardController extends Controller
 
         return $path;
 
+    }
+
+    protected function deleteOldImage($path)
+    {
+        if ($path) {
+            $relativePath = Str::after($path, Storage::url('/'));
+            if (Storage::disk('public')->exists($relativePath)) {
+                Storage::disk('public')->delete($relativePath);
+            }
+        }
     }
 
     public function updateTotalSaves($id){
