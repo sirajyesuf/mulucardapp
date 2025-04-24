@@ -136,6 +136,7 @@ class CardController extends Controller
 
         $validated = $request->validated();
         $card = Card::findOrFail($id);
+        // dd($card);
 
 
 
@@ -189,6 +190,13 @@ class CardController extends Controller
         //update social links for the card
         $this->updateSocialLinks($card, $validated);
 
+        $this->updateCardService($card, $validated['services'] ?? []);
+        $this->updateGalleries($card, $validated['galleries'] ?? []);
+
+
+
+        // dd($validated);
+
         // // Update galleries
         // if (isset($validated['galleries'])) {
         //     // Remove galleries that are not in the new set
@@ -239,6 +247,91 @@ class CardController extends Controller
 
         // return redirect()->route('dashboard')->with('success', 'Card updated successfully!');
         return redirect()->back();
+    }
+
+    protected function updateCardService($card, $services){
+        // pluck all services ids belongs the card
+        $serviceIds = $card->services->pluck('id')->filter()->toArray();
+
+        //services length zero delelte all services
+        if(count($services) === 0){
+            $card->services()->delete();
+            return;
+        }
+
+        foreach($services as $service){
+            
+            if($service['file'] === null){
+
+                $card->services()->where('id', $service['id'])->update([
+                    'name' => $service['name'],
+                    'description' => $service['description']
+                ]);
+            }
+
+            if($service['file'] !== null and !in_array($service['id'], $serviceIds)){
+                $path = Storage::disk('public')->putFile('services', $service['file']);
+                $card->services()->create([
+                    'path' => Storage::url($path),
+                    'name' => $service['name'],
+                    'description' => $service['description']
+                ]);
+            }
+
+            if($service['file'] !== null and in_array($service['id'], $serviceIds)){
+                $path = Storage::disk('public')->putFile('services', $service['file']);
+                $card->services()->where('id', $service['id'])->update([
+                    'path' => Storage::url($path),
+                    'name' => $service['name'],
+                    'description' => $service['description']
+                ]);
+            }
+        }
+
+        //delete old services
+        // $card->services()->whereNotIn('id', $serviceIds)->delete();
+    }
+
+
+    protected function updateGalleries($card, $galleries){
+
+        // pluck all gallery ids from the $galleries
+        $galleryIds = array_filter(array_column($galleries, 'id'));
+
+        foreach($card->galleries as $gallery){
+            
+            if(!in_array($gallery->id, $galleryIds)){
+                $gallery->delete();
+            }
+        }
+
+        $dbGalleryIds = $card->galleries->pluck('id')->filter()->toArray();
+
+        foreach($galleries as $gallery){
+
+            if($gallery['file'] === null){
+                $card->galleries()->where('id', $gallery['id'])->update([
+                    'description' => $gallery['description']
+                ]);
+            }
+
+            if($gallery['file'] !== null and !in_array($gallery['id'], $dbGalleryIds)){
+                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
+                $card->galleries()->create([
+                    'path' => Storage::url($path),
+                    'description' => $gallery['description']
+                ]);
+            }
+
+            if($gallery['file'] !== null and in_array($gallery['id'], $dbGalleryIds)){
+                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
+                $card->galleries()->where('id', $gallery['id'])->update([
+                    'path' => Storage::url($path),
+                    'description' => $gallery['description']
+                ]);
+            }
+        }
+        
     }
 
     protected function updateSocialLinks($card, $validated){

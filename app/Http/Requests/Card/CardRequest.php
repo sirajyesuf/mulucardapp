@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Card;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use App\Enums\CardSocialLinks;
 
 class CardRequest extends FormRequest
 {
@@ -35,9 +35,9 @@ class CardRequest extends FormRequest
                 'organization' => 'required|string|max:255',
                 'job_title' => 'required|string|max:255',
                 'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
-                'links' => 'required|array|max:6',
+                'links' => 'required|array|max:100',
                 'links.*.name' => 'required|string|max:255',
-                'links.*.url' => "required|url:https",
+                'links.*.url' => "nullable|url:https",
                 'phone' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255',
                 'headline' => 'required|string|max:255',
@@ -48,8 +48,10 @@ class CardRequest extends FormRequest
                 'business_hours.*.isOpen' => 'required|boolean',
                 'business_hours.*.open' => 'required|date_format:H:i',
                 'business_hours.*.close' => 'required|date_format:H:i',
+
+                //validation for galleries
                 'galleries' => [
-                    'required',
+                    'nullable',
                     'array',
                     function($attribute, $value, $fail)  use ($galleryLimit){
                         if ($galleryLimit >= 0 && count($value) > $galleryLimit) {
@@ -58,9 +60,12 @@ class CardRequest extends FormRequest
                     }
                 ],
                 'galleries.*.file' => 'required|image|max:2048',
+                'galleries.*.path' => 'required|string|max:255',
                 'galleries.*.description' => 'required|string|max:500',
+
+                //validation for services
                 'services' => [
-                    'required',
+                    'nullable',
                     'array',
                     function($attribute, $value, $fail) use($serviceLimit) {
                         if ($serviceLimit >= 0 && count($value) > $serviceLimit) {
@@ -69,6 +74,7 @@ class CardRequest extends FormRequest
                     }
                 ],
                 'services.*.file' => 'required|image|max:2048',
+                'services.*.path' => 'required|string',
                 'services.*.name' => 'required|string',
                 'services.*.description' => 'required|string|max:500'
 
@@ -81,7 +87,7 @@ class CardRequest extends FormRequest
     public function messages(): array
     {
             $dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            $links = ['Website','Facebook', 'Twitter', 'Instagram', 'LinkedIn', 'YouTube'];
+            $links = CardSocialLinks::links();
             $business_messages = [];
             $gallery_messages = [];
             $services_messages = [];
@@ -97,21 +103,36 @@ class CardRequest extends FormRequest
             }
 
 
-            foreach(request()->galleries as $index => $gallery) {
-                $gallery_messages["galleries.{$index}.file.required"] = "the image file is required.";
-                $gallery_messages["galleries.{$index}.description.required"] = "Please enter a description.";
+            if(isset(request()->galleries)) {
+                foreach(request()->galleries as $index => $gallery) {
+                    $gallery_messages["galleries.{$index}.file.required"] = "the image file is required.";
+                    $gallery_messages["galleries.{$index}.description.required"] = "Please enter a description.";
+                }
             }
 
-            foreach(request()->services as $index => $service) {
-                $services_messages["services.{$index}.file.required"] = "the image file is required";
-                $services_messages["services.{$index}.name.required"] = "the name field is required";
-                $services_messages["services.{$index}.description.required"] =  "the description field is required";
-
+            if(isset(request()->services)) {
+                foreach(request()->services as $index => $service) {
+                    $services_messages["services.{$index}.file.required"] = "the image file is required";
+                    $services_messages["services.{$index}.name.required"] = "the name field is required";
+                    $services_messages["services.{$index}.description.required"] =  "the description field is required";
+                }
             }
 
-            foreach($links as $index => $link) {
-                $links_messages["links.{$index}.url.required"] = "The {$link} field is required.";
-            }
+        // --- Generate Link Messages Dynamically ---
+        // Iterate over the actual submitted links data
+        foreach ($this->input('links', []) as $index => $linkData) {
+            // Use the 'name' from the submitted data, default to generic if 'name' is missing
+            $linkName = $linkData['name'] ?? "Link #{$index}";
+            // Capitalize first letter for display
+            $linkNameDisplay = ucfirst($linkName);
+
+            // Key format: links.index.field.rule
+            $requiredKey = "links.{$index}.url.required";
+            $urlKey = "links.{$index}.url.url";
+
+            $links_messages[$requiredKey] = "The {$linkNameDisplay} URL is required.";
+            $links_messages[$urlKey] = "The {$linkNameDisplay} URL must be a valid URL starting with https://.";
+        }
 
 
 

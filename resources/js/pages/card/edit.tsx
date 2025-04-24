@@ -11,25 +11,61 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import BusinessHoursPreview from '@/components/business-hours'; // Assuming this is the path
-import { type BreadcrumbItem, type Card as CardType, type DaySchedule, type Gallery, type Image, type Service } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
-import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X } from 'lucide-react';
+import { type BreadcrumbItem, type Card as CardType, type DaySchedule, type Gallery, type Service, type SharedData,type Image, type Link } from '@/types';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Check, Clock, Copy, LoaderCircle, PlusCircle, ShieldAlert, Upload, X,Globe } from 'lucide-react';
 import { FormEventHandler } from 'react';
+
+interface CardForm {
+    banner: Image;
+    avatar: Image;
+    logo: Image;
+    first_name: string;
+    last_name: string;
+    organization: string;
+    job_title: string;
+    email: string;
+    phone: string;
+    banner_color: string;
+    links: Link[];
+    location: string;
+    address: string;
+    headline: string;
+    business_hours: DaySchedule[];
+    galleries: Gallery[];
+    services: Service[];
+    [key: string]: any; // Add index signature to allow string indexing
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Edit Card', href: '' },
 ];
 
-interface EditCardProps {
-    card: CardType;
-}
+// interface EditCardProps {
+//     card: CardType;
+// }
 
-export default function EditCard({ card }: EditCardProps) {
+export default function EditCard({ card }: { card: CardType }) {
+    const props = usePage<SharedData>().props;
+    const auth = props.auth;
+    const activePlan = auth.activePlan;
+    const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
+    const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
+    const cardSocialLinks = props.cardSocialLinks;
+    const existingLinksMap = new Map(
+        (card.links || []).map((link) => [link.name, link.url])
+    );
 
-    console.log(card);
+    const links = cardSocialLinks.map((linkName) => ({
+        name: linkName,
+        url: existingLinksMap.get(linkName) || '',
+        placeholder: `https://${linkName.toLowerCase()}.com/your-profile`,
+    }));
+
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
+
+    console.log(card);  
 
     const timeOptions: string[] = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -40,46 +76,25 @@ export default function EditCard({ card }: EditCardProps) {
         }
     }
 
-    const { data, setData, put, processing, errors } = useForm<CardType>({
-        id: card.id,
-        url: card.url,
-        banner: card.banner || { file: null, path: null },
-        cardname: card.cardname || '',
-        avatar: card.avatar || { file: null, path: null },
-        logo: card.logo || { file: null, path: null },
-        first_name: card.first_name || '',
-        last_name: card.last_name || '',
-        organization: card.organization || '',
-        job_title: card.job_title || '',
-        email: card.email || '',
-        phone: card.phone || '',
-        banner_color: card.banner_color || colors[0],
-        links: card.links || [
-            { name: 'website', url: '', placeholder: 'https://example.com' },
-            { name: 'facebook', url: '', placeholder: 'https://facebook.com/example' },
-            { name: 'twitter', url: '', placeholder: 'https://twitter.com/example' },
-            { name: 'instagram', url: '', placeholder: 'https://instagram.com/example' },
-            { name: 'linkedin', url: '', placeholder: 'https://linkedin.com/example' },
-            { name: 'youtube', url: '', placeholder: 'https://youtube.com/example' },
-        ],
-        location: card.location || '',
-        address: card.address || '',
-        headline: card.headline || '',
-        galleries: card.galleries?.length > 0 ? card.galleries : [{ id: crypto.randomUUID(), file: null, path: null, description: '' }],
-        services: card.services?.length > 0 ? card.services : [{ id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }],
-        business_hours: card.business_hours?.length > 0 ? card.business_hours : [
-            { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '03:00', close: '11:00' },
-            { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '03:00', close: '11:00' },
-            { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '03:00', close: '11:00' },
-            { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '03:00', close: '11:00' },
-            { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '03:00', close: '11:00' },
-            { id: crypto.randomUUID(), day: 'Saturday', isOpen: false, open: '03:00', close: '11:00' },
-            { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '03:00', close: '11:00' },
-        ],
-        total_views: card.total_views,
-        total_saves: card.total_saves,
-        qr_code: card.qr_code || '',
-        status: card.status || false,
+    const { data, setData, post, processing, errors } = useForm<CardForm>({
+        banner: card.banner,
+        avatar: card.avatar,
+        logo: card.logo,
+        first_name: card.first_name,
+        last_name: card.last_name,
+        organization: card.organization,
+        job_title: card.job_title,
+        email: card.email,
+        phone: card.phone,
+        banner_color: card.banner_color,
+        links: links,
+        location: card.location,
+        address: card.address,
+        headline: card.headline,
+        galleries: card.galleries?.length > 0 ? card.galleries : [],
+        services: card.services?.length > 0 ? card.services : [],
+        business_hours: card.business_hours
+
     });
 
     const copyToAllDays = (day: DaySchedule) => {
@@ -128,6 +143,7 @@ export default function EditCard({ card }: EditCardProps) {
             }
             return item;
         });
+        console.log(newService);
         setData('services', newService);
     };
 
@@ -169,34 +185,46 @@ export default function EditCard({ card }: EditCardProps) {
         setData('services', [...data.services, { id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }]);
     };
 
-    const removeItem = (id: string) => {
-        if (data.galleries.length > 1) {
-            setData('galleries', data.galleries.filter((item: Gallery) => item.id !== id));
-        }
+    const removeGalleryItem = (id: string) => {
+        // if (data.galleries.length > 1) {
+            setData(
+                'galleries',
+                data.galleries.filter((item: Gallery) => item.id !== id),
+            );
+        // }
     };
 
     const removeServiceItem = (id: string) => {
-        if (data.services.length > 1) {
-            setData('services', data.services.filter((item: Service) => item.id !== id));
-        }
+        // if (data.services.length > 1) {
+            setData(
+                'services',
+                data.services.filter((item: Service) => item.id !== id),
+            );
+        // }
     };
 
     const removeGalleryFile = (id: string) => {
-        setData('galleries', data.galleries.map((item: Gallery) => {
-            if (item.id === id) {
-                return { ...item, file: null, path: null };
-            }
-            return item;
-        }));
+        setData(
+            'galleries',
+            data.galleries.map((item: Gallery) => {
+                if (item.id === id) {
+                    return { ...item, file: null, path: null };
+                }
+                return item;
+            }),
+        );
     };
 
     const removeServiceFile = (id: string) => {
-        setData('services', data.services.map((item: Service) => {
-            if (item.id === id) {
-                return { ...item, file: null, path: null };
-            }
-            return item;
-        }));
+        setData(
+            'services',
+            data.services.map((item: Service) => {
+                if (item.id === id) {
+                    return { ...item, file: null, path: null };
+                }
+                return item;
+            }),
+        );
     };
 
     const handleFileChange = (field: 'avatar' | 'logo' | 'banner') => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,7 +236,9 @@ export default function EditCard({ card }: EditCardProps) {
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
-        put(route('card.update', card.id), {
+        console.log(data);
+        post(route('card.update', card.id), {
+            forceFormData: true, // Ensure Inertia sends as multipart/form-data
             onSuccess: () => {
                 console.log('Update successful!');
             },
@@ -235,7 +265,7 @@ export default function EditCard({ card }: EditCardProps) {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-xl md:block">
+                    <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-none md:block">
                         <ScrollArea className="h-[800px] cursor-pointer rounded-md border-1">
                             <MuluCard
                                 avatar={data.avatar}
@@ -251,17 +281,18 @@ export default function EditCard({ card }: EditCardProps) {
                                 address={data.address}
                                 location={data.location}
                                 headline={data.headline}
-                                galleries={data.galleries} // Pass all galleries, not just filtered
-                                services={data.services} // Pass all services, not just filtered
+                                galleries={data.galleries}
+                                services={data.services}
                                 business_hours={data.business_hours}
                                 banner={data.banner}
+                                url={data.url}
                             />
                         </ScrollArea>
                     </div>
 
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
-                            <TabsList className="h-auto w-full flex flex-row flex-wrap justify-around">
+                            <TabsList className="flex h-auto w-full flex-row flex-wrap justify-around">
                                 <TabsTrigger value="display">Display</TabsTrigger>
                                 <TabsTrigger value="personal_information">Information</TabsTrigger>
                                 <TabsTrigger value="links">Social Links</TabsTrigger>
@@ -283,7 +314,7 @@ export default function EditCard({ card }: EditCardProps) {
                                             </Label>
                                             {data.banner.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                    <span className="flex-1 truncate">{data.banner.file?.name || 'Existing Banner'}</span>
+                                                    <span className="flex-1 truncate">{data.banner.path.split('/').pop() || 'Existing Banner'}</span>
                                                     <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('banner')}>
                                                         <X className="h-4 w-4" />
                                                         <span className="sr-only">Remove file</span>
@@ -309,7 +340,7 @@ export default function EditCard({ card }: EditCardProps) {
                                                     </Button>
                                                 </div>
                                             )}
-                                            <InputError message={errors['banner.file']} className="mt-2" />
+                                            <InputError message={errors['banner.file'] || errors['banner.path']} className="mt-2" />
                                         </div>
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
@@ -318,7 +349,7 @@ export default function EditCard({ card }: EditCardProps) {
                                             </Label>
                                             {data.avatar.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                    <span className="flex-1 truncate">{data.avatar.file?.name || 'Existing Avatar'}</span>
+                                                    <span className="flex-1 truncate">{data.avatar.path.split('/').pop() || 'Existing Avatar'}</span>
                                                     <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('avatar')}>
                                                         <X className="h-4 w-4" />
                                                         <span className="sr-only">Remove file</span>
@@ -344,7 +375,7 @@ export default function EditCard({ card }: EditCardProps) {
                                                     </Button>
                                                 </div>
                                             )}
-                                            <InputError message={errors['avatar.file']} className="mt-2" />
+                                            <InputError message={errors['avatar.file'] || errors['avatar.path']} className="mt-2" />
                                         </div>
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
@@ -353,7 +384,7 @@ export default function EditCard({ card }: EditCardProps) {
                                             </Label>
                                             {data.logo.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                    <span className="flex-1 truncate">{data.logo.file?.name || 'Existing Logo'}</span>
+                                                    <span className="flex-1 truncate">{data.logo.path.split('/').pop() || 'Existing Logo'}</span>
                                                     <Button type="button" variant="ghost" size="icon" onClick={() => removeFile('logo')}>
                                                         <X className="h-4 w-4" />
                                                         <span className="sr-only">Remove file</span>
@@ -379,7 +410,7 @@ export default function EditCard({ card }: EditCardProps) {
                                                     </Button>
                                                 </div>
                                             )}
-                                            <InputError message={errors['logo.file']} className="mt-2" />
+                                            <InputError message={errors['logo.file'] || errors['logo.path']} className="mt-2" />
                                         </div>
 
                                         <div className="flex flex-row flex-wrap gap-2 rounded-lg border-2 p-2">
@@ -407,7 +438,7 @@ export default function EditCard({ card }: EditCardProps) {
                                         <CardDescription>Update your personal information here.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        <div className="space-y-1">
+                                        {/* <div className="space-y-1">
                                             <Label htmlFor="cardname">Card Name</Label>
                                             <Input
                                                 id="cardname"
@@ -416,7 +447,7 @@ export default function EditCard({ card }: EditCardProps) {
                                                 disabled={processing}
                                             />
                                             <InputError message={errors.cardname} className="mt-2" />
-                                        </div>
+                                        </div> */}
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
                                                 <Label htmlFor="fname">First Name</Label>
@@ -676,7 +707,7 @@ export default function EditCard({ card }: EditCardProps) {
                                             {data.services.map((item, index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
-                                                        {data.services.length > 1 && (
+                                                        {/* {data.services.length > 1 && ( */}
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
@@ -687,13 +718,13 @@ export default function EditCard({ card }: EditCardProps) {
                                                                 <X className="h-5 w-5" />
                                                                 <span className="sr-only">Remove</span>
                                                             </Button>
-                                                        )}
+                                                        {/* )} */}
                                                         <div className="space-y-4">
                                                             <div>
                                                                 <div className="flex flex-col gap-2">
                                                                     {item.path ? (
                                                                         <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                                            <span className="flex-1 truncate">{item.name}</span>
+                                                                            <span className="flex-1 truncate">{item.path.split('/').pop()}</span>
                                                                             <Button
                                                                                 type="button"
                                                                                 variant="ghost"
@@ -727,7 +758,7 @@ export default function EditCard({ card }: EditCardProps) {
                                                                             </Button>
                                                                         </div>
                                                                     )}
-                                                                    <InputError message={errors[`services.${index}.file`]} className="mt-2" />
+                                                                    <InputError message={errors[`services.${index}.file`] || errors[`services.${index}.path`]} className="mt-2" />
                                                                 </div>
                                                             </div>
                                                             <div>
@@ -765,10 +796,17 @@ export default function EditCard({ card }: EditCardProps) {
                                                     variant="outline"
                                                     onClick={addMoreServiceItem}
                                                     className="flex items-center gap-2"
+                                                    disabled={data.services.length >= serviceLimit}
                                                 >
                                                     <PlusCircle className="h-5 w-5" />
                                                     Add More
                                                 </Button>
+                                                {data.services.length >= serviceLimit && (
+                                                    <div className="flex items-center gap-2 text-yellow-600">
+                                                        <ShieldAlert className="h-4 w-4" />
+                                                        <span>Service limit reached. Upgrade your plan to add more services.</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </CardContent>
@@ -785,18 +823,18 @@ export default function EditCard({ card }: EditCardProps) {
                                             {data.galleries.map((item, index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
-                                                        {data.galleries.length > 1 && (
+                                                        {/* {data.galleries.length > 1 && ( */}
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="absolute top-2 right-2"
-                                                                onClick={() => removeItem(item.id)}
+                                                                onClick={() => removeGalleryItem(item.id)}
                                                             >
                                                                 <X className="h-5 w-5" />
                                                                 <span className="sr-only">Remove</span>
                                                             </Button>
-                                                        )}
+                                                        {/* )} */}
                                                         <div className="space-y-4">
                                                             <div>
                                                                 <Label htmlFor={`image-${item.id}`} className="mb-2 block">
@@ -805,7 +843,9 @@ export default function EditCard({ card }: EditCardProps) {
                                                                 <div className="flex flex-col gap-2">
                                                                     {item.path ? (
                                                                         <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                                            <span className="flex-1 truncate">{item.file instanceof File ? item.file.name : 'Existing Image'}</span>
+                                                                            <span className="flex-1 truncate">
+                                                                                {item.file instanceof File ? item.file.name : 'Existing Image'}
+                                                                            </span>
                                                                             <Button
                                                                                 type="button"
                                                                                 variant="ghost"
@@ -825,7 +865,7 @@ export default function EditCard({ card }: EditCardProps) {
                                                                                 className="hidden"
                                                                                 onChange={(e) => {
                                                                                     const file = e.target.files?.[0] || null;
-                                                                                    handleServiceFileChange(item.id, file);
+                                                                                    handleGalleryFileChange(item.id, file);
                                                                                 }}
                                                                             />
                                                                             <Button
@@ -840,7 +880,7 @@ export default function EditCard({ card }: EditCardProps) {
                                                                         </div>
                                                                     )}
                                                                 </div>
-                                                                <InputError message={errors[`galleries.${index}.file`]} className="mt-2" />
+                                                                <InputError message={errors[`galleries.${index}.file`] || errors[`galleries.${index}.path`]} className="mt-2" />
                                                             </div>
                                                             <div>
                                                                 <Label htmlFor={`description-${item.id}`} className="mb-2 block">
@@ -860,10 +900,22 @@ export default function EditCard({ card }: EditCardProps) {
                                                 </Card>
                                             ))}
                                             <div className="flex flex-col gap-4 sm:flex-row">
-                                                <Button type="button" variant="outline" onClick={addMoreItem} className="flex items-center gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={addMoreItem}
+                                                    className="flex items-center gap-2"
+                                                    disabled={data.galleries.length >= galleryLimit}
+                                                >
                                                     <PlusCircle className="h-5 w-5" />
                                                     Add More
                                                 </Button>
+                                                {data.galleries.length >= galleryLimit && (
+                                                    <div className="flex items-center gap-2 text-yellow-600">
+                                                        <ShieldAlert className="h-4 w-4" />
+                                                        <span>Gallery limit reached. Upgrade your plan to add more images.</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </CardContent>

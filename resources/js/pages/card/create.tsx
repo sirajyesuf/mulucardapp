@@ -118,7 +118,7 @@ export default function CreateCard() {
         setData('business_hours', updatedSchedule);
     };
 
-    const { data, setData, post, processing, errors ,transform} = useForm<CardForm>({
+    const { data, setData, post, processing, errors } = useForm<CardForm>({
         banner: {
             file: null,
             path: null,

@@ -2,7 +2,7 @@ import BusinessHoursPreview from '@/components/business-hours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
 import { Gallery, Service, type DaySchedule, type Image } from '@/types';
-import { MapPin } from 'lucide-react';
+import { MapPin,Globe } from 'lucide-react';
 type MuluCardProps = {
     url: string;
     banner:Image;
