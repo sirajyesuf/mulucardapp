@@ -21,7 +21,7 @@ enum Role:string
     public static function options(): array
     {
         return [
-            self::ADMIN->value => 'Administrator',
+            self::ADMIN->value => 'Admin',
             self::CUSTOMER->value => 'Customer',
         ];
     }

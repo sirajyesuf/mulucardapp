@@ -1,6 +1,6 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { Link, useForm, Head, usePage, router, createInertiaApp } from "@inertiajs/react";
-import { LoaderCircle, CheckIcon, Clock, Youtube, Linkedin, Instagram, Twitter, Facebook, Globe as Globe$1, Phone, Mail, MapPin, ChevronDownIcon, ChevronUpIcon, XIcon, PanelLeftIcon, Settings, CircleDollarSign, CreditCard, LogOut, ChevronsUpDown, BadgeCheck, LayoutGrid, ChevronRight, Bell, X, Upload, Check, Copy, PlusCircle, Download, Edit, ChevronUp, ChevronDown, ArrowLeft, ArrowRight, Share2, LinkIcon, Contact, Sun, Moon, Monitor, AlertCircle, Menu, Github, Smartphone, Zap, Repeat, Shield, Palette } from "lucide-react";
+import { LoaderCircle, CheckIcon, Clock, Youtube, Linkedin, Instagram, Twitter, Facebook, Globe, Phone, Mail, MapPin, ChevronDownIcon, ChevronUpIcon, XIcon, PanelLeftIcon, Settings, CircleDollarSign, CreditCard, LogOut, ChevronsUpDown, BadgeCheck, LayoutGrid, ChevronRight, Bell, X, Upload, Check, Copy, PlusCircle, ShieldAlert, Wifi, Download, Edit, ChevronUp, ChevronDown, ArrowLeft, ArrowRight, Share2, LinkIcon, Contact, Sun, Moon, Monitor, AlertCircle, Menu, Github, Smartphone, Zap, Repeat, Shield, Palette } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Slot } from "@radix-ui/react-slot";
@@ -9,13 +9,14 @@ import * as LabelPrimitive from "@radix-ui/react-label";
 import { useTheme } from "next-themes";
 import { Toaster as Toaster$1, toast } from "sonner";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import * as React from "react";
+import { useEffect, useState, useCallback, Fragment as Fragment$1, useRef } from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { TabsContent as TabsContent$1 } from "@radix-ui/react-tabs";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import * as React from "react";
-import { useState, useEffect, useCallback, Fragment as Fragment$1, useRef } from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
@@ -203,12 +204,12 @@ function AuthLayout({ children, title, description, ...props }) {
   ] });
 }
 function ConfirmPassword() {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const { data, setData, post: post2, processing, errors, reset } = useForm({
     password: ""
   });
   const submit = (e) => {
     e.preventDefault();
-    post(route("password.confirm"), {
+    post2(route("password.confirm"), {
       onFinish: () => reset("password")
     });
   };
@@ -264,12 +265,12 @@ function TextLink({ className = "", children, ...props }) {
   );
 }
 function ForgotPassword({ status }) {
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post: post2, processing, errors } = useForm({
     email: ""
   });
   const submit = (e) => {
     e.preventDefault();
-    post(route("password.email"));
+    post2(route("password.email"));
   };
   return /* @__PURE__ */ jsxs(AuthLayout, { title: "Forgot password", description: "Enter your email to receive a password reset link", children: [
     /* @__PURE__ */ jsx(Head, { title: "Forgot password" }),
@@ -334,14 +335,14 @@ function Checkbox({
   );
 }
 function Login({ status, canResetPassword }) {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const { data, setData, post: post2, processing, errors, reset } = useForm({
     email: "",
     password: "",
     remember: false
   });
   const submit = (e) => {
     e.preventDefault();
-    post(route("login"), {
+    post2(route("login"), {
       onFinish: () => reset("password")
     });
   };
@@ -409,16 +410,25 @@ const __vite_glob_0_2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   __proto__: null,
   default: Login
 }, Symbol.toStringTag, { value: "Module" }));
-function MagicLogin() {
-  const { data, setData, post, processing, errors, reset } = useForm({
+function MagicLogin({ status }) {
+  const { data, setData, post: post2, processing, errors, reset } = useForm({
     email: ""
   });
+  useEffect(() => {
+    if (status) {
+      toast.success(status);
+      reset();
+    }
+  }, [status, reset]);
   const submit = (e) => {
     e.preventDefault();
-    post(route("login"), {
-      onFinish: () => {
-        reset();
-        toast.success("Login Magic Link Sent to Your Email Address.");
+    post2(route("login"), {
+      onSuccess: () => {
+      },
+      onError: (errors2) => {
+        if (errors2.email && !errors2.email.includes("required")) {
+          toast.error(errors2.email);
+        }
       }
     });
   };
@@ -462,7 +472,7 @@ const __vite_glob_0_3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   default: MagicLogin
 }, Symbol.toStringTag, { value: "Module" }));
 function Register() {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const { data, setData, post: post2, processing, errors, reset } = useForm({
     name: "",
     email: ""
     // password: '',
@@ -470,7 +480,7 @@ function Register() {
   });
   const submit = (e) => {
     e.preventDefault();
-    post(route("register"));
+    post2(route("register"));
   };
   return /* @__PURE__ */ jsxs(AuthLayout, { title: "Create an account", description: "Enter your details below to create your account", children: [
     /* @__PURE__ */ jsx(Head, { title: "Register" }),
@@ -531,7 +541,7 @@ const __vite_glob_0_4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   default: Register
 }, Symbol.toStringTag, { value: "Module" }));
 function ResetPassword({ token, email }) {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const { data, setData, post: post2, processing, errors, reset } = useForm({
     token,
     email,
     password: "",
@@ -539,7 +549,7 @@ function ResetPassword({ token, email }) {
   });
   const submit = (e) => {
     e.preventDefault();
-    post(route("password.store"), {
+    post2(route("password.store"), {
       onFinish: () => reset("password", "password_confirmation")
     });
   };
@@ -610,10 +620,10 @@ const __vite_glob_0_5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   default: ResetPassword
 }, Symbol.toStringTag, { value: "Module" }));
 function VerifyEmail({ status }) {
-  const { post, processing } = useForm({});
+  const { post: post2, processing } = useForm({});
   const submit = (e) => {
     e.preventDefault();
-    post(route("verification.send"));
+    post2(route("verification.send"));
   };
   return /* @__PURE__ */ jsxs(AuthLayout, { title: "Verify email", description: "Please verify your email address by clicking on the link we just emailed to you.", children: [
     /* @__PURE__ */ jsx(Head, { title: "Email verification" }),
@@ -696,7 +706,7 @@ function BusinessHoursPreview({ business_hours }) {
 const socialIconMap = {
   email: Mail,
   phone: Phone,
-  website: Globe$1,
+  website: Globe,
   facebook: Facebook,
   twitter: Twitter,
   instagram: Instagram,
@@ -2086,60 +2096,22 @@ function Badge({
   );
 }
 function NotificationPanel() {
-  const [notifications, setNotifications] = useState([
-    {
-      id: "1",
-      title: "New message",
-      description: "You have received a new message from John Doe",
-      details: "John Doe sent you a message regarding the project proposal. He's asking about the timeline and budget estimates for the next phase. You can reply directly from your inbox.",
-      time: "2 minutes ago",
-      read: false
-    },
-    {
-      id: "2",
-      title: "Payment successful",
-      description: "Your payment of $199.00 has been processed successfully",
-      details: "Transaction ID: TXN123456789. The payment was processed through your saved Visa card ending in 4242. This payment covers your subscription for the next month. A receipt has been sent to your email.",
-      time: "1 hour ago",
-      read: false
-    },
-    {
-      id: "3",
-      title: "Account update",
-      description: "Your account details have been updated",
-      details: "Your profile information was updated successfully. This includes your new phone number and updated address. If you didn't make these changes, please contact support immediately.",
-      time: "5 hours ago",
-      read: true
-    },
-    {
-      id: "4",
-      title: "New feature available",
-      description: "Check out our new dashboard features",
-      details: "We've added new analytics tools to your dashboard. Now you can track user engagement, view conversion rates, and export custom reports. Visit the dashboard to explore these new features.",
-      time: "1 day ago",
-      read: true
-    }
-  ]);
+  const page = usePage();
+  const { auth } = page.props;
+  const unReadNotifications = auth.unReadNotifications;
+  const unreadCount = unReadNotifications.length;
   const [expandedId, setExpandedId] = useState(null);
-  const unreadCount = notifications.filter((notification) => !notification.read).length;
   const removeNotification = (id) => {
-    setNotifications(notifications.filter((notification) => notification.id !== id));
+    router.post(route("dashboard.marknotificationasread", { id }));
   };
   const markAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        read: true
-      }))
-    );
+    const notificationIds = unReadNotifications.map((notification) => notification.id);
+    router.post(route("dashboard.markallasread"), {
+      notificationsIds: notificationIds
+    });
   };
   const toggleNotification = (id) => {
     setExpandedId(expandedId === id ? null : id);
-    if (expandedId !== id) {
-      setNotifications(
-        notifications.map((notification) => notification.id === id ? { ...notification, read: true } : notification)
-      );
-    }
   };
   return /* @__PURE__ */ jsxs(Sheet, { children: [
     /* @__PURE__ */ jsx(SheetTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(Button, { variant: "outline", size: "icon", className: "relative", children: [
@@ -2152,16 +2124,16 @@ function NotificationPanel() {
         /* @__PURE__ */ jsxs(SheetDescription, { className: "flex justify-between items-center", children: [
           /* @__PURE__ */ jsxs("span", { children: [
             "You have ",
-            notifications.length,
+            unreadCount,
             " notifications"
           ] }),
-          unreadCount > 0 && /* @__PURE__ */ jsx(Button, { variant: "ghost", size: "sm", onClick: markAllAsRead, children: "Mark all as read" })
+          unreadCount > 0 && /* @__PURE__ */ jsx(Button, { variant: "ghost", size: "sm", onClick: () => markAllAsRead(), children: "Mark all as read" })
         ] })
       ] }),
-      /* @__PURE__ */ jsx("div", { className: "space-y-4 mt-4 max-h-[80vh] overflow-y-auto pr-2", children: notifications.length > 0 ? notifications.map((notification) => /* @__PURE__ */ jsxs(
+      /* @__PURE__ */ jsx("div", { className: "space-y-4 mt-4 max-h-[80vh] overflow-y-auto pr-2", children: unreadCount > 0 ? unReadNotifications.map((notification) => /* @__PURE__ */ jsxs(
         "div",
         {
-          className: `relative p-4 border rounded-lg ${notification.read ? "bg-background" : "bg-muted"} transition-all`,
+          className: `relative p-4 border rounded-lg ${notification.read_at ? "bg-background" : "bg-muted"} transition-all`,
           children: [
             /* @__PURE__ */ jsxs(
               Button,
@@ -2180,10 +2152,9 @@ function NotificationPanel() {
               }
             ),
             /* @__PURE__ */ jsxs("div", { className: "pr-6 cursor-pointer", onClick: () => toggleNotification(notification.id), children: [
-              /* @__PURE__ */ jsx("h4", { className: "font-medium", children: notification.title }),
-              /* @__PURE__ */ jsx("p", { className: "text-sm text-muted-foreground mt-1", children: notification.description }),
-              /* @__PURE__ */ jsx("p", { className: "text-xs text-muted-foreground mt-2", children: notification.time }),
-              expandedId === notification.id && /* @__PURE__ */ jsx("div", { className: "mt-4 pt-4 border-t text-sm animate-in fade-in-50 duration-200", children: /* @__PURE__ */ jsx("p", { children: notification.details }) })
+              /* @__PURE__ */ jsx("h4", { className: "font-medium", children: notification.data.subject }),
+              /* @__PURE__ */ jsx("p", { className: "text-xs text-muted-foreground mt-2", children: notification.created_at }),
+              expandedId === notification.id && /* @__PURE__ */ jsx("div", { className: "mt-4 pt-4 border-t text-sm animate-in fade-in-50 duration-200", children: /* @__PURE__ */ jsx("p", { children: notification.data.body }) })
             ] })
           ]
         },
@@ -2223,6 +2194,17 @@ const breadcrumbs$8 = [
   { title: "Create Card", href: "" }
 ];
 function CreateCard() {
+  var _a, _b;
+  const auth = usePage().props.auth;
+  const activePlan = auth.activePlan;
+  const serviceLimit = ((_a = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _a.number_of_service) ?? 0;
+  const galleryLimit = ((_b = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _b.number_of_gallery) ?? 0;
+  const cardSocialLinks = usePage().props.cardSocialLinks;
+  const links = cardSocialLinks.map((link) => ({
+    name: link,
+    url: "",
+    placeholder: `https://${link.toLowerCase()}.com/your-profile`
+  }));
   const colors = ["#3a59ae", "#a580e5", "#6dd3c7", "#3bb55d", "#ffc631", "#ff8c39", "#ea3a2e", "#ee85dd", "#4a4a4a"];
   const timeOptions = [];
   for (let hour = 0; hour < 24; hour++) {
@@ -2274,7 +2256,7 @@ function CreateCard() {
     });
     setData("business_hours", updatedSchedule);
   };
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post: post2, processing, errors } = useForm({
     banner: {
       file: null,
       path: null
@@ -2294,19 +2276,15 @@ function CreateCard() {
     phone: "",
     email: "",
     banner_color: colors[0],
-    links: [
-      { name: "website", url: "", placeholder: "https://example.com" },
-      { name: "facebook", url: "", placeholder: "https://facebook.com/example" },
-      { name: "twitter", url: "", placeholder: "https://twitter.com/example" },
-      { name: "instagram", url: "", placeholder: "https://instagram.com/example" },
-      { name: "linkedin", url: "", placeholder: "https://linkedin.com/example" },
-      { name: "youtube", url: "", placeholder: "https://youtube.com/example" }
-    ],
+    // constract the links from cardSocialLinks
+    links,
     address: "",
     location: "",
     headline: "",
     galleries: [{ id: crypto.randomUUID(), file: null, path: null, description: "" }],
-    services: [{ id: crypto.randomUUID(), file: null, path: null, name: "", description: "" }],
+    services: [
+      { id: crypto.randomUUID(), file: null, path: null, name: "", description: "" }
+    ],
     business_hours: [
       { id: crypto.randomUUID(), day: "Monday", isOpen: true, open: "03:00", close: "11:00" },
       { id: crypto.randomUUID(), day: "Tuesday", isOpen: true, open: "03:00", close: "11:00" },
@@ -2317,6 +2295,25 @@ function CreateCard() {
       { id: crypto.randomUUID(), day: "Sunday", isOpen: false, open: "03:00", close: "11:00" }
     ]
   });
+  const hasTabError = (prefixes, errors2) => {
+    return Object.keys(errors2).some(
+      (key) => prefixes.some((prefix) => key.startsWith(prefix))
+    );
+  };
+  const DisplayError = hasTabError(["avatar.file", "banner.file", "logo.file"], errors);
+  const personalInformationError = hasTabError(
+    ["first_name", "last_name", "organization", "job_title", "email", "phone", "headline"],
+    errors
+  );
+  const linksError = hasTabError(
+    ["links.0", "links.1", "links.2", "links.3", "links.4", "links.5"],
+    errors
+  );
+  const locationError = hasTabError(["address", "location"], errors);
+  const galleryError = hasTabError(["galleries.0", "galleries.1", "galleries.2"], errors);
+  const serviceError = hasTabError(["services.0", "services.1", "services.2"], errors);
+  const businessHoursError = hasTabError(["business_hours.0", "business_hours.1", "business_hours.2"], errors);
+  console.log("personalInformationError", personalInformationError);
   const handleGalleryFileChange = (id, file) => {
     const newGallery = data.galleries.map((item) => {
       if (item.id === id) {
@@ -2385,21 +2382,17 @@ function CreateCard() {
   const addMoreServiceItem = () => {
     setData("services", [...data.services, { id: crypto.randomUUID(), file: null, name: "", path: null, description: "" }]);
   };
-  const removeItem = (id) => {
-    if (data.galleries.length > 1) {
-      setData(
-        "galleries",
-        data.galleries.filter((item) => item.id !== id)
-      );
-    }
+  const removeGalleryItem = (id) => {
+    setData(
+      "galleries",
+      data.galleries.filter((item) => item.id !== id)
+    );
   };
   const removeServiceItem = (id) => {
-    if (data.services.length > 1) {
-      setData(
-        "services",
-        data.services.filter((item) => item.id !== id)
-      );
-    }
+    setData(
+      "services",
+      data.services.filter((item) => item.id !== id)
+    );
   };
   const removeGalleryFile = (id) => {
     setData(
@@ -2426,8 +2419,8 @@ function CreateCard() {
   const validItems = data.galleries.filter((item) => item.file && item.path);
   const ValidServiceItems = data.services.filter((item) => item.file && item.path);
   const handleFileChange = (field) => (e) => {
-    var _a;
-    const file = (_a = e.target.files) == null ? void 0 : _a[0];
+    var _a2;
+    const file = (_a2 = e.target.files) == null ? void 0 : _a2[0];
     if (field === "banner") {
       const newBanner = {
         file,
@@ -2453,7 +2446,7 @@ function CreateCard() {
   const submit = (event) => {
     event.preventDefault();
     console.log(data);
-    post(route("card.store"), {
+    post2(route("card.store"), {
       onSuccess: () => {
         console.log("Upload successful!");
       },
@@ -2481,9 +2474,10 @@ function CreateCard() {
         "Create Card"
       ] }) }),
       /* @__PURE__ */ jsxs("div", { className: "m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5", children: [
-        /* @__PURE__ */ jsx("div", { className: "col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-xl md:block", children: /* @__PURE__ */ jsx(ScrollArea, { className: "h-[800px] cursor-pointer rounded-md border-1", children: /* @__PURE__ */ jsx(
+        /* @__PURE__ */ jsx("div", { className: "col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-none md:block", children: /* @__PURE__ */ jsx(ScrollArea, { className: "h-[800px] cursor-pointer rounded-md border-1", children: /* @__PURE__ */ jsx(
           MuluCard,
           {
+            url: data.url,
             avatar: data.avatar,
             logo: data.logo,
             first_name: data.first_name,
@@ -2505,13 +2499,13 @@ function CreateCard() {
         ) }) }),
         /* @__PURE__ */ jsx("div", { className: "col-span-3 border-none p-2", children: /* @__PURE__ */ jsxs(Tabs, { defaultValue: "display", children: [
           /* @__PURE__ */ jsxs(TabsList, { className: "h- flex h-auto w-full flex-row flex-wrap justify-around", children: [
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "display", children: "Display" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "personal_information", children: "Information" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "links", children: "Social Links" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "location", children: "Location" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "business_hours", children: "Business Hours" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "service", children: "Services" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "gallery", children: "Galleries" })
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "display", children: DisplayError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Display" }) : /* @__PURE__ */ jsx("span", { className: "", children: "Display" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "personal_information", children: personalInformationError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Information" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Information" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "links", children: linksError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Social Links" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Social Links" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "location", children: locationError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Location" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Location" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "business_hours", children: businessHoursError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Business Hours" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Business Hours" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "service", children: serviceError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Services" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Services" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "gallery", children: galleryError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Galleries" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Galleries" }) })
           ] }),
           /* @__PURE__ */ jsx(TabsContent, { value: "display", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
@@ -2544,8 +2538,8 @@ function CreateCard() {
                       type: "button",
                       variant: "outline",
                       onClick: () => {
-                        var _a;
-                        return (_a = document.getElementById("banner-upload")) == null ? void 0 : _a.click();
+                        var _a2;
+                        return (_a2 = document.getElementById("banner-upload")) == null ? void 0 : _a2.click();
                       },
                       className: "flex items-center gap-2",
                       children: [
@@ -2582,8 +2576,8 @@ function CreateCard() {
                       type: "button",
                       variant: "outline",
                       onClick: () => {
-                        var _a;
-                        return (_a = document.getElementById("avatar-upload")) == null ? void 0 : _a.click();
+                        var _a2;
+                        return (_a2 = document.getElementById("avatar-upload")) == null ? void 0 : _a2.click();
                       },
                       className: "flex items-center gap-2",
                       children: [
@@ -2620,8 +2614,8 @@ function CreateCard() {
                       type: "button",
                       variant: "outline",
                       onClick: () => {
-                        var _a;
-                        return (_a = document.getElementById("logo-upload")) == null ? void 0 : _a.click();
+                        var _a2;
+                        return (_a2 = document.getElementById("logo-upload")) == null ? void 0 : _a2.click();
                       },
                       className: "flex items-center gap-2",
                       children: [
@@ -2909,7 +2903,7 @@ function CreateCard() {
             ] }),
             /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
               data.services.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                data.services.length > 1 && /* @__PURE__ */ jsxs(
+                /* @__PURE__ */ jsxs(
                   Button,
                   {
                     type: "button",
@@ -2949,8 +2943,8 @@ function CreateCard() {
                           accept: "image/*",
                           className: "hidden",
                           onChange: (e) => {
-                            var _a;
-                            const file = ((_a = e.target.files) == null ? void 0 : _a[0]) || null;
+                            var _a2;
+                            const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
                             handleServiceFileChange(item.id, file);
                           }
                         }
@@ -2961,8 +2955,8 @@ function CreateCard() {
                           type: "button",
                           variant: "outline",
                           onClick: () => {
-                            var _a;
-                            return (_a = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a.click();
+                            var _a2;
+                            return (_a2 = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a2.click();
                           },
                           className: "flex items-center gap-2",
                           children: [
@@ -3021,36 +3015,50 @@ function CreateCard() {
                   ] })
                 ] })
               ] }) }, item.id)),
-              /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-4 sm:flex-row", children: /* @__PURE__ */ jsxs(
-                Button,
+              data.services.length >= serviceLimit && /* @__PURE__ */ jsx(
+                InputError,
                 {
-                  type: "button",
-                  variant: "outline",
-                  onClick: addMoreServiceItem,
-                  className: "flex items-center gap-2",
-                  children: [
-                    /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                    "Add More"
-                  ]
+                  message: errors.services,
+                  className: "mt-2"
                 }
-              ) })
+              ),
+              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                /* @__PURE__ */ jsxs(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "outline",
+                    onClick: addMoreServiceItem,
+                    className: "flex items-center gap-2",
+                    disabled: data.services.length >= serviceLimit,
+                    children: [
+                      /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                      "Add More"
+                    ]
+                  }
+                ),
+                data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  /* @__PURE__ */ jsx(ShieldAlert, { className: "h-8 w-8" }),
+                  /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
+                ] })
+              ] })
             ] }) })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "gallery", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
-              /* @__PURE__ */ jsx(CardTitle, { children: "Location" }),
-              /* @__PURE__ */ jsx(CardDescription, { children: "Enter your address and location details." })
+              /* @__PURE__ */ jsx(CardTitle, { children: "Gallery" }),
+              /* @__PURE__ */ jsx(CardDescription, { children: "enter your pictures" })
             ] }),
             /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
               data.galleries.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                data.galleries.length > 1 && /* @__PURE__ */ jsxs(
+                /* @__PURE__ */ jsxs(
                   Button,
                   {
                     type: "button",
                     variant: "ghost",
                     size: "icon",
                     className: "absolute top-2 right-2",
-                    onClick: () => removeItem(item.id),
+                    onClick: () => removeGalleryItem(item.id),
                     children: [
                       /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
                       /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
@@ -3087,8 +3095,8 @@ function CreateCard() {
                           accept: "image/*",
                           className: "hidden",
                           onChange: (e) => {
-                            var _a;
-                            const file = ((_a = e.target.files) == null ? void 0 : _a[0]) || null;
+                            var _a2;
+                            const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
                             handleGalleryFileChange(item.id, file);
                           }
                         }
@@ -3099,8 +3107,8 @@ function CreateCard() {
                           type: "button",
                           variant: "outline",
                           onClick: () => {
-                            var _a;
-                            return (_a = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a.click();
+                            var _a2;
+                            return (_a2 = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a2.click();
                           },
                           className: "flex items-center gap-2",
                           children: [
@@ -3140,10 +3148,33 @@ function CreateCard() {
                   ] })
                 ] })
               ] }) }, item.id)),
-              /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-4 sm:flex-row", children: /* @__PURE__ */ jsxs(Button, { type: "button", variant: "outline", onClick: addMoreItem, className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                "Add More"
-              ] }) })
+              data.galleries.length >= galleryLimit && /* @__PURE__ */ jsx(
+                InputError,
+                {
+                  message: errors.galleries,
+                  className: "mt-2"
+                }
+              ),
+              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                /* @__PURE__ */ jsxs(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "outline",
+                    onClick: addMoreItem,
+                    className: "flex items-center gap-2",
+                    disabled: data.galleries.length >= galleryLimit,
+                    children: [
+                      /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                      "Add More"
+                    ]
+                  }
+                ),
+                data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  /* @__PURE__ */ jsx(ShieldAlert, { className: "h-6 w-6" }),
+                  /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
+                ] })
+              ] })
             ] }) })
           ] }) })
         ] }) })
@@ -3160,9 +3191,23 @@ const breadcrumbs$7 = [
   { title: "Edit Card", href: "" }
 ];
 function EditCard({ card }) {
-  var _a, _b, _c, _d, _e, _f;
-  console.log(card);
+  var _a, _b, _c, _d;
+  const props = usePage().props;
+  const auth = props.auth;
+  const activePlan = auth.activePlan;
+  const serviceLimit = ((_a = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _a.number_of_service) ?? 0;
+  const galleryLimit = ((_b = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _b.number_of_gallery) ?? 0;
+  const cardSocialLinks = props.cardSocialLinks;
+  const existingLinksMap = new Map(
+    (card.links || []).map((link) => [link.name, link.url])
+  );
+  const links = cardSocialLinks.map((linkName) => ({
+    name: linkName,
+    url: existingLinksMap.get(linkName) || "",
+    placeholder: `https://${linkName.toLowerCase()}.com/your-profile`
+  }));
   const colors = ["#3a59ae", "#a580e5", "#6dd3c7", "#3bb55d", "#ffc631", "#ff8c39", "#ea3a2e", "#ee85dd", "#4a4a4a"];
+  console.log(card);
   const timeOptions = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
@@ -3171,47 +3216,43 @@ function EditCard({ card }) {
       timeOptions.push(`${formattedHour}:${formattedMinute}`);
     }
   }
-  const { data, setData, put, processing, errors } = useForm({
-    id: card.id,
-    url: card.url,
-    banner: card.banner || { file: null, path: null },
-    cardname: card.cardname || "",
-    avatar: card.avatar || { file: null, path: null },
-    logo: card.logo || { file: null, path: null },
-    first_name: card.first_name || "",
-    last_name: card.last_name || "",
-    organization: card.organization || "",
-    job_title: card.job_title || "",
-    email: card.email || "",
-    phone: card.phone || "",
-    banner_color: card.banner_color || colors[0],
-    links: card.links || [
-      { name: "website", url: "", placeholder: "https://example.com" },
-      { name: "facebook", url: "", placeholder: "https://facebook.com/example" },
-      { name: "twitter", url: "", placeholder: "https://twitter.com/example" },
-      { name: "instagram", url: "", placeholder: "https://instagram.com/example" },
-      { name: "linkedin", url: "", placeholder: "https://linkedin.com/example" },
-      { name: "youtube", url: "", placeholder: "https://youtube.com/example" }
-    ],
-    location: card.location || "",
-    address: card.address || "",
-    headline: card.headline || "",
-    galleries: ((_a = card.galleries) == null ? void 0 : _a.length) > 0 ? card.galleries : [{ id: crypto.randomUUID(), file: null, path: null, description: "" }],
-    services: ((_b = card.services) == null ? void 0 : _b.length) > 0 ? card.services : [{ id: crypto.randomUUID(), file: null, path: null, name: "", description: "" }],
-    business_hours: ((_c = card.business_hours) == null ? void 0 : _c.length) > 0 ? card.business_hours : [
-      { id: crypto.randomUUID(), day: "Monday", isOpen: true, open: "03:00", close: "11:00" },
-      { id: crypto.randomUUID(), day: "Tuesday", isOpen: true, open: "03:00", close: "11:00" },
-      { id: crypto.randomUUID(), day: "Wednesday", isOpen: true, open: "03:00", close: "11:00" },
-      { id: crypto.randomUUID(), day: "Thursday", isOpen: true, open: "03:00", close: "11:00" },
-      { id: crypto.randomUUID(), day: "Friday", isOpen: true, open: "03:00", close: "11:00" },
-      { id: crypto.randomUUID(), day: "Saturday", isOpen: false, open: "03:00", close: "11:00" },
-      { id: crypto.randomUUID(), day: "Sunday", isOpen: false, open: "03:00", close: "11:00" }
-    ],
-    total_views: card.total_views,
-    total_saves: card.total_saves,
-    qr_code: card.qr_code || "",
-    status: card.status || false
+  const { data, setData, post: post2, processing, errors } = useForm({
+    banner: card.banner,
+    avatar: card.avatar,
+    logo: card.logo,
+    first_name: card.first_name,
+    last_name: card.last_name,
+    organization: card.organization,
+    job_title: card.job_title,
+    email: card.email,
+    phone: card.phone,
+    banner_color: card.banner_color,
+    links,
+    location: card.location,
+    address: card.address,
+    headline: card.headline,
+    galleries: ((_c = card.galleries) == null ? void 0 : _c.length) > 0 ? card.galleries : [],
+    services: ((_d = card.services) == null ? void 0 : _d.length) > 0 ? card.services : [],
+    business_hours: card.business_hours
   });
+  const hasTabError = (prefixes, errors2) => {
+    return Object.keys(errors2).some(
+      (key) => prefixes.some((prefix) => key.startsWith(prefix))
+    );
+  };
+  const DisplayError = hasTabError(["avatar.file", "banner.file", "logo.file"], errors);
+  const personalInformationError = hasTabError(
+    ["first_name", "last_name", "organization", "job_title", "email", "phone", "headline"],
+    errors
+  );
+  const linksError = hasTabError(
+    ["links.0", "links.1", "links.2", "links.3", "links.4", "links.5"],
+    errors
+  );
+  const locationError = hasTabError(["address", "location"], errors);
+  const galleryError = hasTabError(["galleries.0", "galleries.1", "galleries.2"], errors);
+  const serviceError = hasTabError(["services.0", "services.1", "services.2"], errors);
+  const businessHoursError = hasTabError(["business_hours.0", "business_hours.1", "business_hours.2"], errors);
   const copyToAllDays = (day) => {
     const updatedSchedule = data.business_hours.map((item) => ({
       ...item,
@@ -3238,6 +3279,15 @@ function EditCard({ card }) {
     });
     setData("business_hours", updatedSchedule);
   };
+  const handleGalleryFileChange = (id, file) => {
+    const newGallery = data.galleries.map((item) => {
+      if (item.id === id) {
+        return { ...item, file, path: file ? URL.createObjectURL(file) : null };
+      }
+      return item;
+    });
+    setData("galleries", newGallery);
+  };
   const handleServiceFileChange = (id, file) => {
     const newService = data.services.map((item) => {
       if (item.id === id) {
@@ -3245,6 +3295,7 @@ function EditCard({ card }) {
       }
       return item;
     });
+    console.log(newService);
     setData("services", newService);
   };
   const handleServiceDescriptionChange = (id, description) => {
@@ -3280,31 +3331,39 @@ function EditCard({ card }) {
   const addMoreServiceItem = () => {
     setData("services", [...data.services, { id: crypto.randomUUID(), file: null, path: null, name: "", description: "" }]);
   };
-  const removeItem = (id) => {
-    if (data.galleries.length > 1) {
-      setData("galleries", data.galleries.filter((item) => item.id !== id));
-    }
+  const removeGalleryItem = (id) => {
+    setData(
+      "galleries",
+      data.galleries.filter((item) => item.id !== id)
+    );
   };
   const removeServiceItem = (id) => {
-    if (data.services.length > 1) {
-      setData("services", data.services.filter((item) => item.id !== id));
-    }
+    setData(
+      "services",
+      data.services.filter((item) => item.id !== id)
+    );
   };
   const removeGalleryFile = (id) => {
-    setData("galleries", data.galleries.map((item) => {
-      if (item.id === id) {
-        return { ...item, file: null, path: null };
-      }
-      return item;
-    }));
+    setData(
+      "galleries",
+      data.galleries.map((item) => {
+        if (item.id === id) {
+          return { ...item, file: null, path: null };
+        }
+        return item;
+      })
+    );
   };
   const removeServiceFile = (id) => {
-    setData("services", data.services.map((item) => {
-      if (item.id === id) {
-        return { ...item, file: null, path: null };
-      }
-      return item;
-    }));
+    setData(
+      "services",
+      data.services.map((item) => {
+        if (item.id === id) {
+          return { ...item, file: null, path: null };
+        }
+        return item;
+      })
+    );
   };
   const handleFileChange = (field) => (e) => {
     var _a2;
@@ -3315,11 +3374,12 @@ function EditCard({ card }) {
   };
   const submit = (event) => {
     event.preventDefault();
-    put(route("card.update", card.id), {
+    post2(route("card.update", card.id), {
       onSuccess: () => {
-        console.log("Update successful!");
+        toast.success("Card updated successfully!");
       },
       onError: (errors2) => {
+        toast.error("Failed to update card. Please check the form for errors.");
         console.log("Update errors:", errors2);
       },
       preserveState: true,
@@ -3332,12 +3392,15 @@ function EditCard({ card }) {
   return /* @__PURE__ */ jsxs(AppLayout, { breadcrumbs: breadcrumbs$7, children: [
     /* @__PURE__ */ jsx(Head, { title: "Edit Card" }),
     /* @__PURE__ */ jsxs("form", { onSubmit: submit, className: "min-h-screen", children: [
-      /* @__PURE__ */ jsx("div", { className: "m-2 flex flex-row justify-end rounded-lg border-2 p-2 shadow-none", children: /* @__PURE__ */ jsxs(Button, { variant: "outline", type: "submit", className: "cursor-pointer bg-green-600 text-white", disabled: processing, children: [
-        processing && /* @__PURE__ */ jsx(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
-        "Update Card"
-      ] }) }),
+      /* @__PURE__ */ jsxs("div", { className: "m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none", children: [
+        /* @__PURE__ */ jsx(Link, { className: "cursor-pointer bg-red-300  rounded-sm px-4  py-1 text-black", href: route("card.show", card.id), children: "Cancel" }),
+        /* @__PURE__ */ jsxs(Button, { variant: "outline", type: "submit", className: "cursor-pointer bg-green-600 text-white", disabled: processing, children: [
+          processing && /* @__PURE__ */ jsx(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
+          "Update Card"
+        ] })
+      ] }),
       /* @__PURE__ */ jsxs("div", { className: "m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5", children: [
-        /* @__PURE__ */ jsx("div", { className: "col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-xl md:block", children: /* @__PURE__ */ jsx(ScrollArea, { className: "h-[800px] cursor-pointer rounded-md border-1", children: /* @__PURE__ */ jsx(
+        /* @__PURE__ */ jsx("div", { className: "col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-none md:block", children: /* @__PURE__ */ jsx(ScrollArea, { className: "h-[800px] cursor-pointer rounded-md border-1", children: /* @__PURE__ */ jsx(
           MuluCard,
           {
             avatar: data.avatar,
@@ -3356,18 +3419,19 @@ function EditCard({ card }) {
             galleries: data.galleries,
             services: data.services,
             business_hours: data.business_hours,
-            banner: data.banner
+            banner: data.banner,
+            url: data.url
           }
         ) }) }),
         /* @__PURE__ */ jsx("div", { className: "col-span-3 border-none p-2", children: /* @__PURE__ */ jsxs(Tabs, { defaultValue: "display", children: [
-          /* @__PURE__ */ jsxs(TabsList, { className: "h-auto w-full flex flex-row flex-wrap justify-around", children: [
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "display", children: "Display" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "personal_information", children: "Information" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "links", children: "Social Links" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "location", children: "Location" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "business_hours", children: "Business Hours" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "service", children: "Services" }),
-            /* @__PURE__ */ jsx(TabsTrigger, { value: "gallery", children: "Galleries" })
+          /* @__PURE__ */ jsxs(TabsList, { className: "flex h-auto w-full flex-row flex-wrap justify-around", children: [
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "display", children: DisplayError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Display" }) : /* @__PURE__ */ jsx("span", { className: "", children: "Display" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "personal_information", children: personalInformationError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Information" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Information" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "links", children: linksError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Social Links" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Social Links" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "location", children: locationError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Location" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Location" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "business_hours", children: businessHoursError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Business Hours" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Business Hours" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "service", children: serviceError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Services" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Services" }) }),
+            /* @__PURE__ */ jsx(TabsTrigger, { value: "gallery", children: galleryError ? /* @__PURE__ */ jsx("span", { className: "text-red-500", children: "Galleries" }) : /* @__PURE__ */ jsx("span", { className: "", children: " Galleries" }) })
           ] }),
           /* @__PURE__ */ jsx(TabsContent, { value: "display", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
@@ -3378,7 +3442,7 @@ function EditCard({ card }) {
               /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 rounded-xl border-2 px-2 py-4", children: [
                 /* @__PURE__ */ jsx(Label, { htmlFor: "banner-upload", className: "text-sm font-medium text-black", children: "Upload Your Banner" }),
                 data.banner.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                  /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: ((_d = data.banner.file) == null ? void 0 : _d.name) || "Existing Banner" }),
+                  /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: data.banner.path.split("/").pop() || "Existing Banner" }),
                   /* @__PURE__ */ jsxs(Button, { type: "button", variant: "ghost", size: "icon", onClick: () => removeFile("banner"), children: [
                     /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
                     /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
@@ -3411,12 +3475,12 @@ function EditCard({ card }) {
                     }
                   )
                 ] }),
-                /* @__PURE__ */ jsx(InputError, { message: errors["banner.file"], className: "mt-2" })
+                /* @__PURE__ */ jsx(InputError, { message: errors["banner.file"] || errors["banner.path"], className: "mt-2" })
               ] }),
               /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 rounded-xl border-2 px-2 py-4", children: [
                 /* @__PURE__ */ jsx(Label, { htmlFor: "avatar-upload", className: "text-sm font-medium text-black", children: "Upload Your Avatar" }),
                 data.avatar.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                  /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: ((_e = data.avatar.file) == null ? void 0 : _e.name) || "Existing Avatar" }),
+                  /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: data.avatar.path.split("/").pop() || "Existing Avatar" }),
                   /* @__PURE__ */ jsxs(Button, { type: "button", variant: "ghost", size: "icon", onClick: () => removeFile("avatar"), children: [
                     /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
                     /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
@@ -3449,12 +3513,12 @@ function EditCard({ card }) {
                     }
                   )
                 ] }),
-                /* @__PURE__ */ jsx(InputError, { message: errors["avatar.file"], className: "mt-2" })
+                /* @__PURE__ */ jsx(InputError, { message: errors["avatar.file"] || errors["avatar.path"], className: "mt-2" })
               ] }),
               /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 rounded-xl border-2 px-2 py-4", children: [
                 /* @__PURE__ */ jsx(Label, { htmlFor: "logo-upload", className: "text-sm font-medium text-black", children: "Upload Your Logo" }),
                 data.logo.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                  /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: ((_f = data.logo.file) == null ? void 0 : _f.name) || "Existing Logo" }),
+                  /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: data.logo.path.split("/").pop() || "Existing Logo" }),
                   /* @__PURE__ */ jsxs(Button, { type: "button", variant: "ghost", size: "icon", onClick: () => removeFile("logo"), children: [
                     /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
                     /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
@@ -3487,7 +3551,7 @@ function EditCard({ card }) {
                     }
                   )
                 ] }),
-                /* @__PURE__ */ jsx(InputError, { message: errors["logo.file"], className: "mt-2" })
+                /* @__PURE__ */ jsx(InputError, { message: errors["logo.file"] || errors["logo.path"], className: "mt-2" })
               ] }),
               /* @__PURE__ */ jsx("div", { className: "flex flex-row flex-wrap gap-2 rounded-lg border-2 p-2", children: colors.map((color, index) => /* @__PURE__ */ jsx("div", { className: "cursor-pointer rounded-full border-2 p-2", children: /* @__PURE__ */ jsx("div", { className: "flex items-center space-x-2", children: /* @__PURE__ */ jsx(
                 "div",
@@ -3506,19 +3570,6 @@ function EditCard({ card }) {
               /* @__PURE__ */ jsx(CardDescription, { children: "Update your personal information here." })
             ] }),
             /* @__PURE__ */ jsxs(CardContent, { className: "space-y-4", children: [
-              /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
-                /* @__PURE__ */ jsx(Label, { htmlFor: "cardname", children: "Card Name" }),
-                /* @__PURE__ */ jsx(
-                  Input,
-                  {
-                    id: "cardname",
-                    value: data.cardname,
-                    onChange: (e) => setData("cardname", e.target.value),
-                    disabled: processing
-                  }
-                ),
-                /* @__PURE__ */ jsx(InputError, { message: errors.cardname, className: "mt-2" })
-              ] }),
               /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2", children: [
                 /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
                   /* @__PURE__ */ jsx(Label, { htmlFor: "fname", children: "First Name" }),
@@ -3768,7 +3819,7 @@ function EditCard({ card }) {
             ] }),
             /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
               data.services.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                data.services.length > 1 && /* @__PURE__ */ jsxs(
+                /* @__PURE__ */ jsxs(
                   Button,
                   {
                     type: "button",
@@ -3785,7 +3836,7 @@ function EditCard({ card }) {
                 /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
                   /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2", children: [
                     item.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.name }),
+                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.path.split("/").pop() }),
                       /* @__PURE__ */ jsxs(
                         Button,
                         {
@@ -3831,7 +3882,7 @@ function EditCard({ card }) {
                         }
                       )
                     ] }),
-                    /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.file`], className: "mt-2" })
+                    /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.file`] || errors[`services.${index}.path`], className: "mt-2" })
                   ] }) }),
                   /* @__PURE__ */ jsxs("div", { children: [
                     /* @__PURE__ */ jsx(Label, { htmlFor: `name-${item.id}`, className: "mb-2 block", children: "Name" }),
@@ -3862,19 +3913,26 @@ function EditCard({ card }) {
                   ] })
                 ] })
               ] }) }, item.id)),
-              /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-4 sm:flex-row", children: /* @__PURE__ */ jsxs(
-                Button,
-                {
-                  type: "button",
-                  variant: "outline",
-                  onClick: addMoreServiceItem,
-                  className: "flex items-center gap-2",
-                  children: [
-                    /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                    "Add More"
-                  ]
-                }
-              ) })
+              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                /* @__PURE__ */ jsxs(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "outline",
+                    onClick: addMoreServiceItem,
+                    className: "flex items-center gap-2",
+                    disabled: data.services.length >= serviceLimit,
+                    children: [
+                      /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                      "Add More"
+                    ]
+                  }
+                ),
+                data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
+                  /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
+                ] })
+              ] })
             ] }) })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "gallery", children: /* @__PURE__ */ jsxs(Card, { children: [
@@ -3884,14 +3942,14 @@ function EditCard({ card }) {
             ] }),
             /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
               data.galleries.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                data.galleries.length > 1 && /* @__PURE__ */ jsxs(
+                /* @__PURE__ */ jsxs(
                   Button,
                   {
                     type: "button",
                     variant: "ghost",
                     size: "icon",
                     className: "absolute top-2 right-2",
-                    onClick: () => removeItem(item.id),
+                    onClick: () => removeGalleryItem(item.id),
                     children: [
                       /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
                       /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
@@ -3930,7 +3988,7 @@ function EditCard({ card }) {
                           onChange: (e) => {
                             var _a2;
                             const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
-                            handleServiceFileChange(item.id, file);
+                            handleGalleryFileChange(item.id, file);
                           }
                         }
                       ),
@@ -3951,7 +4009,7 @@ function EditCard({ card }) {
                         }
                       )
                     ] }) }),
-                    /* @__PURE__ */ jsx(InputError, { message: errors[`galleries.${index}.file`], className: "mt-2" })
+                    /* @__PURE__ */ jsx(InputError, { message: errors[`galleries.${index}.file`] || errors[`galleries.${index}.path`], className: "mt-2" })
                   ] }),
                   /* @__PURE__ */ jsxs("div", { children: [
                     /* @__PURE__ */ jsx(Label, { htmlFor: `description-${item.id}`, className: "mb-2 block", children: "Description" }),
@@ -3969,10 +4027,26 @@ function EditCard({ card }) {
                   ] })
                 ] })
               ] }) }, item.id)),
-              /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-4 sm:flex-row", children: /* @__PURE__ */ jsxs(Button, { type: "button", variant: "outline", onClick: addMoreItem, className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                "Add More"
-              ] }) })
+              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                /* @__PURE__ */ jsxs(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "outline",
+                    onClick: addMoreItem,
+                    className: "flex items-center gap-2",
+                    disabled: data.galleries.length >= galleryLimit,
+                    children: [
+                      /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                      "Add More"
+                    ]
+                  }
+                ),
+                data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
+                  /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
+                ] })
+              ] })
             ] }) })
           ] }) })
         ] }) })
@@ -3984,6 +4058,40 @@ const __vite_glob_0_9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   __proto__: null,
   default: EditCard
 }, Symbol.toStringTag, { value: "Module" }));
+function NFCCardPreview({ logo, brandColor, qrcode }) {
+  const [activeTab, setActiveTab] = useState("front");
+  return /* @__PURE__ */ jsxs(Tabs, { defaultValue: "front", onValueChange: (Value2) => setActiveTab(Value2), children: [
+    /* @__PURE__ */ jsxs(TabsList, { className: "grid grid-cols-2 mb-6", children: [
+      /* @__PURE__ */ jsx(TabsTrigger, { value: "front", children: "Front Side" }),
+      /* @__PURE__ */ jsx(TabsTrigger, { value: "back", children: "Back Side" })
+    ] }),
+    /* @__PURE__ */ jsx(TabsContent$1, { value: "front", className: "flex justify-center items-center p-2", children: /* @__PURE__ */ jsx("div", { className: "w-[400px] h-[200px] md:w-[600px] md:h-[300px] flex items-center justify-center  rounded-lg border-none", style: { backgroundColor: brandColor }, children: /* @__PURE__ */ jsx(
+      "img",
+      {
+        src: logo.path,
+        alt: "",
+        className: "w-[100px] h-[100px] md:w-[250px] md:h-[250px] rounded-md overflow-hidden flex items-center justify-center border-4 object-contain",
+        style: {
+          borderColor: brandColor
+        }
+      }
+    ) }) }),
+    /* @__PURE__ */ jsx(TabsContent$1, { value: "back", className: "flex justify-center items-center", children: /* @__PURE__ */ jsxs("div", { className: "w-[400px] h-[200px] md:w-[600px] md:h-[300px] grid grid-cols-4 rounded-lg border-none p-1 gap-2", style: { backgroundColor: brandColor }, children: [
+      /* @__PURE__ */ jsx("div", { className: "col-span-3 border-none border-red-400 flex justify-center items-center", children: /* @__PURE__ */ jsx(
+        "img",
+        {
+          src: `/storage/${qrcode}`,
+          alt: "",
+          className: "w-[100px] h-[100px] md:w-[250px] md:h-[250px] border-4 border-yellow-400 rounded-md  flex items-center justify-center object-contain",
+          style: {
+            borderColor: brandColor
+          }
+        }
+      ) }),
+      /* @__PURE__ */ jsx("div", { className: "col-span-1 border-none flex justify-end", children: /* @__PURE__ */ jsx(Wifi, { size: 80, color: "white" }) })
+    ] }) })
+  ] });
+}
 const breadcrumbs$6 = [
   {
     title: "Dashboard",
@@ -3997,7 +4105,7 @@ function ShowCard() {
   const { props } = usePage();
   const card = props.card;
   console.log(card);
-  const { data, setData, post, errors, reset } = useForm({
+  const { data, setData, get, errors, reset } = useForm({
     personalizedurl: card.url.split("/").pop(),
     cardname: card.cardname,
     status: card.status
@@ -4035,13 +4143,14 @@ function ShowCard() {
     });
   };
   const deleteCard = () => {
-    post(route("card.delete", { id: card.id }), {
+    get(route("card.delete", { id: card.id }), {
       onFinish: () => {
         reset();
         toast.success("Card has been deleted");
       },
       onSuccess: () => {
         console.log("Upload successful!");
+        toast.success("Card has been deleted successfully");
       },
       onError: (errors2) => {
         console.log("Upload errors:", errors2);
@@ -4066,6 +4175,7 @@ function ShowCard() {
       /* @__PURE__ */ jsx("div", { className: "col-span-1 hidden rounded-sm border-2 p-0 md:block", children: /* @__PURE__ */ jsx(ScrollArea, { className: "h-[800px] pr-2", children: /* @__PURE__ */ jsx(
         MuluCard,
         {
+          url: card == null ? void 0 : card.url,
           avatar: card == null ? void 0 : card.avatar,
           logo: card == null ? void 0 : card.logo,
           first_name: card == null ? void 0 : card.first_name,
@@ -4087,10 +4197,11 @@ function ShowCard() {
       ) }) }),
       /* @__PURE__ */ jsxs("div", { className: "col-span-2 flex flex-col justify-between rounded-lg border-none p-4", children: [
         /* @__PURE__ */ jsxs(Tabs, { defaultValue: "share", className: "w-full", onValueChange: (value) => setActiveTab(value), children: [
-          /* @__PURE__ */ jsxs(TabsList, { className: "flex h-16 w-full flex-row justify-between px-4", children: [
+          /* @__PURE__ */ jsxs(TabsList, { className: "flex h-24 w-full flex-row justify-between px-4", children: [
             /* @__PURE__ */ jsxs("div", { className: "space-x-4", children: [
               /* @__PURE__ */ jsx(TabsTrigger, { value: "share", className: "font-bold", children: "Share" }),
-              /* @__PURE__ */ jsx(TabsTrigger, { value: "settings", className: "font-bold", children: "Settings" })
+              /* @__PURE__ */ jsx(TabsTrigger, { value: "settings", className: "font-bold", children: "Settings" }),
+              /* @__PURE__ */ jsx(TabsTrigger, { value: "nfc", className: "font-bold", children: "NFC Card" })
             ] }),
             /* @__PURE__ */ jsxs("div", { className: "flex flex-row gap-4", children: [
               activeTab === "share" && /* @__PURE__ */ jsx(Button, { variant: "outline", className: "cursor-pointer", onClick: () => DownloadQRCode(), children: /* @__PURE__ */ jsx(Download, { size: 100 }) }),
@@ -4190,6 +4301,21 @@ function ShowCard() {
                 )
               ] })
             ] })
+          ] }) }),
+          /* @__PURE__ */ jsx(TabsContent, { value: "nfc", children: /* @__PURE__ */ jsxs(Card, { className: "shadow-none", children: [
+            /* @__PURE__ */ jsxs(CardHeader, { children: [
+              /* @__PURE__ */ jsx(CardTitle, { children: "NFC Card" }),
+              /* @__PURE__ */ jsx(CardDescription, { children: "NFC card preview" })
+            ] }),
+            /* @__PURE__ */ jsx(CardContent, { className: "space-y-8", children: /* @__PURE__ */ jsx(
+              NFCCardPreview,
+              {
+                logo: card == null ? void 0 : card.logo,
+                brandColor: card == null ? void 0 : card.banner_color,
+                qrcode: card == null ? void 0 : card.qr_code,
+                side: "front"
+              }
+            ) })
           ] }) })
         ] }),
         activeTab === "settings" && /* @__PURE__ */ jsx(
@@ -4243,7 +4369,7 @@ const BankSelector = ({ banks, selectedBank, onSelectBank }) => {
               /* @__PURE__ */ jsx("p", { className: "font-medium", children: selectedBank.name }),
               /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground text-sm", children: [
                 "Account ending in ",
-                selectedBank.account_number
+                selectedBank.account_number.slice(-4)
               ] })
             ] })
           ] }) : /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: "Select your bank" }),
@@ -4268,7 +4394,7 @@ const BankSelector = ({ banks, selectedBank, onSelectBank }) => {
             /* @__PURE__ */ jsx("p", { className: "font-medium", children: bank.name }),
             /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground text-sm", children: [
               "Account ending in ",
-              bank.account_number
+              bank.account_number.slice(-4)
             ] })
           ] }),
           (selectedBank == null ? void 0 : selectedBank.account_number) === bank.account_number && /* @__PURE__ */ jsx(Check, { className: "text-primary h-5 w-5" })
@@ -4313,7 +4439,7 @@ const Index$1 = () => {
   const { auth } = usePage().props;
   const banks = props.banks;
   const plan = props.plan;
-  const { data, setData, post, errors } = useForm({
+  const { data, setData, post: post2, errors } = useForm({
     bank: banks[0],
     transactionCode: "",
     email: auth.user.email
@@ -4324,7 +4450,7 @@ const Index$1 = () => {
   const baseAmount = plan.price;
   const paymentAmount = baseAmount;
   const handlePayment = () => {
-    post(route("checkout.order", { plan }), {
+    post2(route("checkout.order", { plan }), {
       onSuccess: () => {
         toast.success("Payment successful. wait for approval");
       },
@@ -4365,27 +4491,19 @@ const Index$1 = () => {
         ] })
       ] }) }),
       /* @__PURE__ */ jsx(Separator, { className: "my-6" }),
-      /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsx("span", { className: "font-medium", children: "Subtotal" }),
-        /* @__PURE__ */ jsxs("span", { className: "font-medium", children: [
-          "$",
-          baseAmount
-        ] })
-      ] }),
-      /* @__PURE__ */ jsx(Separator, { className: "my-6" }),
       /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between font-medium", children: [
         /* @__PURE__ */ jsx("span", { children: "Total due today" }),
         /* @__PURE__ */ jsxs("span", { children: [
-          "$",
+          "Birr ",
           paymentAmount
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxs("div", { className: "flex flex-col bg-gray-50 p-6 md:w-1/2 md:p-12 border-none", children: [
-      /* @__PURE__ */ jsx("h1", { className: "mb-6 text-xl font-semibold", children: "Pay with bank transfer" }),
+      /* @__PURE__ */ jsx("h1", { className: "mb-6 text-xl font-semibold", children: "Pay with Bank Transfer" }),
       /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
         /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ jsx(Label, { htmlFor: "email", children: "Email" }),
+          /* @__PURE__ */ jsx(Label, { htmlFor: "email", children: "Email Address" }),
           /* @__PURE__ */ jsx(
             Input,
             {
@@ -4426,7 +4544,7 @@ const Index$1 = () => {
               placeholder: "Enter your transaction reference code"
             }
           ),
-          /* @__PURE__ */ jsx("p", { className: "text-xs text-gray-500", children: "Enter the reference code from your bank transfer" }),
+          /* @__PURE__ */ jsx("p", { className: "text-xs text-gray-500", children: "Enter the transaction reference code from your bank transfer." }),
           /* @__PURE__ */ jsx(InputError, { className: "mt-2", message: errors.transactionCode })
         ] }),
         /* @__PURE__ */ jsx(Button$1, { onClick: handlePayment, className: "mt-4 w-full rounded-md bg-blue-400 py-4 text-white hover:bg-blue-500", children: "Subscribe" }),
@@ -4455,62 +4573,86 @@ const breadcrumbs$5 = [
   }
 ];
 function Dashboard() {
+  const { auth } = usePage().props;
+  const permissions = auth.permissions;
   function showCardDetail(id) {
+    console.log("show card detail", id);
     router.get(route("card.show", { id }));
   }
   const { props } = usePage();
   const cards = props.cards;
   const reports = props.reports;
   console.log(reports);
+  console.log(permissions);
   return /* @__PURE__ */ jsxs(AppLayout, { breadcrumbs: breadcrumbs$5, children: [
     /* @__PURE__ */ jsx(Head, { title: "Dashboard" }),
-    /* @__PURE__ */ jsx("div", { className: "flex flex-row justify-end rounded-xl border-none p-2", children: /* @__PURE__ */ jsx(
-      Link,
-      {
-        className: "flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 p-0 text-black shadow-none hover:bg-gray-100",
-        href: "card/create",
-        children: /* @__PURE__ */ jsxs(Button, { size: "lg", className: "bg-brand-purple hover:bg-brand-purple-dark group transition-colors", children: [
-          /* @__PURE__ */ jsx("span", { children: "Create New Card" }),
-          /* @__PURE__ */ jsx(ArrowRight, { className: "ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" })
-        ] })
-      }
-    ) }),
-    /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 gap-4 rounded-sm border-none p-2 md:grid-cols-3", children: [
-      /* @__PURE__ */ jsxs(Card, { className: "flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none", children: [
-        /* @__PURE__ */ jsx("h1", { className: "text-xl font-bold capitalize", children: "Number of cards" }),
-        /* @__PURE__ */ jsx("p", { className: "text-2xl font-extrabold", children: reports.total_cards })
+    reports.total_cards === 0 && /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center gap-4 rounded-xl border-none p-2", children: [
+      /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center gap-4 rounded-xl border-none p-2", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-xl font-bold capitalize", children: "No cards found" }),
+        /* @__PURE__ */ jsx("p", { className: "text-gray-500", children: "You have no cards. Create one now." })
       ] }),
-      /* @__PURE__ */ jsxs(Card, { className: "flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none", children: [
-        /* @__PURE__ */ jsx("h1", { className: "text-xl font-bold capitalize", children: "Number of active cards" }),
-        /* @__PURE__ */ jsx("p", { className: "text-xl font-extrabold", children: reports.active_cards })
-      ] }),
-      /* @__PURE__ */ jsxs(Card, { className: "flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none", children: [
-        /* @__PURE__ */ jsx("h1", { className: "text-xl font-bold capitalize", children: "Number of inactive cards" }),
-        /* @__PURE__ */ jsx("p", { className: "text-2xl font-extrabold", children: reports.inactive_cards })
-      ] })
+      /* @__PURE__ */ jsx(
+        Link,
+        {
+          className: "flex flex-row items-center justify-center gap-4 rounded-lg p-0 text-black shadow-none hover:bg-gray-100",
+          href: "card/create",
+          children: /* @__PURE__ */ jsxs(Button, { size: "lg", className: "bg-brand-purple hover:bg-brand-purple-dark group transition-colors", children: [
+            /* @__PURE__ */ jsx("span", { children: "Create New Card" }),
+            /* @__PURE__ */ jsx(ArrowRight, { className: "ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" })
+          ] })
+        }
+      )
     ] }),
-    /* @__PURE__ */ jsx("div", { className: "flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-none p-4", children: cards.map((card, index) => /* @__PURE__ */ jsx(ScrollArea, { className: "h-[500px] w-full cursor-pointer rounded-md border-none md:w-[400px]", children: /* @__PURE__ */ jsx("div", { className: "", onClick: () => showCardDetail(card.id), children: /* @__PURE__ */ jsx(
-      MuluCard,
-      {
-        banner: card.banner,
-        avatar: card.avatar,
-        logo: card.logo,
-        first_name: card.first_name,
-        last_name: card.last_name,
-        organization: card.organization,
-        job_title: card.job_title,
-        email: card.email,
-        phone: card.phone,
-        banner_color: card.banner_color,
-        links: card.links,
-        headline: card.headline,
-        services: card.services,
-        galleries: card.galleries,
-        address: card.address,
-        location: card.location,
-        business_hours: card.business_hours
-      }
-    ) }, index) })) })
+    reports.total_cards > 0 && /* @__PURE__ */ jsxs(Fragment, { children: [
+      permissions.card.create && /* @__PURE__ */ jsx("div", { className: "flex flex-row justify-end rounded-xl border-none p-2", children: /* @__PURE__ */ jsx(
+        Link,
+        {
+          className: "flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 p-0 text-black shadow-none hover:bg-gray-100",
+          href: "card/create",
+          children: /* @__PURE__ */ jsxs(Button, { size: "lg", className: "bg-brand-purple hover:bg-brand-purple-dark group transition-colors", children: [
+            /* @__PURE__ */ jsx("span", { children: "Create New Card" }),
+            /* @__PURE__ */ jsx(ArrowRight, { className: "ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" })
+          ] })
+        }
+      ) }),
+      /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 gap-4 rounded-none border-none p-2 md:grid-cols-3", children: [
+        /* @__PURE__ */ jsxs(Card, { className: "flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-xl font-bold capitalize", children: "Number of cards" }),
+          /* @__PURE__ */ jsx("p", { className: "text-2xl font-extrabold", children: reports.total_cards })
+        ] }),
+        /* @__PURE__ */ jsxs(Card, { className: "flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-xl font-bold capitalize", children: "Number of active cards" }),
+          /* @__PURE__ */ jsx("p", { className: "text-xl font-extrabold", children: reports.active_cards })
+        ] }),
+        /* @__PURE__ */ jsxs(Card, { className: "flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-xl font-bold capitalize", children: "Number of inactive cards" }),
+          /* @__PURE__ */ jsx("p", { className: "text-2xl font-extrabold", children: reports.inactive_cards })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "min-h-screen  grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3  gap-4 rounded-xl border-none p-4", children: cards.map((card, index) => /* @__PURE__ */ jsx(ScrollArea, { className: "h-[600px] w-full cursor-pointer rounded-md border-none md:w-[500px]", children: /* @__PURE__ */ jsx("div", { className: "cursor-pointer", onClick: () => showCardDetail(card.id), children: /* @__PURE__ */ jsx(
+        MuluCard,
+        {
+          url: card.url,
+          banner: card.banner,
+          avatar: card.avatar,
+          logo: card.logo,
+          first_name: card.first_name,
+          last_name: card.last_name,
+          organization: card.organization,
+          job_title: card.job_title,
+          email: card.email,
+          phone: card.phone,
+          banner_color: card.banner_color,
+          links: card.links,
+          headline: card.headline,
+          services: card.services,
+          galleries: card.galleries,
+          address: card.address,
+          location: card.location,
+          business_hours: card.business_hours
+        }
+      ) }, index) })) })
+    ] })
   ] });
 }
 const __vite_glob_0_12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
@@ -4992,12 +5134,11 @@ const __vite_glob_0_15 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: Password
 }, Symbol.toStringTag, { value: "Module" }));
-const MOST_POPULAR_PLAN = "professional";
 const ANIMATION_DELAY = "0.2s";
-const MostPopularBadge = () => /* @__PURE__ */ jsx("div", { className: "absolute -top-4 left-1/2 -translate-x-1/2 transform", children: /* @__PURE__ */ jsx("div", { className: "bg-brand-purple rounded-full px-4 py-1 text-xs font-medium text-white", children: "Most Popular" }) });
+const MostPopularBadge = () => /* @__PURE__ */ jsx("div", { className: "absolute -top-3 right-8 transform", children: /* @__PURE__ */ jsx("div", { className: "bg-brand-purple rounded-full px-3 py-1 text-xs font-semibold text-white shadow-sm", children: "Most Popular" }) });
 const PricingDisplay = ({ plan }) => /* @__PURE__ */ jsxs("div", { className: "mt-4", children: [
-  /* @__PURE__ */ jsx("span", { className: "text-4xl font-bold", children: plan.type === "free" ? "Free" : `$${plan.price}` }),
-  /* @__PURE__ */ jsx("span", { className: "text-muted-foreground ml-2", children: plan.type === "free" ? "forever" : "/ year" })
+  /* @__PURE__ */ jsx("span", { className: "text-4xl font-bold", children: plan.price < 0 ? "Custom Pricing" : plan.price === 0 ? "Free" : `Birr ${plan.price}` }),
+  /* @__PURE__ */ jsx("span", { className: "text-muted-foreground ml-2", children: plan.price === 0 ? "forever" : plan.price < 0 ? "" : "/ year" })
 ] });
 const FeatureItem = ({ feature }) => /* @__PURE__ */ jsxs("li", { className: "flex items-start", children: [
   /* @__PURE__ */ jsx("svg", { xmlns: "http://www.w3.org/2000/svg", className: "text-brand-purple mt-0.5 mr-3 h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor", children: /* @__PURE__ */ jsx(
@@ -5012,18 +5153,17 @@ const FeatureItem = ({ feature }) => /* @__PURE__ */ jsxs("li", { className: "fl
 ] });
 function PlanCard({
   plan,
-  isMostPopular = plan.type === MOST_POPULAR_PLAN,
-  buttonText,
-  buttonRedirect,
-  isButtonDisabled = false
+  isButtonDisabled = false,
+  billing = false
 }) {
+  var _a;
   return /* @__PURE__ */ jsxs(
     "div",
     {
-      className: `animate-fade-in relative rounded-xl border bg-white p-8 shadow-sm ${isMostPopular ? "border-brand-purple border-2 shadow-md" : "border-border"}`,
+      className: `animate-fade-in relative rounded-xl border bg-white p-8 shadow-sm ${plan.most_popular ? "border-brand-purple border-2 shadow-md" : "border-border"}`,
       style: { animationDelay: ANIMATION_DELAY },
       children: [
-        isMostPopular && /* @__PURE__ */ jsx(MostPopularBadge, {}),
+        plan.most_popular === true && /* @__PURE__ */ jsx(MostPopularBadge, {}),
         /* @__PURE__ */ jsxs("div", { className: "mb-6", children: [
           /* @__PURE__ */ jsx("h3", { className: "text-xl font-semibold", children: plan.name }),
           /* @__PURE__ */ jsx(PricingDisplay, { plan }),
@@ -5031,20 +5171,39 @@ function PlanCard({
         ] }),
         /* @__PURE__ */ jsx(Separator, { className: "my-6" }),
         /* @__PURE__ */ jsxs("ul", { className: "mb-8 space-y-4", children: [
-          /* @__PURE__ */ jsx(FeatureItem, { feature: `${plan.number_of_vcard} number of digital virtual bussiness card` }),
-          /* @__PURE__ */ jsx(FeatureItem, { feature: `${plan.number_of_service} number of service` }),
-          /* @__PURE__ */ jsx(FeatureItem, { feature: `${plan.number_of_nfc_business_card} number of nfc bussiness card` }),
-          /* @__PURE__ */ jsx(FeatureItem, { feature: `${plan.number_of_gallery} number of gallery` }),
-          plan.features.map((feature, index) => /* @__PURE__ */ jsx(FeatureItem, { feature }, index))
+          plan.number_of_digital_business_card !== null && /* @__PURE__ */ jsx(
+            FeatureItem,
+            {
+              feature: `${plan.number_of_digital_business_card <= 0 ? plan.number_of_digital_business_card < 0 ? "Unlimited" : "No" : plan.number_of_digital_business_card} digital business card${plan.number_of_digital_business_card === 1 ? "" : "s"}`
+            }
+          ),
+          plan.number_of_service !== null && /* @__PURE__ */ jsx(
+            FeatureItem,
+            {
+              feature: `${plan.number_of_service <= 0 ? plan.number_of_service < 0 ? "Unlimited" : "No" : plan.number_of_service} service${plan.number_of_service === 1 ? "" : "s"}`
+            }
+          ),
+          plan.number_of_nfc_business_card !== null && /* @__PURE__ */ jsx(
+            FeatureItem,
+            {
+              feature: `${plan.number_of_nfc_business_card <= 0 ? plan.number_of_nfc_business_card < 0 ? "Unlimited" : "No" : plan.number_of_nfc_business_card} NFC business card${plan.number_of_nfc_business_card === 1 ? "" : "s"}`
+            }
+          ),
+          plan.number_of_gallery !== null && /* @__PURE__ */ jsx(
+            FeatureItem,
+            {
+              feature: `${plan.number_of_gallery <= 0 ? plan.number_of_gallery < 0 ? "Unlimited" : "No" : plan.number_of_gallery} galler${plan.number_of_gallery === 1 ? "y" : "ies"}`
+            }
+          ),
+          (_a = plan.features) == null ? void 0 : _a.map((feature, index) => /* @__PURE__ */ jsx(FeatureItem, { feature }, index))
         ] }),
-        isButtonDisabled ? /* @__PURE__ */ jsx(Button, { className: "w-full", variant: "secondary", disabled: true, children: buttonText }) : /* @__PURE__ */ jsx(
+        isButtonDisabled ? /* @__PURE__ */ jsx(Button, { className: "w-full", variant: "secondary", disabled: true, children: plan.price < 0 ? "Contact Sales" : "Get Started" }) : /* @__PURE__ */ jsx(
           Button,
           {
             asChild: true,
-            className: `w-full ${isMostPopular ? "bg-brand-purple hover:bg-brand-purple-dark" : ""}`,
-            variant: isMostPopular ? "default" : "outline",
-            disabled: true,
-            children: /* @__PURE__ */ jsx(Link, { href: buttonRedirect, children: buttonText })
+            className: `w-full ${plan.most_popular ? "bg-brand-purple hover:bg-brand-purple-dark" : ""}`,
+            variant: plan.most_popular ? "default" : "outline",
+            children: /* @__PURE__ */ jsx(Link, { href: plan.price < 0 ? "/contact-sales" : billing ? route("checkout", { plan: plan.id }) : route("register"), children: plan.price < 0 ? "Contact Sales" : billing ? "Upgrade Now" : "Get Started" })
           }
         )
       ]
@@ -5068,23 +5227,16 @@ function Plan({ plans }) {
         /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mt-4 text-lg", children: "Choose the perfect plan for your needs with no hidden fees." })
       ] }),
       /* @__PURE__ */ jsx("div", { className: "grid gap-8 border-none border-red-900 lg:grid-cols-1 xl:grid-cols-3", children: [...plans].sort((a, b) => {
-        if (a.type === "free" && b.type !== "free") return -1;
-        if (b.type === "free" && a.type !== "free") return 1;
-        if (a.type === "professional" && b.type === "enterprise") return -1;
-        if (b.type === "professional" && a.type === "enterprise") return 1;
         return 0;
       }).map((plan, index) => {
         var _a, _b;
         const isCurrentPlan = plan.id === ((_b = (_a = auth.activePlan) == null ? void 0 : _a.plan) == null ? void 0 : _b.id);
-        const buttonText = isCurrentPlan ? "Current Plan" : "Upgrade Now";
-        const buttonRedirect = route("checkout", { plan });
         return /* @__PURE__ */ jsx(
           PlanCard,
           {
             plan,
-            buttonText,
-            buttonRedirect,
-            isButtonDisabled: isCurrentPlan
+            isButtonDisabled: isCurrentPlan,
+            billing: true
           },
           index
         );
@@ -5446,18 +5598,16 @@ const Hero = () => {
       /* @__PURE__ */ jsx("h1", { className: "text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl", children: "Digital Business Cards for Modern Professionals" }),
       /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mt-6 text-lg", children: "Share your contact information instantly. Create beautiful digital business cards that leave a lasting impression." })
     ] }),
-    /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap gap-4", children: [
-      /* @__PURE__ */ jsxs(Button, { size: "lg", className: "bg-brand-purple hover:bg-brand-purple-dark group transition-colors", children: [
-        /* @__PURE__ */ jsx("span", { children: "Create Your Card" }),
-        /* @__PURE__ */ jsx(ArrowRight, { className: "ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" })
-      ] }),
-      /* @__PURE__ */ jsx(Button, { variant: "outline", size: "lg", children: "View Templates" })
-    ] })
+    /* @__PURE__ */ jsx("div", { className: "flex flex-wrap gap-4", children: /* @__PURE__ */ jsxs(Button, { size: "lg", className: "bg-brand-purple hover:bg-brand-purple-dark group transition-colors", children: [
+      /* @__PURE__ */ jsx(Link, { href: route("register"), children: "Create Your Card" }),
+      /* @__PURE__ */ jsx(ArrowRight, { className: "ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" })
+    ] }) })
   ] }) }) }) });
 };
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { auth } = usePage().props;
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -5487,7 +5637,7 @@ const Navbar = () => {
             /* @__PURE__ */ jsx("a", { href: "#how-it-works", className: "hover:text-brand-purple text-sm font-medium transition-colors", children: "How It Works" }),
             /* @__PURE__ */ jsx("a", { href: "#pricing", className: "hover:text-brand-purple text-sm font-medium transition-colors", children: "Pricing" })
           ] }),
-          /* @__PURE__ */ jsxs("div", { className: "hidden items-center gap-4 md:flex", children: [
+          auth.user ? /* @__PURE__ */ jsx("div", { className: "hidden items-center gap-4 md:flex", children: /* @__PURE__ */ jsx(Button, { className: "bg-brand-purple hover:bg-brand-purple-dark transition-colors", children: /* @__PURE__ */ jsx(Link, { href: route("dashboard"), children: "Dashboard" }) }) }) : /* @__PURE__ */ jsxs("div", { className: "hidden items-center gap-4 md:flex", children: [
             /* @__PURE__ */ jsx(Button, { variant: "ghost", className: "font-medium", children: /* @__PURE__ */ jsx(Link, { href: route("login"), children: "Log in" }) }),
             /* @__PURE__ */ jsx(Button, { className: "bg-brand-purple hover:bg-brand-purple-dark transition-colors", children: /* @__PURE__ */ jsx(Link, { href: route("register"), children: "Get Started" }) })
           ] }),
@@ -5534,7 +5684,7 @@ const Footer = () => {
   const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
   return /* @__PURE__ */ jsxs("footer", { className: "relative border-t bg-white", children: [
     /* @__PURE__ */ jsxs("div", { className: "container mx-auto max-w-7xl px-4 py-12", children: [
-      /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-12", children: [
+      /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12", children: [
         /* @__PURE__ */ jsxs("div", { className: "md:col-span-1", children: [
           /* @__PURE__ */ jsx("a", { href: "/", className: "mb-4 inline-block", children: /* @__PURE__ */ jsxs("span", { className: "flex items-center text-xl font-semibold", children: [
             /* @__PURE__ */ jsx("span", { className: "text-brand-purple", children: "mulu" }),
@@ -5557,29 +5707,18 @@ const Footer = () => {
           ] })
         ] }),
         /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("h3", { className: "mb-4 font-semibold", children: "Product" }),
-          /* @__PURE__ */ jsxs("ul", { className: "space-y-3", children: [
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Features" }) }),
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Templates" }) }),
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Pricing" }) }),
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "FAQ" }) })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { children: [
           /* @__PURE__ */ jsx("h3", { className: "mb-4 font-semibold", children: "Company" }),
           /* @__PURE__ */ jsxs("ul", { className: "space-y-3", children: [
             /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "About" }) }),
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Careers" }) }),
             /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Blog" }) }),
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Contact" }) })
+            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Contact Us" }) })
           ] })
         ] }),
         /* @__PURE__ */ jsxs("div", { children: [
           /* @__PURE__ */ jsx("h3", { className: "mb-4 font-semibold", children: "Legal" }),
           /* @__PURE__ */ jsxs("ul", { className: "space-y-3", children: [
             /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Privacy Policy" }) }),
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Terms of Service" }) }),
-            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Cookies" }) })
+            /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("a", { href: "#", className: "text-muted-foreground hover:text-foreground text-sm transition-colors", children: "Terms of Service" }) })
           ] })
         ] })
       ] }),
@@ -5602,7 +5741,7 @@ const features = [
   {
     icon: /* @__PURE__ */ jsx(Share2, { className: "text-brand-purple h-6 w-6" }),
     title: "Instant Sharing",
-    description: "Share your digital card via QR code, tap, link, or email with a single click."
+    description: "Share your digital card via QR code, and tap."
   },
   {
     icon: /* @__PURE__ */ jsx(Zap, { className: "text-brand-purple h-6 w-6" }),
@@ -5649,8 +5788,6 @@ const Features = () => {
 };
 function Index({ plans }) {
   const { auth } = usePage().props;
-  console.log(auth);
-  console.log(plans);
   useEffect(() => {
     document.body.classList.add("animate-fade-in");
     return () => {
@@ -5697,23 +5834,12 @@ function Index({ plans }) {
           /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mt-4 text-lg", children: "Choose the perfect plan for your needs with no hidden fees." })
         ] }),
         /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3", children: [...plans].sort((a, b) => {
-          if (a.type === "free" && b.type !== "free") return -1;
-          if (b.type === "free" && a.type !== "free") return 1;
-          if (a.type === "professional" && b.type === "enterprise") return -1;
-          if (b.type === "professional" && a.type === "enterprise") return 1;
           return 0;
         }).map((plan, index) => {
-          var _a, _b;
-          const isCurrentPlan = plan.id === ((_b = (_a = auth.activePlan) == null ? void 0 : _a.plan) == null ? void 0 : _b.id);
-          const buttonText = isCurrentPlan ? "Current Plan" : plan.type === "enterprise" ? "Contact Sales" : "Get Started";
-          const buttonRedirect = route("checkout", { plan });
           return /* @__PURE__ */ jsx(
             PlanCard,
             {
-              plan,
-              buttonText,
-              buttonRedirect,
-              isButtonDisabled: isCurrentPlan
+              plan
             },
             index
           );
@@ -5722,7 +5848,7 @@ function Index({ plans }) {
       /* @__PURE__ */ jsx("section", { className: "py-20", children: /* @__PURE__ */ jsx("div", { className: "container mx-auto max-w-7xl px-4", children: /* @__PURE__ */ jsxs("div", { className: "bg-brand-purple animate-fade-in mx-auto max-w-4xl rounded-2xl p-10 text-center text-white md:p-16", children: [
         /* @__PURE__ */ jsx("h2", { className: "mb-6 text-3xl font-bold md:text-4xl", children: "Ready to go digital?" }),
         /* @__PURE__ */ jsx("p", { className: "mb-8 text-lg opacity-90", children: "Join thousands of professionals who are already using mulucard to make connections that matter." }),
-        /* @__PURE__ */ jsx(Button, { size: "lg", variant: "secondary", className: "text-brand-purple bg-white hover:bg-white/90", children: "Create Your Free Card" })
+        /* @__PURE__ */ jsx(Button, { size: "lg", variant: "secondary", className: "text-brand-purple bg-white hover:bg-white/90", children: /* @__PURE__ */ jsx(Link, { href: route("register"), children: "Create Your Free Card" }) })
       ] }) }) })
     ] }),
     /* @__PURE__ */ jsx(Footer, {})

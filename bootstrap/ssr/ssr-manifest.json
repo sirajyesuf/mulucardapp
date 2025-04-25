@@ -16,6 +16,7 @@
   "resources/js/components/nav-footer.tsx": [],
   "resources/js/components/nav-main.tsx": [],
   "resources/js/components/nav-user.tsx": [],
+  "resources/js/components/nfc-card-preview.tsx": [],
   "resources/js/components/notification-panel.tsx": [],
   "resources/js/components/plan-card.tsx": [],
   "resources/js/components/share-button.tsx": [],

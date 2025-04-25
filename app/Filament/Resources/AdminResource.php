@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CustomerResource\Pages;
+use App\Filament\Resources\AdminResource\Pages;
+use App\Filament\Resources\AdminResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -10,29 +11,22 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Enums\Role;
-use App\Enums\OrderStatus;
-use App\Enums\SubscriptionStatus;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
-use App\Filament\Resources\CustomerResource\RelationManagers;
 
-class CustomerResource extends Resource
+class AdminResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?int $navigationSort = 1;
-    protected static ?string $modelLabel = 'Customer';
-    protected static ?string $pluralModelLabel = 'Customers';
-  
+    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $modelLabel = 'Admin';
+    protected static ?string $pluralModelLabel = 'Admins';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Customer Information')
+                Forms\Components\Section::make('Admin Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -42,6 +36,10 @@ class CustomerResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique(),
+                        Forms\Components\TextInput::make('password')
+                            ->password()
+                            ->required()
+                            ->minLength(8),
                     ])
                     ->columns(2),
             ]);
@@ -51,20 +49,15 @@ class CustomerResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                    
-                TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                TextColumn::make('created_at')
-                    ->label('Registered At')
-                    ->date()
-                
             ])
             ->filters([])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -73,29 +66,15 @@ class CustomerResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            RelationManagers\CardsRelationManager::class,
-            RelationManagers\OrdersRelationManager::class,
-            RelationManagers\SubscriptionsRelationManager::class,
-        ];
-    }
-
-
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomers::route('/'),
-            'create' => Pages\CreateCustomer::route('/create'),
-            'view' => Pages\ViewCustomer::route('/{record}'),
-            'edit' => Pages\EditCustomer::route('/{record}/edit'),
+            'index' => Pages\ManageAdmins::route('/'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', Role::CUSTOMER);
+        return parent::getEloquentQuery()->where('role', Role::ADMIN->value);
     }
 }
