@@ -59,11 +59,11 @@ export default function Footer() {
                                     Privacy Policy
                                 </a>
                             </li>
-                            {/* <li>
-                                <a href={route("terms-of-service")} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                            <li>
+                                <a href={route("terms")} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                                     Terms of Service
                                 </a>
-                            </li> */}
+                            </li>
                         </ul>
                     </div>
                 </div>
