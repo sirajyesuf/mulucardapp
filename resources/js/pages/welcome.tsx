@@ -5,6 +5,8 @@ import { type Plan, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, ChevronRight, Github, Instagram, Twitter } from 'lucide-react';
 import { useEffect } from 'react';
+import Footer from "@/components/footer";
+import NavBar from "@/components/NavBar";
 
 const DEFAULT_REDIRECTS = {
     billing: '/settings/billing/upgrade',
@@ -42,205 +44,9 @@ const Hero = () => {
     );
 };
 
-import { cn } from '@/lib/utils';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
 
 
-const Navbar = () => {
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { auth } = usePage<SharedData>().props;
 
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 10) {
-                setIsScrolled(true);
-            } else {
-                setIsScrolled(false);
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    return (
-        <header
-            className={cn(
-                'fixed top-0 right-0 left-0 z-50 px-4 py-4 transition-all duration-300 md:px-8',
-                isScrolled ? 'glass shadow-sm backdrop-blur-lg' : 'bg-transparent',
-            )}
-        >
-            <div className="container mx-auto max-w-7xl">
-                <div className="flex items-center justify-between">
-                    <a href="/" className="flex items-center gap-[1px] text-xl font-semibold">
-                        <span className="text-brand-purple">Mulu</span>
-                        <span>Card</span>
-                    </a>
-
-                    {/* Desktop Navigation */}
-                    <nav className="hidden items-center gap-8 md:flex">
-                        <a href="#features" className="hover:text-brand-purple text-sm font-medium transition-colors">
-                            Features
-                        </a>
-                        <a href="#how-it-works" className="hover:text-brand-purple text-sm font-medium transition-colors">
-                            How It Works
-                        </a>
-                        <a href="#pricing" className="hover:text-brand-purple text-sm font-medium transition-colors">
-                            Pricing
-                        </a>
-                    </nav>
-
-                    {
-                        auth.user ? (
-                            <div className="hidden items-center gap-4 md:flex">
-                                <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
-                                    <Link href={route('dashboard')}>Dashboard</Link>
-                                </Button>
-                            </div>
-                        ) : (
-                            <div className="hidden items-center gap-4 md:flex">
-                                <Button variant="ghost" className="font-medium">
-                                    <Link href={route('login')}>Log in</Link>
-                                </Button>
-                                <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
-                                    <Link href={route('register')}>Get Started</Link>
-                                </Button>
-                            </div>
-                        )
-                    }
-
-                    {/* Mobile Menu Button */}
-                    <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                        {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                    </button>
-                </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {isMenuOpen && (
-                <div className="h-screen glass animate-fade-in absolute top-full right-0 left-0 p-4 shadow-md md:hidden bg-gray-50">
-                    <nav className="flex flex-col gap-2 py-4">
-                        <a
-                            href="#features"
-                            className="hover:bg-secondary rounded-md px-4 py-2 text-sm font-medium transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Features
-                        </a>
-                        <a
-                            href="#how-it-works"
-                            className="hover:bg-secondary rounded-md px-4 py-2 text-sm font-medium transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            How It Works
-                        </a>
-                        <a
-                            href="#pricing"
-                            className="hover:bg-secondary rounded-md px-4 py-2 text-sm font-medium transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Pricing
-                        </a>
-                        <div className="mt-2 flex flex-col gap-2">
-                            <Button variant="ghost" className="justify-start font-medium">
-                                Log in
-                            </Button>
-                            <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">Get Started</Button>
-                        </div>
-                    </nav>
-                </div>
-            )}
-        </header>
-    );
-};
-
-const Footer = () => {
-    const currentYear = new Date().getFullYear();
-
-    return (
-        <footer className="relative border-t bg-white">
-            <div className="container mx-auto max-w-7xl px-4 py-12">
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
-                    <div className="md:col-span-1">
-                        <a href="/" className="mb-4 inline-block">
-                            <span className="flex items-center text-xl font-semibold">
-                                <span className="text-brand-purple">mulu</span>
-                                <span>card</span>
-                            </span>
-                        </a>
-                        <p className="text-muted-foreground mb-4 text-sm">Modern digital business cards for professionals.</p>
-                        <div className="flex space-x-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                                <Twitter className="h-4 w-4" />
-                                <span className="sr-only">Twitter</span>
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                                <Github className="h-4 w-4" />
-                                <span className="sr-only">GitHub</span>
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                                <Instagram className="h-4 w-4" />
-                                <span className="sr-only">Instagram</span>
-                            </Button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 className="mb-4 font-semibold">Company</h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    About
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Blog
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Contact Us
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 className="mb-4 font-semibold">Legal</h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Privacy Policy
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                                    Terms of Service
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <Separator className="my-8" />
-
-                <div className="flex flex-col items-center justify-between md:flex-row">
-                    <p className="text-muted-foreground text-sm">&copy; {currentYear} Mulucard. All rights reserved.</p>
-                </div>
-            </div>
-
-            {/* Fixed banner at the bottom of the screen */}
-            <div className="pointer-events-none fixed right-0 bottom-0 left-0 z-50 flex justify-center">
-                <div className="bg-brand-purple mx-auto mb-4 flex h-12 w-auto items-center justify-center rounded-full border-none px-6 text-xs text-white">
-                    a free digital business card from mulucard
-                </div>
-            </div>
-        </footer>
-    );
-};
 
 
 import { Palette, Repeat, Share2, Shield, Smartphone, Zap } from 'lucide-react';
@@ -323,7 +129,7 @@ function Index({ plans }: { plans: Plan[] }) {
 
     return (
         <div className="flex min-h-screen flex-col">
-            <Navbar />
+            <NavBar />
 
             <main>
                 <Hero />

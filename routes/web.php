@@ -42,3 +42,6 @@ Route::middleware(['auth'])->group(function(){
 
 Route::post('card/{id}/updatetotalsaves',[CardController::class,"updateTotalSaves"])->name("card.updatetotalsaves");
 Route::get("/hello/{url}",[HelloController::class,"index"])->name("card.hello");
+Route::get("/privacy-policy",function(){
+    return Inertia::render('privacypolicy');
+})->name("privacy-policy");

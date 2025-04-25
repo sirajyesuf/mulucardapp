@@ -1,34 +1,86 @@
-import { Link } from '@inertiajs/react';
-import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Twitter,Instagram } from 'lucide-react';
+
 export default function Footer() {
+    const currentYear = new Date().getFullYear();
+
     return (
-        <footer className="flex flex-col items-center justify-center gap-2 border-t-2 py-2">
-            <div className="flex flex-row items-center justify-between gap-8 border-none p-2 font-bold">
-                <Link href="home">Home</Link>
-                <Link href="home">Blog</Link>
-                <Link href="home">Privacy Policy</Link>
-                <Link href="home">terms</Link>
+        <footer className="relative border-t bg-white">
+            <div className="container mx-auto max-w-7xl px-4 py-12">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
+                    <div className="md:col-span-1">
+                        <a href="/" className="mb-4 inline-block">
+                            <span className="flex items-center text-xl font-semibold">
+                                <span className="text-brand-purple">mulu</span>
+                                <span>card</span>
+                            </span>
+                        </a>
+                        <p className="text-muted-foreground mb-4 text-sm">Modern digital business cards for professionals.</p>
+                        <div className="flex space-x-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                <Twitter className="h-4 w-4" />
+                                <span className="sr-only">Twitter</span>
+                            </Button>
+                        
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                <Instagram className="h-4 w-4" />
+                                <span className="sr-only">Instagram</span>
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="mb-4 font-semibold">Company</h3>
+                        <ul className="space-y-3">
+                            <li>
+                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                    About
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                    Blog
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                    Contact Us
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="mb-4 font-semibold">Legal</h3>
+                        <ul className="space-y-3">
+                            <li>
+                                <a href={route("privacy-policy")} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                    Privacy Policy
+                                </a>
+                            </li>
+                            {/* <li>
+                                <a href={route("terms-of-service")} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                    Terms of Service
+                                </a>
+                            </li> */}
+                        </ul>
+                    </div>
+                </div>
+
+                <Separator className="my-8" />
+
+                <div className="flex flex-col items-center justify-between md:flex-row">
+                    <p className="text-muted-foreground text-sm">&copy; {currentYear} Mulucard. All rights reserved.</p>
+                </div>
             </div>
 
-            <div className="flex flex-row items-center justify-center gap-4 border-none p-0">
-                <div className="bg-brand-purple flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
-                    <a href="/" className="text-xl font-bold text-black">
-                        <Facebook className="h-5 w-5 text-white" />
-                    </a>
-                </div>
-
-                <div className="bg-brand-purple flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
-                    <a href="/" className="text-xl font-bold text-black">
-                        <Twitter className="h-5 w-5 text-white" />
-                    </a>
-                </div>
-
-                <div className="bg-brand-purple flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
-                    <a href="/" className="text-xl font-bold text-black">
-                        <Instagram className="h-5 w-5 text-white" />
-                    </a>
+            {/* Fixed banner at the bottom of the screen */}
+            <div className="pointer-events-none fixed right-0 bottom-0 left-0 z-50 flex justify-center">
+                <div className="bg-brand-purple mx-auto mb-4 flex h-12 w-auto items-center justify-center rounded-full border-none px-6 text-xs text-white">
+                    a free digital business card from mulucard
                 </div>
             </div>
         </footer>
     );
-}
+};
