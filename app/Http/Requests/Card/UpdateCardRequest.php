@@ -149,18 +149,6 @@ class UpdateCardRequest extends FormRequest
 
 
             return [
-            // 'banner.file.required' => 'The banner field is required.',
-            // 'banner.file.image' => 'The banner field must be a valid image file.',
-            // 'banner.file.max' => 'The banner file size must not exceed 2MB.',
-            // 'banner.file.dimensions' => 'The banner image dimensions must be 1200x313.',
-            // 'avatar.file.required' => 'The avatar field is required.',
-            // 'avatar.file.image' => 'The avatar field must be a valid image file.',
-            // 'avatar.file.max' => 'The avatar file size must not exceed 2MB.',
-
-            // 'logo.file.required' => 'The logo field is required.',
-            // 'logo.file.image' => 'The logo field must be a valid image file.',
-            // 'logo.file.max' => 'The logo field size must not exceed 2MB.',
-            // ... $business_messages,
             ...$gallery_messages,
             ...$services_messages,
             ...$links_messages,

@@ -410,7 +410,7 @@ class CardController extends Controller
 
         $card->delete();
 
-        return redirect()->route('card.create');
+        return redirect()->route('dashboard');
     }
 
 

@@ -11,13 +11,16 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
-import { type BreadcrumbItem, type Card as CardType, type DaySchedule, type Gallery, type Service, type SharedData,type Image, type Link } from '@/types';
+import { type BreadcrumbItem, type Card as CardType, type DaySchedule, type Gallery, type Service, type SharedData,type Image, type Link as LinkType } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Check, Clock, Copy, LoaderCircle, PlusCircle, ShieldAlert, Upload, X,Globe } from 'lucide-react';
+import { toast } from 'sonner';
+import { Check, Clock, Copy, LoaderCircle, PlusCircle, ShieldAlert, Upload, X } from 'lucide-react';
 import { FormEventHandler } from 'react';
+import { Link } from '@inertiajs/react'
+
 
 interface CardForm {
-    banner: Image;
+    banner: Image;  
     avatar: Image;
     logo: Image;
     first_name: string;
@@ -27,7 +30,7 @@ interface CardForm {
     email: string;
     phone: string;
     banner_color: string;
-    links: Link[];
+    links: LinkType[];
     location: string;
     address: string;
     headline: string;
@@ -96,6 +99,35 @@ export default function EditCard({ card }: { card: CardType }) {
         business_hours: card.business_hours
 
     });
+
+
+    const hasTabError = (prefixes: string[], errors: Partial<Record<string, string>>) => {
+        return Object.keys(errors).some(key =>
+            prefixes.some(prefix => key.startsWith(prefix))
+        );
+    };
+
+    const DisplayError = hasTabError(['avatar.file', 'banner.file', 'logo.file'], errors);
+
+    
+    const personalInformationError = hasTabError(
+        ['first_name', 'last_name', 'organization', 'job_title', 'email', 'phone','headline'],
+        errors
+    );
+    
+    const linksError = hasTabError(
+        ['links.0', 'links.1', 'links.2', 'links.3', 'links.4', 'links.5'],
+        errors
+    );
+    
+    const locationError = hasTabError(['address', 'location'], errors);
+    
+    const galleryError = hasTabError(['galleries.0', 'galleries.1', 'galleries.2'], errors);
+    
+    const serviceError = hasTabError(['services.0', 'services.1', 'services.2'], errors);
+    
+    const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
+
 
     const copyToAllDays = (day: DaySchedule) => {
         const updatedSchedule = data.business_hours.map((item) => ({
@@ -236,13 +268,12 @@ export default function EditCard({ card }: { card: CardType }) {
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
-        console.log(data);
         post(route('card.update', card.id), {
-            forceFormData: true, // Ensure Inertia sends as multipart/form-data
             onSuccess: () => {
-                console.log('Update successful!');
+                toast.success('Card updated successfully!');
             },
             onError: (errors) => {
+                toast.error('Failed to update card. Please check the form for errors.');
                 console.log('Update errors:', errors);
             },
             preserveState: true,
@@ -258,7 +289,12 @@ export default function EditCard({ card }: { card: CardType }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Card" />
             <form onSubmit={submit} className="min-h-screen">
-                <div className="m-2 flex flex-row justify-end rounded-lg border-2 p-2 shadow-none">
+
+                <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
+                    <Link className="cursor-pointer bg-red-300  rounded-sm px-4  py-1 text-black" href={route('card.show', card.id)}>
+                        Cancel
+                    </Link>
+
                     <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Update Card
@@ -293,13 +329,90 @@ export default function EditCard({ card }: { card: CardType }) {
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
                             <TabsList className="flex h-auto w-full flex-row flex-wrap justify-around">
-                                <TabsTrigger value="display">Display</TabsTrigger>
-                                <TabsTrigger value="personal_information">Information</TabsTrigger>
-                                <TabsTrigger value="links">Social Links</TabsTrigger>
-                                <TabsTrigger value="location">Location</TabsTrigger>
-                                <TabsTrigger value="business_hours">Business Hours</TabsTrigger>
-                                <TabsTrigger value="service">Services</TabsTrigger>
-                                <TabsTrigger value="gallery">Galleries</TabsTrigger>
+                                <TabsTrigger value="display">
+                                    {
+                                        DisplayError ? (
+                                            <span className="text-red-500">
+                                                Display
+                                                </span>
+                                        ) : (
+                                            <span className="">Display</span>
+                                        )
+                                    }
+
+                                </TabsTrigger>
+                                <TabsTrigger value="personal_information">
+                                    
+                                    {
+                                        personalInformationError ? (
+                                            <span className="text-red-500">
+                                                Information
+                                                </span>
+                                        ) : (
+                                            <span className=""> Information</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="links">
+                                    
+                                    {
+                                        linksError ? (
+                                            <span className="text-red-500">
+                                                Social Links
+                                                </span>
+                                        ) : (
+                                            <span className=""> Social Links</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="location">
+                                    
+                                    {
+                                        locationError ? (
+                                            <span className="text-red-500">
+                                                Location
+                                                </span>
+                                        ) : (
+                                            <span className=""> Location</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="business_hours">
+                                    
+                                    {
+                                        businessHoursError ? (
+                                            <span className="text-red-500">
+                                                Business Hours
+                                                </span>
+                                        ) : (
+                                            <span className=""> Business Hours</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="service">
+                                    
+                                    {
+                                        serviceError ? (
+                                            <span className="text-red-500">
+                                                Services
+                                                </span>
+                                        ) : (
+                                            <span className=""> Services</span>
+                                        )
+                                    }
+                                </TabsTrigger>
+                                <TabsTrigger value="gallery">
+                                    
+                                    {
+                                        galleryError ? (
+                                            <span className="text-red-500">
+                                                Galleries
+                                                </span>
+                                        ) : (
+                                            <span className=""> Galleries</span>
+                                        )
+                                    }
+                                </TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
                                 <Card>

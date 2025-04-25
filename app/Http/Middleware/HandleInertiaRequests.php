@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Enums\CardSocialLinks;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -52,6 +53,7 @@ class HandleInertiaRequests extends Middleware
                     ]
                 ]
             ],
+            'cardSocialLinks' => CardSocialLinks::links()
         ];
     }
 }

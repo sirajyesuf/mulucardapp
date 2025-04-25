@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Service, type SharedData } from '@/types';
+import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Service, type SharedData,type Card as CardType } from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
@@ -16,39 +16,39 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Type for individual social link
-interface SocialLink {
-    id: number;
-    name: string;
-    url: string;
-    card_id: number;
-    created_at: string; // ISO 8601 date string
-    updated_at: string; // ISO 8601 date string
-}
+// interface SocialLink {
+//     id: number;
+//     name: string;
+//     url: string;
+//     card_id: number;
+//     created_at: string; // ISO 8601 date string
+//     updated_at: string; // ISO 8601 date string
+// }
 
-interface Card {
-    id: number;
-    url: string;
-    banner: Image;
-    avatar: Image;
-    logo: Image;
-    user_id: number;
-    first_name: string;
-    last_name: string;
-    organization: string;
-    job_title: string;
-    email: string | null;
-    phone: string | null;
-    banner_color: string | null;
-    created_at: string;
-    updated_at: string;
-    social_links: SocialLink[];
-    headline: string;
-    services: Service[];
-    galleries: Gallery[];
-    address: string;
-    location: string;
-    business_hours: DaySchedule[];
-}
+// interface Card {
+//     id: number;
+//     url: string;
+//     banner: Image;
+//     avatar: Image;
+//     logo: Image;
+//     user_id: number;
+//     first_name: string;
+//     last_name: string;
+//     organization: string;
+//     job_title: string;
+//     email: string | null;
+//     phone: string | null;
+//     banner_color: string | null;
+//     created_at: string;
+//     updated_at: string;
+//     social_links: SocialLink[];
+//     headline: string;
+//     services: Service[];
+//     galleries: Gallery[];
+//     address: string;
+//     location: string;
+//     business_hours: DaySchedule[];
+// }
 
 type Reports = {
     active_cards: number;
@@ -56,7 +56,7 @@ type Reports = {
     total_cards: number;
 };
 
-type CardList = Card[];
+type CardList = CardType[];
 
 export default function Dashboard() {
     const { auth } = usePage<SharedData>().props;
@@ -135,11 +135,12 @@ export default function Dashboard() {
             </div>
 
 
-            <div className="flex min-h-screen flex-row flex-wrap items-start justify-start gap-2 rounded-xl border-none p-4">
+            <div className="min-h-screen  grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3  gap-4 rounded-xl border-none p-4">
                 {cards.map((card, index) => (
-                    <ScrollArea className="h-[500px] w-full cursor-pointer rounded-md border-none md:w-[400px]">
-                        <div className="" key={index} onClick={() => showCardDetail(card.id)}>
+                    <ScrollArea className="h-[600px] w-full cursor-pointer rounded-md border-none md:w-[500px]">
+                        <div className="cursor-pointer" key={index} onClick={() => showCardDetail(card.id)}>
                             <MuluCard
+                                url={card.url}
                                 banner={card.banner}
                                 avatar={card.avatar}
                                 logo={card.logo}

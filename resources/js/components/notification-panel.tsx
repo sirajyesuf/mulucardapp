@@ -9,7 +9,7 @@ import { usePoll } from '@inertiajs/react'
 
 
 export default function NotificationPanel() {
-  usePoll(10000)
+  // usePoll(10000)
   const page = usePage<SharedData>();
   const { auth } = page.props;
   const unReadNotifications  = auth.unReadNotifications

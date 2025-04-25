@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("description");
             $table->string("path");
             $table->unsignedBigInteger("card_id");
-            $table->foreign("card_id")->references("id")->on("cards");
+            $table->foreign("card_id")->references("id")->on("cards")->onDelete('cascade');
             $table->timestamps();
         });
     }

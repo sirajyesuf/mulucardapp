@@ -31,7 +31,7 @@ export default function ShowCard() {
     const card = props.card as CardType;
     console.log(card)
 
-    const { data, setData, post, errors, reset } = useForm({
+    const { data, setData,  get,     errors, reset } = useForm({
         personalizedurl: card.url.split('/').pop(),
         cardname: card.cardname,
         status: card.status,
@@ -78,13 +78,15 @@ export default function ShowCard() {
     };
 
     const deleteCard = () => {
-        post(route('card.delete', { id: card.id }), {
+        get(route('card.delete', { id: card.id }), {
             onFinish: () => {
                 reset();
                 toast.success('Card has been deleted');
             },
             onSuccess: () => {
                 console.log('Upload successful!');
+                toast.success('Card has been deleted successfully');
+
             },
             onError: (errors) => {
                 console.log('Upload errors:', errors);

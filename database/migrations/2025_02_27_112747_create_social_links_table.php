@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('social_links', function (Blueprint $table) {
             $table->id();
             $table->string('name');  // Name of the social media platform
-            $table->string('url');   // URL of the social media profile
+            $table->string('url')->nullable();   // URL of the social media profile
             $table->unsignedBigInteger("card_id");
             $table->foreign('card_id')->references('id')->on('cards')->onDelete('cascade');
             $table->timestamps();

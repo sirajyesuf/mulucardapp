@@ -33,6 +33,7 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     [key: string]: unknown;
+    cardSocialLinks: string[];
 }
 
 export interface User {

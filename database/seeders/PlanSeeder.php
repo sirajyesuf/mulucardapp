@@ -1,17 +1,16 @@
 <?php
-
 namespace Database\Seeders;
-
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Plan;
+use App\Models\Order;
+use App\Models\Subscription;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PlanSeeder extends Seeder
 {
-
     public function run(): void
     {
-
         $plans = [
             [
                 'name' => 'Free',
@@ -32,7 +31,6 @@ class PlanSeeder extends Seeder
                     '24/7 Email Support',
                     'Mobile-Friendly Design',
                 ]
-
             ],
             [
                 'name' => 'Professional',
@@ -57,7 +55,7 @@ class PlanSeeder extends Seeder
             ],
             [
                 'name' => 'Enterprise',
-                'price' => -1, // for custome price
+                'price' => -1,
                 'description' => 'For Large Organizations and Corporations',
                 'number_of_digital_business_card' => null,
                 'number_of_nfc_business_card' => null,
@@ -73,17 +71,19 @@ class PlanSeeder extends Seeder
                     'Custom Themes',
                     'Custom Branding'
                 ]
-            ],
-
+            ]
         ];
 
-        Plan::truncate();
+        // 🔐 Safe deletion
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Subscription::query()->delete();
+        Order::query()->delete();
+        Plan::query()->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
+        // 🔁 Seeding
         foreach ($plans as $plan) {
             Plan::create($plan);
         }
     }
-
-
-
 }

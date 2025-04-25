@@ -46,6 +46,7 @@ export default function MuluCard({
     galleries,
     services,
     business_hours,
+    
 }: MuluCardProps) {
     return (
         <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
