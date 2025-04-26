@@ -44,7 +44,6 @@ class SubscriptionsRelationManager extends RelationManager
                     ->colors([
                         'success' => SubscriptionStatus::ACTIVE->value,
                         'danger' => SubscriptionStatus::EXPIRED->value,
-                        'gray' => SubscriptionStatus::CANCELLED->value,
                     ]),
             ])
             ->filters([

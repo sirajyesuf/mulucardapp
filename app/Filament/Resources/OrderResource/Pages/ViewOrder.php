@@ -19,6 +19,7 @@ use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
 use Filament\Support\Enums\FontWeight;
 use Filament\Notifications\Notification;
+use App\Enums\SubscriptionStatus;
 
 class ViewOrder extends ViewRecord
 {
@@ -110,12 +111,6 @@ class ViewOrder extends ViewRecord
     protected function updateStatus(array $data, Order $order): void
     {
 
-        // dump($data['status']);
-        // dump($order->status->value);
-        // dump(OrderStatus::PAID->value);
-        // dump(OrderStatus::CANCELLED->value);
-        // dd("yes");
-
         //update the order status from pending to paid
         if($order->status->value === OrderStatus::PENDING->value and $data['status'] === OrderStatus::PAID->value) {
             $this->updateStatusToPaid($order);
@@ -133,8 +128,22 @@ class ViewOrder extends ViewRecord
     {
         $order->status = OrderStatus::PAID->value;
         $order->save();
-        // create subscription
 
+
+        //inactive all existing subscriptions first
+        $order->user->subscriptions()->where('status',SubscriptionStatus::ACTIVE)
+        ->update([
+            'status' => SubscriptionStatus::EXPIRED
+        ]); 
+
+        // create subscription
+        $order->user->subscriptions()->create([
+            'plan_id' => $order->plan_id,
+            'start_date' => now(),
+            'renewal_date' => now()->addYear(),
+            'status' => SubscriptionStatus::ACTIVE->value,
+            'order_id' => $order->id,
+        ]);
         // send notification to the database
         $order->user->notify(new OrderStatusUpdatedNotification($order,
             'Order Status Updated',

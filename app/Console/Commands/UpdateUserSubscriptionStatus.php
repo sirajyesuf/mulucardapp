@@ -49,38 +49,38 @@ class UpdateUserSubscriptionStatus extends Command
         }
 
         foreach ($expiredSubscriptions as $subscription) {
+
             DB::transaction(function () use ($subscription, $freePlan) {
+
                 // Mark current subscription as expired
                 $subscription->update([
                     'status' => SubscriptionStatus::EXPIRED->value
                 ]);
 
-                // Create new free subscription
-                if ($subscription->plan->price !== 0) {
-                    // Create a zero-amount order to track the automatic downgrade to free plan
-                    $order = Order::create([
-                        'user_id' => $subscription->user_id,
-                        'plan_id' => $freePlan->id,
-                        'status' => OrderStatus::PAID->value,
-                        'payment_ref' => sprintf('AUTO-DOWNGRADE-%s-%s', $subscription->user_id, now()->format('YmdHis')),
-                        'amount' => 0
-                    ]);
+                // Create a zero-amount order to track the automatic downgrade to free plan
+                $order = Order::create([
+                    'order_number' => uniqid(),
+                    'user_id' => $subscription->user_id,
+                    'plan_id' => $freePlan->id,
+                    'status' => OrderStatus::PAID->value,
+                    'payment_ref' => sprintf('AUTO-DOWNGRADE-%s-%s', $subscription->user_id, now()->format('YmdHis')),
+                ]);
 
-                    // Create subscription linked to the order
-                    Subscription::create([
-                        'user_id' => $subscription->user_id,
-                        'plan_id' => $freePlan->id,
-                        'order_id' => $order->id,
-                        'start_date' => now(),
-                        'renewal_date' => null, // Free plan never expires
-                        'status' => SubscriptionStatus::ACTIVE->value
-                    ]);
-                }
+
+                // Create subscription linked to the order
+                Subscription::create([
+                    'user_id' => $subscription->user_id,
+                    'plan_id' => $freePlan->id,
+                    'order_id' => $order->id,
+                    'start_date' => now(),
+                    'renewal_date' => now()->addYear(),
+                    'status' => SubscriptionStatus::ACTIVE->value
+                ]);
+
             });
         }
 
-        $count = $expiredSubscriptions->count();
-        $this->info("Processed {$count} expired subscriptions.");
+        $this->info("Processed {$expiredSubscriptions->count()} expired subscriptions.");
 
         return 0;
     }

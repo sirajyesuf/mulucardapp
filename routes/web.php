@@ -45,3 +45,8 @@ Route::get("/hello/{url}",[HelloController::class,"index"])->name("card.hello");
 Route::get("/privacy-policy",function(){
     return Inertia::render('privacypolicy');
 })->name("privacy-policy");
+
+Route::get("/terms",function(){
+    return Inertia::render('terms');
+})->name("terms");
+    
