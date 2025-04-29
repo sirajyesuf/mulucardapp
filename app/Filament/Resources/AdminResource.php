@@ -77,4 +77,6 @@ class AdminResource extends Resource
     {
         return parent::getEloquentQuery()->where('role', Role::ADMIN->value);
     }
+
+
 }

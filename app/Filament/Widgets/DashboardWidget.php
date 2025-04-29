@@ -13,13 +13,12 @@ class DashboardWidget extends BaseWidget
     {
         $total_customers = User::where('role', Role::CUSTOMER->value)->count();
         $total_admins = User::where('role', Role::ADMIN->value)->count();
+        $total_cards = Card::count();
+
         return [
-            Stat::make('Total Customers', $total_customers)
-            ->descriptionIcon('heroicon-m-users')
-            ->color('gray'),
+            Stat::make('Total Customers', $total_customers),
             Stat::make('Total Admins', $total_admins),
-            Stat::make('Total Users', User::count()),
-            Stat::make('Total Cards', Card::count()),
+            Stat::make('Total Cards', $total_cards),
         ];
     }
 }

@@ -3,7 +3,7 @@ import { Facebook, Instagram, Twitter } from 'lucide-react';
 export default function Dashboardfooter() {
     return (
         <footer className="flex flex-col items-center justify-center gap-2 border-t-2 py-2">
-            <div className="flex flex-row items-center justify-between gap-8 border-none p-2 font-bold">
+            <div className="flex flex-row items-center justify-between gap-2 border-none p-2 font-bold">
                 <Link href="/">home</Link>
                 <Link href={route('privacy-policy')}>privacy</Link>
                 <Link href={route('terms')}>terms</Link>

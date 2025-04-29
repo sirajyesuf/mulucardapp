@@ -7,6 +7,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 use App\Enums\OrderStatus;
+use App\Models\Plan;
 
 class CreateOrder extends CreateRecord
 {
@@ -16,6 +17,13 @@ class CreateOrder extends CreateRecord
     {       
         $data['order_number'] = uniqid();
         $data['status'] = OrderStatus::PENDING;
+
+        $freePlan = Plan::where('price', '=', 0)->first();
+        $freePlanId = $freePlan ? $freePlan->id : null;
+
+        if ($freePlanId !== null && isset($data['plan_id']) && $data['plan_id'] == $freePlanId) {
+            $data['payment_ref'] = 'Automatically Generated Reference Number';
+        }
 
         return $data;
     }
