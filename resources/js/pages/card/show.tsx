@@ -31,7 +31,7 @@ export default function ShowCard() {
     const card = props.card as CardType;
     console.log(card)
 
-    const { data, setData,  post,     errors, reset } = useForm({
+    const { data, setData,  post,   get,  errors, reset } = useForm({
         personalizedurl: card.url.split('/').pop(),
         cardname: card.cardname,
         status: card.status,
@@ -222,9 +222,9 @@ export default function ShowCard() {
                                             value={data.personalizedurl}
                                             onChange = { (e) => setData('personalizedurl', e.target.value)}
                                         />
-                                        <span className="text-normal text-sm">
-                                            {route('card.hello', { url: data.personalizedurl == '' ? card.url : data.personalizedurl })}
-                                        </span>
+                                        <span className="text-normal text-sm text-wrap break-all">
+                                             {route('card.hello', { url: data.personalizedurl == '' ? card.url : data.personalizedurl })}
+                                         </span>
                                         <InputError message={errors.personalizedurl} className="mt-2" />
                                     </div>
 
@@ -256,7 +256,7 @@ export default function ShowCard() {
                                     <div className="flex flex-row items-center justify-between rounded-lg border-2 border-red-400 bg-red-50 px-4 py-4">
                                         <div className="flex flex-col">
                                             <p className="font-extrabold">Delete</p>
-                                            <p className="text-mute font-normal">Delete this card permanently.</p>
+                                            {/* <p className="text-mute font-normal">Delete this card permanently.</p> */}
                                         </div>
 
                                         <Button

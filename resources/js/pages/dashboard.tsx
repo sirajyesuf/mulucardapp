@@ -117,7 +117,7 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <div className="grid grid-cols-3 gap-4 rounded-none border-none p-2 md:grid-cols-3">
+            <div className="grid grid-cols-3 gap-2 rounded-none border-none p-1 md:px-8 md:grid-cols-3">
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
                     <h1 className="text-sm font-bold  text-center">Number of Cards</h1>
                     <p className="text-4xl font-extrabold">{reports.total_cards}</p>
