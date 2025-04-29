@@ -305,7 +305,7 @@ const Index = () => {
     const handlePayment = () => {
         post(route('checkout.order', { plan: plan }), {
             onSuccess: () => {
-                toast.success('Payment successful. wait for approval');
+                toast.success('Your order has been placed successfully! Your subscription will be activated shortly after approval. Thank you for choosing MuluCard!');
             },
             onError: (error) => {
                 toast.error(error.message);
