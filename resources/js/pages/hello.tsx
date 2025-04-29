@@ -5,7 +5,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import ShareButton from '@/components/share-button';
 import MuluCard from './card/card';
-
+import { Button } from '@/components/ui/button';
 
 export default function Hello() {
 
@@ -115,7 +115,7 @@ export default function Hello() {
     const description = card ? `${card.job_title} at ${card.organization}` : 'MuluCard';
     const ogtitle = card ? `${card.first_name} ${card.last_name}` : 'MuluCard';
     const ogdescription = card ? description : 'MuluCard';
-    const ogimage = card ? card.avatar.path : 'MuluCard';
+    const ogimage = card?.avatar?.path ?? 'MuluCard'; 
     const ogurl = card ? card.url : 'MuluCard';  
     const twitterTitle = card ? `${card.first_name} ${card.last_name}` : 'MuluCard';  
     const twitterDescription = card ? description : 'MuluCard';  
@@ -177,19 +177,11 @@ export default function Hello() {
                             description="I found this really interesting article that I thought you might enjoy."
                         />
 
-                        {/* <div
-                            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-gray-400 hover:bg-gray-500"
-                            onClick={() => setShowSocialShare(!showSocialShare)}
-                        >
-                            <Share2 size={30} color="white" />
-                        </div> */}
                     </div>
-                    <div
-                        className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-gray-400 hover:bg-gray-500"
-                        onClick={() => downloadVCard()}
-                    >
-                        <Contact size={30} color="white" />
-                    </div>
+                    <Button variant="outline" size="sm" onClick={() => downloadVCard()} >
+                    <Contact className="h-4 w-4" />
+                    Add To Contact
+                    </Button>
                 </div>
             </div>
         </>
