@@ -117,20 +117,20 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 gap-4 rounded-none border-none p-2 md:grid-cols-3">
+            <div className="grid grid-cols-3 gap-4 rounded-none border-none p-2 md:grid-cols-3">
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
-                    <h1 className="text-xl font-bold capitalize">Number of cards</h1>
-                    <p className="text-2xl font-extrabold">{reports.total_cards}</p>
+                    <h1 className="text-sm font-bold  text-center">Number of Cards</h1>
+                    <p className="text-4xl font-extrabold">{reports.total_cards}</p>
                 </Card>
 
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
-                    <h1 className="text-xl font-bold capitalize">Number of active cards</h1>
-                    <p className="text-xl font-extrabold">{reports.active_cards}</p>
+                    <h1 className="text-sm font-bold  text-center">Number of Active Cards</h1>
+                    <p className="text-4xl font-extrabold">{reports.active_cards}</p>
                 </Card>
 
                 <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
-                    <h1 className="text-xl font-bold capitalize">Number of inactive cards</h1>
-                    <p className="text-2xl font-extrabold">{reports.inactive_cards}</p>
+                    <h1 className="text-sm font-bold  text-center">Number of Inactive Cards</h1>
+                    <p className="text-4xl font-extrabold">{reports.inactive_cards}</p>
                 </Card>
             </div>
 
