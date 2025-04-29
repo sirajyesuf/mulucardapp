@@ -63,6 +63,8 @@ class CardController extends Controller
 
     public function  store(Request $request){
 
+
+
         $validated = $request->validated();
 
         $bannerPath = $request->file('banner.file')
@@ -118,6 +120,12 @@ class CardController extends Controller
     public function show($id)
     {
         $card = Card::where('id', $id)->with('socialLinks', 'galleries', 'services')->firstOrFail();
+
+        if (auth()->user()->cannot('view',$card)) {
+
+            return redirect()->route('dashboard');
+        }
+
         $card = new CardResource($card);
         return Inertia::render('card/show', ['card' => $card]);
     }
@@ -126,6 +134,12 @@ class CardController extends Controller
     public function edit($id)
     {
         $card = Card::where('id', $id)->with('socialLinks', 'galleries', 'services')->firstOrFail();
+
+        if (auth()->user()->cannot('update',$card)) {
+
+            return redirect()->route('dashboard');
+        }
+
         $card = new CardResource($card);
 
         return Inertia::render('card/edit', ['card' => $card]);
