@@ -31,7 +31,7 @@ export default function ShowCard() {
     const card = props.card as CardType;
     console.log(card)
 
-    const { data, setData,  get,     errors, reset } = useForm({
+    const { data, setData,  post,     errors, reset } = useForm({
         personalizedurl: card.url.split('/').pop(),
         cardname: card.cardname,
         status: card.status,
@@ -65,6 +65,7 @@ export default function ShowCard() {
         }
 
         post(route('card.settings', { id: card.id }), {
+            
             preserveScroll: true,
             onSuccess: () => {
                 toast.success('Card updated successfully');
