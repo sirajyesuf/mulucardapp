@@ -1,4 +1,4 @@
-import Footer from '@/components/footer45';
+import Dashboardfooter from '@/components/dashboard-footer';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
@@ -14,6 +14,6 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
         <TooltipProvider>
             <main className="flex-grow">{children}</main>
         </TooltipProvider>
-        {/* <Footer /> */}
+        <Dashboardfooter />
     </AppLayoutTemplate>
 );
