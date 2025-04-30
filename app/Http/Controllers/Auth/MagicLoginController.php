@@ -19,11 +19,13 @@ class MagicLoginController extends Controller
 
     public function send(Request $request)
     {
+
+        // Validate the request
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
         try {
-            // Validate the request
-            $validated = $request->validate([
-                'email' => 'required|email|exists:users,email',
-            ]);
 
             // Find the user
             $user = User::where('email', $validated['email'])->first();
@@ -34,35 +36,25 @@ class MagicLoginController extends Controller
             // Send the magic link email
             Mail::to($user->email)->send(new MagicLinkMail($url));
 
-            // Return a success response for Inertia
-            return Inertia::render('auth/magic-login')->with([
-                'status' => 'Magic link has been sent to your email.',
+            return back()->withSuccess([
+                'message' => 'login magic link has been sent to your email address.',
             ]);
 
-        } catch (ValidationException $e) {
-            // Return validation errors to Inertia
-            return back()->withErrors($e->errors())->withInput();
-
-        } catch (\Swift_TransportException $e) {
-            // Handle email sending failure
-            return back()->withErrors([
-                'email' => 'Failed to send the magic link email. Please try again later.',
-            ]);
-
-        } catch (\Exception $e) {
-            // Handle any other unexpected errors
-            return back()->withErrors([
-                'email' => 'An unexpected error occurred. Please try again.',
+        }
+        catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+            return back()->withError([
+                'message' => 'Failed to send the magic link email. Please try again later.',
             ]);
         }
+        
+        
     }
 
     public function verify(Request $request, $user)
     {
         if (!$request->hasValidSignature()) {
-            return Inertia::render('auth/magic-login', [
-                'errors' => ['link' => 'Invalid or expired magic link.'],
-            ]);
+            
+            return Inertia::render('invalid-login');
         }
 
         $user = User::findOrFail($user);

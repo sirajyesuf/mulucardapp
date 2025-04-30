@@ -35,7 +35,8 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 
     Route::get('/login', [MagicLoginController::class, 'show'])->name('login');
-    Route::post('/login', [MagicLoginController::class, 'send'])->name('magic.send');
+    Route::post('/login', [MagicLoginController::class, 'send'])->name('magic.send')
+    ->middleware(['throttle:login-magic-link']);
     Route::get('/magic-verify/{user}', [MagicLoginController::class, 'verify'])->name('magic.verify');
 });
 

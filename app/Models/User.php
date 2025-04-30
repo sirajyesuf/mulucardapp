@@ -39,7 +39,7 @@ class User extends Authenticatable implements FilamentUser
 
         return URL::temporarySignedRoute(
                     'magic.verify',
-                    now()->addMinutes(15),
+                    now()->addMinutes(5),
                     ['user' => $this->id]
                 );
 

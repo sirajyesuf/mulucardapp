@@ -53,7 +53,9 @@ class HandleInertiaRequests extends Middleware
                     ]
                 ]
             ],
-            'cardSocialLinks' => CardSocialLinks::links()
+            'cardSocialLinks' => CardSocialLinks::links(),
+            'success' => $request->session()->pull('success'),
+            'error' => $request->session()->pull('error'),
         ];
     }
 }
