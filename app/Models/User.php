@@ -9,10 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\URL;
 use App\Models\Card;
 use App\Enums\SubscriptionStatus;
+use Filament\Models\Contracts\FilamentUser;
+use App\Enums\Role;
+use Filament\Panel;
 
 
-
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
@@ -25,6 +27,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
         ];
+    }
+
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role == Role::ADMIN->value;
     }
 
     public function generateLoginUrl():string {
