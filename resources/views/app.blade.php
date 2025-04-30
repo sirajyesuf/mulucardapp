@@ -4,35 +4,44 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
-
+        
+        
+        @if(isset($metadata))
         {{-- Standard Meta Tags --}}
         <link rel="canonical" href="{{ url()->current() }}" />
-        <meta name="robots" content="index, follow"> {{-- Adjust content as needed (e.g., 'noindex, nofollow') --}}
-        <meta name="description" content="mulucard-Modern digital business cards for freelancers, professionals, and businesses.">
-        <meta name="keywords" content="digital business card, nfc card based business card, business card, card, digital card, nfc card">
-        <meta name="author" content="MuluCard">
+        <meta name="robots" content="index, follow"> 
+        <title>{{ $metadata['title'] }}</title>
+        <meta name="description" content="{{$metadata['description']}}">
+        <meta name="keywords" content="{{$metadata['keywords']}}">
+        <meta name="author" content="{{$metadata['author']}}">
 
-        {{-- Open Graph / Facebook Meta Tags --}}
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:title" content="{{ config('app.name', 'Laravel') }}">
-        <meta property="og:description" content="Modern digital business cards for freelancers, professionals, and businesses.">
-        <meta property="og:image" content="{{ asset('logo.png') }}"> {{-- Replace with actual image path --}}
-        <meta property="og:site_name" content="{{ config('app.name', 'Laravel') }}">
+            {{-- Open Graph / Facebook Meta Tags --}}
+            <meta property="og:type" content="website">
+            <meta property="og:url" content="{{ url()->current() }}">
 
-        {{-- Twitter Card Meta Tags --}}
-        <meta name="twitter:card" content="summary_large_image"> {{-- Use 'summary' for smaller images --}}
-        <meta name="twitter:url" content="{{ url()->current() }}">
-        <meta name="twitter:title" content="{{ config('app.name', 'Laravel') }}">
-        <meta name="twitter:description" content="Modern digital business cards for freelancers, professionals, and businesses.">
-        <meta name="twitter:image" content="{{ asset('logo.png') }}"> {{-- Replace with actual image path --}}
-        <meta name="twitter:site" content="@MuluCard"> {{-- Replace with your site's Twitter handle --}}
-        <meta name="twitter:creator" content="@MuluCard"> {{-- Replace with the content creator's Twitter handle (optional) --}}
+            <meta property="og:title" content="{{$metadata['og:title']}}">
+            <meta property="og:description" content="{{$metadata['og:description']}}">
+            <meta property="og:image" content="{{$metadata['og:image']}}">
+            <meta property="og:site_name" content="{{ $metadata['og:site_name'] }}">
+            <meta property="og:image:height" content="1200">
+            <meta property="og:image:width" content="600">
+            <meta property="og:image:type" content="image/png">
+
+            {{-- Twitter Card Meta Tags --}}
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:url" content="{{ url()->current() }}">
+            <meta name="twitter:title" content="{{$metadata['twitter:title']}}">
+            <meta name="twitter:description" content="{{$metadata['twitter:description']}}">
+            <meta name="twitter:image" content="{{$metadata['twitter:image']}}">
+            <meta name="twitter:site" content="@MuluCard">
+            <meta name="twitter:creator" content="@MuluCard">
+            @endif
+    
+
+
 
         {{-- Favicon --}}
-        <link rel="icon" href="{{ asset('/favicon.ico') }}" type="image/x-icon"> {{-- Replace with your favicon path --}}
-        {{-- Add other favicon sizes/types if needed (e.g., apple-touch-icon) --}}
+        <link rel="icon" href="{{ asset('/favicon.ico') }}" type="image/x-icon">
 
         {{-- Fonts --}}
         <link rel="preconnect" href="https://fonts.bunny.net">
