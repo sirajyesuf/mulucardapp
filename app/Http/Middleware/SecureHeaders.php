@@ -26,31 +26,31 @@ class SecureHeaders
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=()');
 
 
-        if (App::environment('local')) {
-            // Relaxed CSP for local dev with Vite + React
-            $response->headers->set('Content-Security-Policy',
-            "default-src 'self' http://127.0.0.1:5173; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://127.0.0.1:5173; " .
-            "style-src 'self' 'unsafe-inline' http://127.0.0.1:5173 https://fonts.bunny.net; " .
-            "font-src 'self' https://fonts.bunny.net; " .
-            "connect-src 'self' ws://127.0.0.1:5173 http://127.0.0.1:5173; " .
-            "img-src 'self' data:; " .
-            "object-src 'none'; " .
-            "frame-ancestors 'none';"
-        );
-        } else {
-            // Strict CSP for production
-            $response->headers->set('Content-Security-Policy',
-            "default-src 'self'; " .
-            "script-src 'self'; " .
-            "style-src 'self' 'unsafe-inline' https://fonts.bunny.net; " .
-            "font-src 'self' https://fonts.bunny.net; " .
-            "connect-src 'self'; " .
-            "img-src 'self' data:; " .
-            "object-src 'none'; " .
-            "frame-ancestors 'none';"
-        );
-        }
+        // if (App::environment('local')) {
+        //     // Relaxed CSP for local dev with Vite + React
+        //     $response->headers->set('Content-Security-Policy',
+        //     "default-src 'self' http://127.0.0.1:5173; " .
+        //     "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://127.0.0.1:5173; " .
+        //     "style-src 'self' 'unsafe-inline' http://127.0.0.1:5173 https://fonts.bunny.net; " .
+        //     "font-src 'self' https://fonts.bunny.net; " .
+        //     "connect-src 'self' ws://127.0.0.1:5173 http://127.0.0.1:5173; " .
+        //     "img-src 'self' data:; " .
+        //     "object-src 'none'; " .
+        //     "frame-ancestors 'none';"
+        // );
+        // } else {
+        //     // Strict CSP for production
+        //     $response->headers->set('Content-Security-Policy',
+        //     "default-src 'self'; " .
+        //     "script-src 'self'; " .
+        //     "style-src 'self' 'unsafe-inline' https://fonts.bunny.net; " .
+        //     "font-src 'self' https://fonts.bunny.net; " .
+        //     "connect-src 'self'; " .
+        //     "img-src 'self' data:; " .
+        //     "object-src 'none'; " .
+        //     "frame-ancestors 'none';"
+        // );
+        // }
 
         return $response;
     }
