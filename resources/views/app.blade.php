@@ -4,12 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        
-        
+
+
         @if(isset($metadata))
         {{-- Standard Meta Tags --}}
         <link rel="canonical" href="{{ url()->current() }}" />
-        <meta name="robots" content="index, follow"> 
+        <meta name="robots" content="index, follow">
         <title>{{ $metadata['title'] }}</title>
         <meta name="description" content="{{$metadata['description']}}">
         <meta name="keywords" content="{{$metadata['keywords']}}">
@@ -36,7 +36,7 @@
             <meta name="twitter:site" content="@MuluCard">
             <meta name="twitter:creator" content="@MuluCard">
             @endif
-    
+
 
 
 
@@ -47,11 +47,6 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-        <script
-        crossorigin="anonymous"
-        src="https://cdn.jsdelivr.net/npm/meta-scan/dist/auto.global.js"
-        data-auto-enable="true"
-      ></script>
         @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
