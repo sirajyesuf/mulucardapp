@@ -6,7 +6,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use App\Enums\CardSocialLinks;
-
+use App\Models\Card;
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -54,8 +54,6 @@ class HandleInertiaRequests extends Middleware
                 ]
             ],
             'cardSocialLinks' => CardSocialLinks::links(),
-            'success' => $request->session()->pull('success'),
-            'error' => $request->session()->pull('error'),
         ];
     }
 }

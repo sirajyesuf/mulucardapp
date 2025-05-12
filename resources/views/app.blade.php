@@ -7,13 +7,13 @@
 
 
         @if(isset($metadata))
-        {{-- Standard Meta Tags --}}
-        <link rel="canonical" href="{{ url()->current() }}" />
-        <meta name="robots" content="index, follow">
-        <title>{{ $metadata['title'] }}</title>
-        <meta name="description" content="{{$metadata['description']}}">
-        <meta name="keywords" content="{{$metadata['keywords']}}">
-        <meta name="author" content="{{$metadata['author']}}">
+            {{-- Standard Meta Tags --}}
+            <link rel="canonical" href="{{ url()->current() }}" />
+            <meta name="robots" content="index, follow">
+            <title>{{ $metadata['title'] }}</title>
+            <meta name="description" content="{{$metadata['description']}}">
+            <meta name="keywords" content="{{$metadata['keywords']}}">
+            <meta name="author" content="{{$metadata['author']}}">
 
             {{-- Open Graph / Facebook Meta Tags --}}
             <meta property="og:type" content="website">
@@ -35,7 +35,7 @@
             <meta name="twitter:image" content="{{$metadata['twitter:image']}}">
             <meta name="twitter:site" content="@MuluCard">
             <meta name="twitter:creator" content="@MuluCard">
-            @endif
+        @endif
 
 
 

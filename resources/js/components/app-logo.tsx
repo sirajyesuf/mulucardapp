@@ -10,10 +10,10 @@ export default function AppLogo() {
                 <span className="mb-0.5 truncate leading-none font-semibold">MuluCard</span>
             </div> */}
 
-            <a href="/" className="flex items-center gap-[1px] text-xl font-semibold">
+            <div className="flex items-center gap-[1px] text-xl font-semibold">
                 <span className="text-brand-purple">Mulu</span>
                 <span>Card</span>
-            </a>
+            </div>
         </>
     );
 }
