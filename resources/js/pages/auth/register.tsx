@@ -12,25 +12,23 @@ import AuthLayout from '@/layouts/auth-layout';
 interface RegisterForm {
     name: string;
     email: string;
-    // password: string;
-    // password_confirmation: string;
+    password: string;
+    password_confirmation: string;
 }
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
+    const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
         name: '',
         email: '',
-        // password: '',
-        // password_confirmation: '',
+        password: '',
+        password_confirmation: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        // post(route('register'), {
-        //     onFinish: () => reset('password', 'password_confirmation'),
-        // });
-
-        post(route('register'));
+        post(route('register'), {
+            onFinish: () => reset('password', 'password_confirmation'),
+        });
     };
 
     return (
@@ -71,7 +69,7 @@ export default function Register() {
                         <InputError message={errors.email} />
                     </div>
 
-                    {/* <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
                         <Input
                             id="password"
@@ -85,9 +83,9 @@ export default function Register() {
                             placeholder="Password"
                         />
                         <InputError message={errors.password} />
-                    </div> */}
+                    </div>
 
-                    {/* <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm password</Label>
                         <Input
                             id="password_confirmation"
@@ -101,7 +99,7 @@ export default function Register() {
                             placeholder="Confirm password"
                         />
                         <InputError message={errors.password_confirmation} />
-                    </div> */}
+                    </div>
 
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}

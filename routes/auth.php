@@ -17,10 +17,10 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
-    // Route::get('login', [AuthenticatedSessionController::class, 'create'])
-    //     ->name('login');
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+        ->name('login');
 
-    // Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -34,10 +34,11 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-    Route::get('/login', [MagicLoginController::class, 'show'])->name('login');
-    Route::post('/login', [MagicLoginController::class, 'send'])->name('magic.send')
-    ->middleware(['throttle:login-magic-link']);
-    Route::get('/magic-verify/{user}', [MagicLoginController::class, 'verify'])->name('magic.verify');
+    // Route::get('/login', [MagicLoginController::class, 'show'])->name('login');
+    // Route::post('/login', [MagicLoginController::class, 'send'])->name('magic.send')
+    // ->middleware(['throttle:login-magic-link']);
+    // Route::get('/magic-verify/{user}', [MagicLoginController::class, 'verify'])->name('magic.verify');
+    
 });
 
 Route::middleware('auth')->group(function () {

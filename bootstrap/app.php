@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Inertia\Inertia;
 use App\Http\Middleware\SecureHeaders;
-
+use App\Http\Middleware\RestrictAdminFromCustomerPortal;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SecureHeaders::class,
-
+            RestrictAdminFromCustomerPortal::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -27,11 +27,11 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
 
-        RateLimiter::for('login-magic-link', function (Request $request) {
-            $email = strtolower($request->email);
-            
-            return Limit::perMinute(1)->by($email); 
-        });
+        // RateLimiter::for('login-magic-link', function (Request $request) {
+        //     $email = strtolower($request->email);
+
+        //     return Limit::perMinute(1)->by($email);
+        // });
 
     }
 }

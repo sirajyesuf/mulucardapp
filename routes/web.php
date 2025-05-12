@@ -8,7 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HelloController;
 use Inertia\Inertia;
 use App\Http\Controllers\LandingPageController;
-
+use App\Http\Middleware\RestrictAdminFromCustomerPortal;
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
@@ -19,7 +19,7 @@ Route::get('/',[LandingPageController::class,"index"])->name("home");
 
 
 
-Route::middleware(['auth'])->group(function(){
+Route::middleware(['auth',RestrictAdminFromCustomerPortal::class])->group(function(){
 
     Route::get('dashboard',[DashboardController::class,"index"])->name("dashboard");
 
@@ -34,7 +34,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('card/{id}/update',[CardController::class,"update"])->name("card.update");
     Route::get('card/{id}/delete',[CardController::class,"delete"])->name("card.delete");
     Route::post('card/{id}/settings',[CardController::class,"settings"])->name("card.settings");
-    
+
     Route::get('/checkout/{plan}',[CheckoutController::class,"index"])->name("checkout");
     Route::post('/checkout/{plan}/order',[CheckoutController::class,"store"])->name("checkout.order");
 });
@@ -49,4 +49,3 @@ Route::get("/privacy-policy",function(){
 Route::get("/terms",function(){
     return Inertia::render('terms');
 })->name("terms");
-    
