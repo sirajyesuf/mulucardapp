@@ -19,7 +19,7 @@ Route::get('/',[LandingPageController::class,"index"])->name("home");
 
 
 
-Route::middleware(['auth',RestrictAdminFromCustomerPortal::class])->group(function(){
+Route::middleware(['auth'])->group(function(){
 
     Route::get('dashboard',[DashboardController::class,"index"])->name("dashboard");
 
