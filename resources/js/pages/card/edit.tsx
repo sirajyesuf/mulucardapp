@@ -34,21 +34,17 @@ interface CardForm {
     location: string | null;
     address: string | null;
     headline: string;
-    business_hours: DaySchedule[];
+    business_hours: DaySchedule[] | null;
     galleries: Gallery[];
     services: Service[];
     business_hours_enabled: boolean;
-    [key: string]: any; // Add index signature to allow string indexing
+    [key: string]: any; 
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Edit Card', href: '' },
 ];
-
-// interface EditCardProps {
-//     card: CardType;
-// }
 
 export default function EditCard({ card }: { card: CardType }) {
     const props = usePage<SharedData>().props;
@@ -61,7 +57,13 @@ export default function EditCard({ card }: { card: CardType }) {
         (card.links || []).map((link) => [link.name, link.url])
     );
 
-    const [removedLinks, setRemovedLinks] = useState<string[]>([]);
+    // Get all social links that exist in the card
+    const existingLinks = cardSocialLinks.filter(linkName => existingLinksMap.has(linkName));
+    
+    // Add the rest to removedLinks
+    const initialRemovedLinks = cardSocialLinks.filter(linkName => !existingLinksMap.has(linkName));
+
+    const [removedLinks, setRemovedLinks] = useState<string[]>(initialRemovedLinks);
 
     const removeLinkItem = (name: string) => {
         setData(
@@ -81,11 +83,13 @@ export default function EditCard({ card }: { card: CardType }) {
         setRemovedLinks(removedLinks.filter(link => link !== name));
     };
 
-    const links = cardSocialLinks.map((linkName) => ({
+    const links = existingLinks.map((linkName) => ({
         name: linkName,
         url: existingLinksMap.get(linkName) || '',
         placeholder: `https://${linkName.toLowerCase()}.com/your-profile`,
     }));
+
+    useState<string[]>(initialRemovedLinks);
 
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
 
@@ -117,7 +121,7 @@ export default function EditCard({ card }: { card: CardType }) {
         headline: card.headline,
         galleries: card.galleries?.length > 0 ? card.galleries : [],
         services: card.services?.length > 0 ? card.services : [],
-        business_hours_enabled: card.business_hours !== null,
+        business_hours_enabled: card.business_hours_enabled,
         business_hours: card.business_hours || [
             { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '09:00', close: '17:00' },
             { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '09:00', close: '17:00' },
@@ -295,6 +299,25 @@ export default function EditCard({ card }: { card: CardType }) {
         }
     };
 
+    const handleBusinessHoursToggle = (checked: boolean) => {
+        setData('business_hours_enabled', checked);
+        if (!checked) {
+            // When disabled, set business_hours to empty array
+            setData('business_hours', []);
+        } else {
+            // When enabled, restore the previous business hours or use default
+            setData('business_hours', card.business_hours || [
+                { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '09:00', close: '17:00' },
+                { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '09:00', close: '17:00' },
+                { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '09:00', close: '17:00' },
+                { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '09:00', close: '17:00' },
+                { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '09:00', close: '17:00' },
+                { id: crypto.randomUUID(), day: 'Saturday', isOpen: false, open: '09:00', close: '17:00' },
+                { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '09:00', close: '17:00' }
+            ]);
+        }
+    };
+
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
         post(route('card.update', card.id), {
@@ -320,7 +343,7 @@ export default function EditCard({ card }: { card: CardType }) {
             <form onSubmit={submit} className="min-h-screen">
 
                 <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
-                    <Link className="cursor-pointer bg-red-300  rounded-sm px-4  py-1 text-black" href={route('card.show', card.id)}>
+                    <Link className="cursor-pointer bg-red-500 hover:bg-red-600 rounded-lg px-4 py-1 text-white font-bold" href={route('card.show', card.id)}>
                         Cancel
                     </Link>
 
@@ -349,6 +372,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                 galleries={data.galleries}
                                 services={data.services}
                                 business_hours={data.business_hours}
+                                business_hours_enabled={data.business_hours_enabled}
                                 banner={data.banner}
                                 url={data.url}
                             />
@@ -680,6 +704,27 @@ export default function EditCard({ card }: { card: CardType }) {
                                     <CardHeader>
                                         <CardTitle>Links</CardTitle>
                                         <CardDescription>Update your social media links.</CardDescription>
+
+                                        {removedLinks.length > 0 && (
+                                            <div className="mt-4">
+                                                <h3 className="mb-2 text-sm font-medium">Removed Links</h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {removedLinks.map((linkName) => (
+                                                        <Button
+                                                            key={linkName}
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => addBackLink(linkName)}
+                                                            className="flex items-center gap-2"
+                                                        >
+                                                            <PlusCircle className="h-4 w-4" />
+                                                            {linkName}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {data.links.map((link, index) => {
@@ -718,26 +763,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 </div>
                                             );
                                         })}
-                                        {removedLinks.length > 0 && (
-                                            <div className="mt-4">
-                                                <h3 className="mb-2 text-sm font-medium">Removed Links</h3>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {removedLinks.map((linkName) => (
-                                                        <Button
-                                                            key={linkName}
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => addBackLink(linkName)}
-                                                            className="flex items-center gap-2"
-                                                        >
-                                                            <PlusCircle className="h-4 w-4" />
-                                                            {linkName}
-                                                        </Button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
+
                                     </CardContent>
                                 </Card>
                             </TabsContent>
@@ -783,14 +809,16 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 <Switch
                                                     id="business-hours-toggle"
                                                     checked={data.business_hours_enabled}
+                                                    // onCheckedChange={handleBusinessHoursToggle}
                                                     onCheckedChange={(checked) => setData('business_hours_enabled', checked)}
+
                                                 />
                                             </div>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
                                         {data.business_hours_enabled ? (
-                                            data.business_hours.map((day: DaySchedule, index) => (
+                                            data.business_hours?.map((day: DaySchedule, index) => (
                                                 <div key={day.id} className="rounded-lg border p-4">
                                                     <div className="mb-4 flex items-center justify-between">
                                                         <div className="flex items-center space-x-2">

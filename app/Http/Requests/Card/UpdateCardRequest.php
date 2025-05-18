@@ -45,9 +45,9 @@ class UpdateCardRequest extends FormRequest
                 'address' => 'nullable|string|max:255',
                 'location' => 'nullable|string|max:255',
 
-                'links' => 'array|max:100',
-                'links.*.name' => 'required|string|max:255',
-                'links.*.url' => "nullable|url:https",
+                'links' => 'nullable|array|max:100',
+                'links.*.name' => 'required_with:links.*.url|string|max:255',
+                'links.*.url' => "required_with:links.*.name|url:https",
             
             
                 //validation for galleries
@@ -96,9 +96,7 @@ class UpdateCardRequest extends FormRequest
             // $business_messages = [];
             $gallery_messages = [];
             $services_messages = [];
-            // $links_messages = [];
-
-
+            $links_messages = [];
 
             // foreach ($dayNames as $index => $dayName) {
             //     $business_messages["business_hours.{$index}.open.required"] = "Please select an opening time for {$dayName}.";
@@ -128,47 +126,40 @@ class UpdateCardRequest extends FormRequest
                 }
             }
 
-          
-        // --- Generate Link Messages Dynamically ---
-        // Iterate over the actual submitted links data
-        foreach ($this->input('links', []) as $index => $linkData) {
-            // Use the 'name' from the submitted data, default to generic if 'name' is missing
-            $linkName = $linkData['name'] ?? "Link #{$index}";
-            // Capitalize first letter for display
-            $linkNameDisplay = ucfirst($linkName);
+            if(isset(request()->links) && isset(request()->links[0])) {
+                // --- Generate Link Messages Dynamically ---
+                // Iterate over the actual submitted links data
+                foreach (request()->links as $index => $linkData) {
+                    // Use the 'name' from the submitted data, default to generic if 'name' is missing
+                    $linkName = $linkData['name'] ?? "Link #{$index}";
+                    // Capitalize first letter for display
+                    $linkNameDisplay = ucfirst($linkName);
 
-            // Key format: links.index.field.rule
-            $requiredKey = "links.{$index}.url.required";
-            $urlKey = "links.{$index}.url.url";
+                    // Key format: links.index.field.rule
+                    $requiredKey = "links.{$index}.url.required";
+                    $urlKey = "links.{$index}.url.url";
 
-            $links_messages[$requiredKey] = "The {$linkNameDisplay} URL is required.";
-            $links_messages[$urlKey] = "The {$linkNameDisplay} URL must be a valid URL starting with https://.";
-        }
-
-
-
+                    $links_messages[$requiredKey] = "The {$linkNameDisplay} URL is required.";
+                    $links_messages[$urlKey] = "The {$linkNameDisplay} URL must be a valid URL starting with https://.";
+                }
+            }
 
             return [
-            ...$gallery_messages,
-            ...$services_messages,
-            ...$links_messages,
+                ...$gallery_messages,
+                ...$services_messages,
+                ...$links_messages,
 
-            'avatar.file.image' => 'The avatar field must be a valid image file.',
-            'avatar.file.max' => 'The avatar file size must not exceed 2MB.',
-            'avatar.path.required_if' => 'The avatar  field is required.',
+                'avatar.file.image' => 'The avatar field must be a valid image file.',
+                'avatar.file.max' => 'The avatar file size must not exceed 2MB.',
+                'avatar.path.required_if' => 'The avatar  field is required.',
 
-            'logo.file.image' => 'The logo field must be a valid image file.',
-            'logo.file.max' => 'The logo field size must not exceed 2MB.',
-            'logo.path.required_if' => 'The logo  field is required.',
+                'logo.file.image' => 'The logo field must be a valid image file.',
+                'logo.file.max' => 'The logo field size must not exceed 2MB.',
+                'logo.path.required_if' => 'The logo  field is required.',
 
-            'banner.file.image' => 'The banner field must be a valid image file.',
-            'banner.file.max' => 'The banner file size must not exceed 2MB.',
-            'banner.path.required_if' => 'The banner  field is required.',
-
-
-            
-
-
+                'banner.file.image' => 'The banner field must be a valid image file.',
+                'banner.file.max' => 'The banner file size must not exceed 2MB.',
+                'banner.path.required_if' => 'The banner  field is required.',
             ];
-        }
+    }
 }

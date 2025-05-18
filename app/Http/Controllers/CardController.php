@@ -12,6 +12,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Resources\CardResource;
 use JeroenDesloovere\VCard\VCard;
 use App\Enums\CardSocialLinks;
+use Illuminate\Support\Facades\DB;
 
 class CardController extends Controller
 {
@@ -193,7 +194,7 @@ class CardController extends Controller
             'headline' => $request->headline,
             'address' => $request->address,
             'location' => $request->location,
-            'business_hours' => $request->business_hours,
+            'business_hours' => $request->business_hours_enabled ? $request->business_hours : null,
         ]);
 
 
@@ -203,59 +204,6 @@ class CardController extends Controller
         $this->updateCardService($card, $validated['services'] ?? []);
         $this->updateGalleries($card, $validated['galleries'] ?? []);
 
-
-
-        // dd($validated);
-
-        // // Update galleries
-        // if (isset($validated['galleries'])) {
-        //     // Remove galleries that are not in the new set
-        //     $existingGalleryIds = collect($validated['galleries'])
-        //         ->filter(fn($gallery) => isset($gallery['id']) && !isset($gallery['file']))
-        //         ->pluck('id');
-        //     $card->galleries()->whereNotIn('id', $existingGalleryIds)->delete();
-
-        //     foreach ($validated['galleries'] as $gallery) {
-        //         if (isset($gallery['file'])) {
-        //             $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
-        //             $card->galleries()->create([
-        //                 'path' => Storage::url($path),
-        //                 'description' => $gallery['description'],
-        //             ]);
-        //         } elseif (isset($gallery['id'])) {
-        //             $card->galleries()->where('id', $gallery['id'])->update([
-        //                 'description' => $gallery['description']
-        //             ]);
-        //         }
-        //     }
-        // }
-
-        // // Update services
-        // if (isset($validated['services'])) {
-        //     // Remove services that are not in the new set
-        //     $existingServiceIds = collect($validated['services'])
-        //         ->filter(fn($service) => isset($service['id']) && !isset($service['file']))
-        //         ->pluck('id');
-        //     $card->services()->whereNotIn('id', $existingServiceIds)->delete();
-
-        //     foreach ($validated['services'] as $service) {
-        //         if (isset($service['file'])) {
-        //             $path = Storage::disk('public')->putFile('services', $service['file']);
-        //             $card->services()->create([
-        //                 'path' => Storage::url($path),
-        //                 'name' => $service['name'],
-        //                 'description' => $service['description']
-        //             ]);
-        //         } elseif (isset($service['id'])) {
-        //             $card->services()->where('id', $service['id'])->update([
-        //                 'name' => $service['name'],
-        //                 'description' => $service['description']
-        //             ]);
-        //         }
-        //     }
-        // }
-
-        // return redirect()->route('dashboard')->with('success', 'Card updated successfully!');
         return redirect()->back();
     }
 
@@ -297,9 +245,6 @@ class CardController extends Controller
                 ]);
             }
         }
-
-        //delete old services
-        // $card->services()->whereNotIn('id', $serviceIds)->delete();
     }
 
 
@@ -345,20 +290,27 @@ class CardController extends Controller
     }
 
     protected function updateSocialLinks($card, $validated){
-        $links = CardSocialLinks::links();
-        $validatedLinks = [];
-        foreach($validated['links'] as $link){
-            $validatedLinks[$link['name']] = $link['url'];
-        }
+        try {
+            DB::beginTransaction();
+            
+            // Delete all existing social links for this card
+            $card->socialLinks()->delete();
 
-        foreach($links as $link){
-            $card->socialLinks()->updateOrCreate([
-                'name' => $link
-            ], [
-                'url' => $validatedLinks[$link] ?? null
-            ]);
+            // Create new social links if they exist
+            if (!empty($validated['links'])) {
+                foreach ($validated['links'] as $link) {
+                    $card->socialLinks()->create([
+                        'name' => $link['name'],
+                        'url' => $link['url'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-   
     }
 
 

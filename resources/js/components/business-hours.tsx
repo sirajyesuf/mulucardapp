@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 import { type DaySchedule } from '@/types';
 
-export default function BusinessHoursPreview({ business_hours }: { business_hours: DaySchedule[] }) {
+export default function BusinessHoursPreview({ business_hours }: { business_hours: DaySchedule[] | null }) {
     console.log('BusinessHoursPreview');
     console.log(business_hours);
     // Format time from 24h to 12h format

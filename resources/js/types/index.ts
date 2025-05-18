@@ -70,7 +70,8 @@ export interface Card {
     headline: string;
     galleries: Gallery[];
     services: Service[];
-    business_hours: DaySchedule[];
+    business_hours_enabled: boolean;
+    business_hours: DaySchedule[] | null;
     total_views?: number;
     total_saves?: number;
     qr_code:string;

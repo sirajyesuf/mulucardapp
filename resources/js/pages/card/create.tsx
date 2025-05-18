@@ -757,7 +757,7 @@ export default function CreateCard() {
                                         <CardDescription>add social media links.</CardDescription>
                                         {removedLinks.length > 0 && (
                                             <div className="mt-4 space-y-2">
-                                                <h3 className="text-sm font-medium text-gray-500">Removed Links</h3>
+                                                <h3 className="text-sm font-medium text-gray-500">Add More Links</h3>
                                                 <div className="flex flex-wrap gap-2">
                                                     {removedLinks.map((name) => (
                                                         <Button

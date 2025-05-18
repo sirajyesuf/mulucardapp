@@ -128,6 +128,7 @@ export default function Hello() {
                         headline={card?.headline}
                         services={card?.services}
                         galleries={card?.galleries}
+                        business_hours_enabled={card?.business_hours_enabled}
                         business_hours={card?.business_hours}
                         banner={card?.banner}
                     />

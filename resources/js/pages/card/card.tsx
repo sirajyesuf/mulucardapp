@@ -25,7 +25,8 @@ type MuluCardProps = {
     location: string | null;
     galleries: Gallery[];
     services: Service[];
-    business_hours: DaySchedule[];
+    business_hours: DaySchedule[] | null;
+    business_hours_enabled: boolean;
 };
 
 export default function MuluCard({
@@ -46,7 +47,7 @@ export default function MuluCard({
     galleries,
     services,
     business_hours,
-    
+    business_hours_enabled,
 }: MuluCardProps) {
     return (
         <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
@@ -180,26 +181,30 @@ export default function MuluCard({
                     </Card>
                 )}
 
-                {business_hours && (
+                {business_hours_enabled && (
                     <BusinessHoursPreview business_hours={business_hours} />
                 )}
 
 
-                {address && location && (
+                {/* {address || location && ( */}
 
 
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
+                    {address  && (
                     <div className="flex items-center justify-center gap-2 p-2">
                         <MapPin className="h-8 w-8" color={banner_color} />
                         <p className="font-mute text-md">{address}</p>
                     </div>
+                    )}
+                    {location && (
                     <div className="cursor-pointer rounded-4xl p-2 text-center font-bold text-white" style={{ backgroundColor: banner_color }}>
                         <a href={location} target="_blank" className="capitalize">
                             view on google map
                         </a>
                     </div>
+                    )}
                 </div>
-                )}
+                {/* )} */}
             </CardContent>
         </Card>
     );
