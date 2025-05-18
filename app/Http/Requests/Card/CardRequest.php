@@ -37,7 +37,7 @@ class CardRequest extends FormRequest
                 'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
                 'links' => 'array|max:100',
                 'links.*.name' => 'required|string|max:255',
-                'links.*.url' => "nullable|url:https",
+                'links.*.url' => "required|url:https",
                 'phone' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255',
                 'headline' => 'required|string|max:255',
