@@ -62,15 +62,8 @@ class CardController extends Controller
     }
 
     public function  store(StoreRequest $request){
-
-
-
-
-
+        
         $validated = $request->validated();
-
-
-        // dd($validated);
 
         $bannerPath = $request->file('banner.file')
             ? Storage::url($request->file('banner.file')->store('banners', 'public'))
@@ -104,11 +97,11 @@ class CardController extends Controller
             'address' => $request->address,
             'location' => $request->location,
             'qr_code' => $qrCodePath,
-            'business_hours' => $request->business_hours,
+            'business_hours' => $request->business_hours_enabled ? $request->business_hours : null,
         ]);
 
-        if($validated['links'] and count($validated['links']) > 0){
-            $this->storeCardLinks($validated['links'], $card);
+        if($request->links and count($request->links) > 0){
+            $this->storeCardLinks($request->links, $card);
         }
 
         if(isset($request->galleries)){

@@ -42,6 +42,7 @@ interface CardForm {
     business_hours: DaySchedule[];
     galleries: Gallery[];
     services: Service[];
+    business_hours_enabled: boolean;
     [key: string]: any; // Add index signature to allow string indexing
 }
 
@@ -157,7 +158,6 @@ export default function CreateCard() {
         phone: '',
         email: '',
         banner_color: colors[0],
-        // constract the links from cardSocialLinks
         links: links,
         address: '',
         location: '',
@@ -166,6 +166,7 @@ export default function CreateCard() {
         services: [
             { id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }
         ],
+        business_hours_enabled: false,
         business_hours: [
             { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '03:00', close: '11:00' },
             { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '03:00', close: '11:00' },
@@ -848,107 +849,125 @@ export default function CreateCard() {
                             <TabsContent value="business_hours">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Business Hours</CardTitle>
-                                        <CardDescription>Set the operating hours for your organization</CardDescription>
+                                        <div className="flex items-center  justify-between">
+                                            <div>
+                                                <CardTitle>Business Hours</CardTitle>
+                                                <CardDescription>Set the operating hours for your organization</CardDescription>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <Switch
+                                                    id="business-hours-toggle"
+                                                    checked={data.business_hours_enabled}
+                                                    onCheckedChange={(checked) => setData('business_hours_enabled', checked)}
+                                                />
+                                                {/* <Label htmlFor="business-hours-toggle">Enable Business Hours</Label> */}
+                                            </div>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
-                                        {data.business_hours.map((day: DaySchedule, index) => (
-                                            <div key={day.id} className="rounded-lg border p-4">
-                                                <div className="mb-4 flex items-center justify-between">
-                                                    <div className="flex items-center space-x-2">
-                                                        <Switch
-                                                            id={`${day.id}-toggle`}
-                                                            checked={day.isOpen}
-                                                            onCheckedChange={() => toggleDayOpen(day)}
-                                                        />
-                                                        <Label htmlFor={`${day.id}-toggle`} className="text-lg font-medium">
-                                                            {day.day}
-                                                        </Label>
-                                                    </div>
-                                                    {day.isOpen && (
-                                                        <div className="flex items-center gap-2">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => copyToAllDays(day)}
-                                                                className="flex items-center gap-2"
-                                                            >
-                                                                <Copy className="h-4 w-4 md:hidden" />
-                                                                <span className="hidden md:inline">Apply to all days</span>
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                {day.isOpen ? (
-                                                    <div className="space-y-3">
-                                                        <div className="flex flex-row items-center gap-2 md:flex-row">
-                                                            <div className="flex items-center">
-                                                                <Clock className="text-muted-foreground mr-2 hidden h-4 w-4 md:block" />
-                                                                <Select
-                                                                    value={day.open}
-                                                                    onValueChange={(value) => updateTimeSlot(day, 'open', value)}
-                                                                >
-                                                                    <SelectTrigger className="w-[100px] md:w-[150px]">
-                                                                        <SelectValue placeholder="Opening time" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {timeOptions.map((time) => (
-                                                                            <SelectItem key={`open-${time}`} value={time}>
-                                                                                {time}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            <span className="text-muted-foreground">to</span>
-
-                                                            <div className="flex items-center">
-                                                                <Select
-                                                                    value={day.close}
-                                                                    onValueChange={(value) => updateTimeSlot(day, 'close', value)}
-                                                                >
-                                                                    <SelectTrigger className="w-[100px] md:w-[150px]">
-                                                                        <SelectValue placeholder="Closing time" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {timeOptions.map((time) => (
-                                                                            <SelectItem key={`open-${time}`} value={time}>
-                                                                                {time}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                        </div>
-                                                        {errors[`business_hours.${index}.open` as keyof typeof errors] &&
-                                                        errors[`business_hours.${index}.close` as keyof typeof errors] ? (
-                                                            <InputError
-                                                                message={`please select both opening and closing time for ${day.day}`}
-                                                                className="mt-2"
+                                        {data.business_hours_enabled ? (
+                                            data.business_hours.map((day: DaySchedule, index) => (
+                                                <div key={day.id} className="rounded-lg border p-4">
+                                                    <div className="mb-4 flex items-center justify-between">
+                                                        <div className="flex items-center space-x-2">
+                                                            <Switch
+                                                                id={`${day.id}-toggle`}
+                                                                checked={day.isOpen}
+                                                                onCheckedChange={() => toggleDayOpen(day)}
                                                             />
-                                                        ) : (
-                                                            <>
-                                                                {errors[`business_hours.${index}.open` as keyof typeof errors] && (
-                                                                    <InputError
-                                                                        message={errors[`business_hours.${index}.open` as keyof typeof errors]}
-                                                                        className="mt-2"
-                                                                    />
-                                                                )}
-                                                                {errors[`business_hours.${index}.close` as keyof typeof errors] && (
-                                                                    <InputError
-                                                                        message={errors[`business_hours.${index}.close` as keyof typeof errors]}
-                                                                        className="mt-2"
-                                                                    />
-                                                                )}
-                                                            </>
+                                                            <Label htmlFor={`${day.id}-toggle`} className="text-lg font-medium">
+                                                                {day.day}
+                                                            </Label>
+                                                        </div>
+                                                        {day.isOpen && (
+                                                            <div className="flex items-center gap-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => copyToAllDays(day)}
+                                                                    className="flex items-center gap-2"
+                                                                >
+                                                                    <Copy className="h-4 w-4 md:hidden" />
+                                                                    <span className="hidden md:inline">Apply to all days</span>
+                                                                </Button>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                ) : (
-                                                    <div className="text-muted-foreground italic">Closed</div>
-                                                )}
+                                                    {day.isOpen ? (
+                                                        <div className="space-y-3">
+                                                            <div className="flex flex-row items-center gap-2 md:flex-row">
+                                                                <div className="flex items-center">
+                                                                    <Clock className="text-muted-foreground mr-2 hidden h-4 w-4 md:block" />
+                                                                    <Select
+                                                                        value={day.open}
+                                                                        onValueChange={(value) => updateTimeSlot(day, 'open', value)}
+                                                                    >
+                                                                        <SelectTrigger className="w-[100px] md:w-[150px]">
+                                                                            <SelectValue placeholder="Opening time" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {timeOptions.map((time) => (
+                                                                                <SelectItem key={`open-${time}`} value={time}>
+                                                                                    {time}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+                                                                <span className="text-muted-foreground">to</span>
+
+                                                                <div className="flex items-center">
+                                                                    <Select
+                                                                        value={day.close}
+                                                                        onValueChange={(value) => updateTimeSlot(day, 'close', value)}
+                                                                    >
+                                                                        <SelectTrigger className="w-[100px] md:w-[150px]">
+                                                                            <SelectValue placeholder="Closing time" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {timeOptions.map((time) => (
+                                                                                <SelectItem key={`open-${time}`} value={time}>
+                                                                                    {time}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+                                                            </div>
+                                                            {errors[`business_hours.${index}.open` as keyof typeof errors] &&
+                                                            errors[`business_hours.${index}.close` as keyof typeof errors] ? (
+                                                                <InputError
+                                                                    message={`please select both opening and closing time for ${day.day}`}
+                                                                    className="mt-2"
+                                                                />
+                                                            ) : (
+                                                                <>
+                                                                    {errors[`business_hours.${index}.open` as keyof typeof errors] && (
+                                                                        <InputError
+                                                                            message={errors[`business_hours.${index}.open` as keyof typeof errors]}
+                                                                            className="mt-2"
+                                                                        />
+                                                                    )}
+                                                                    {errors[`business_hours.${index}.close` as keyof typeof errors] && (
+                                                                        <InputError
+                                                                            message={errors[`business_hours.${index}.close` as keyof typeof errors]}
+                                                                            className="mt-2"
+                                                                        />
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-muted-foreground italic">Closed</div>
+                                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center text-muted-foreground">
+                                                Business hours are disabled. Enable the toggle above to set your business hours.
                                             </div>
-                                        ))}
+                                        )}
                                     </CardContent>
                                 </Card>
                             </TabsContent>

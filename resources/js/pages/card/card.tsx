@@ -180,7 +180,10 @@ export default function MuluCard({
                     </Card>
                 )}
 
-                <BusinessHoursPreview business_hours={business_hours} />
+                {business_hours && (
+                    <BusinessHoursPreview business_hours={business_hours} />
+                )}
+
 
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
                     <div className="flex items-center justify-center gap-2 p-2">
