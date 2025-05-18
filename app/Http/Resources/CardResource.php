@@ -64,6 +64,7 @@ class CardResource extends JsonResource
             'address' => $this->address,
             'location' => $this->location,
             'business_hours' => $this->business_hours,
+            'business_hours_enabled' => $this->business_hours !== null ? true : false,
             'total_views' => $this->total_views,
             'total_saves' => $this->total_saves
         ];

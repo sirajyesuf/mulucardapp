@@ -42,10 +42,10 @@ class UpdateCardRequest extends FormRequest
                 'organization' => 'required|string|max:255',
                 'job_title' => 'required|string|max:255',
                 'headline' => 'required|string|max:255',
-                'address' => 'required|string|max:255',
-                'location' => 'required|string|max:255',
+                'address' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
 
-                'links' => 'required|array|max:100',
+                'links' => 'array|max:100',
                 'links.*.name' => 'required|string|max:255',
                 'links.*.url' => "nullable|url:https",
             

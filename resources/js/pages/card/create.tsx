@@ -785,14 +785,15 @@ export default function CreateCard() {
                                                             <Icon className="h-6 w-6" />
                                                             {link.name}
                                                         </div>
-                                                        <Button 
+                                                        <Button
                                                             type="button"
-                                                            variant="ghost" 
-                                                            size="icon" 
-                                                            onClick={() => removeLinkItem(link.name)} 
-                                                            className='h-6 w-6 flex flex-row items-center justify-center hover:bg-red-500 hover:text-white'
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeLinkItem(link.name)}
+                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
                                                         >
-                                                            <X className="h-4 w-4" />
+                                                            <X className="h-5 w-5" />
+                                                            <span className="sr-only">Remove</span>
                                                         </Button>
                                                     </div>
                                                     <Input
@@ -999,6 +1000,10 @@ export default function CreateCard() {
 
                                                         <div className="space-y-4">
                                                             <div>
+                                                                <Label htmlFor={`image-${item.id}`} className="text-sm font-medium text-black flex items-center gap-1">
+                                                                    <span>Upload Your Image</span>
+                                                                    <span className="text-red-500 text-lg">*</span>
+                                                                </Label>
                                                                 <div className="flex flex-col gap-2">
                                                                     {item.file ? (
                                                                         <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -1036,17 +1041,17 @@ export default function CreateCard() {
                                                                             </Button>
                                                                         </div>
                                                                     )}
-
-                                                                    <InputError
-                                                                        message={errors[`services.${index}.file` as keyof typeof errors]}
-                                                                        className="mt-2"
-                                                                    />
                                                                 </div>
+                                                                <InputError
+                                                                    message={errors[`services.${index}.file` as keyof typeof errors]}
+                                                                    className="mt-2"
+                                                                />
                                                             </div>
 
                                                             <div>
-                                                                <Label htmlFor="name" className="mb-2 block">
-                                                                    Name
+                                                                <Label htmlFor="name" className="mb-2 block flex items-center gap-1">
+                                                                    <span>Name</span>
+                                                                    <span className="text-red-500 text-lg">*</span>
                                                                 </Label>
                                                                 <Input
                                                                     id="name"
@@ -1062,8 +1067,9 @@ export default function CreateCard() {
                                                             </div>
 
                                                             <div>
-                                                                <Label htmlFor={`description-${item.id}`} className="mb-2 block">
-                                                                    Description
+                                                                <Label htmlFor={`description-${item.id}`} className="mb-2 block flex items-center gap-1">
+                                                                    <span>Description</span>
+                                                                    <span className="text-red-500 text-lg">*</span>
                                                                 </Label>
                                                                 <Textarea
                                                                     id={`description-${item.id}`}
@@ -1162,8 +1168,9 @@ export default function CreateCard() {
 
                                                         <div className="space-y-4">
                                                             <div>
-                                                                <Label htmlFor={`image-${item.id}`} className="mb-2 block">
-                                                                    Image {index + 1}
+                                                                <Label htmlFor={`image-${item.id}`} className="text-sm font-medium text-black flex items-center gap-1">
+                                                                    <span>Upload Your Image</span>
+                                                                    <span className="text-red-500 text-lg">*</span>
                                                                 </Label>
                                                                 <div className="flex flex-col gap-2">
                                                                     {item.file ? (
@@ -1210,8 +1217,9 @@ export default function CreateCard() {
                                                             </div>
 
                                                             <div>
-                                                                <Label htmlFor={`description-${item.id}`} className="mb-2 block">
-                                                                    Description
+                                                                <Label htmlFor={`description-${item.id}`} className="mb-2 block flex items-center gap-1">
+                                                                    <span>Description</span>
+                                                                    <span className="text-red-500 text-lg">*</span>
                                                                 </Label>
                                                                 <Textarea
                                                                     id={`description-${item.id}`}

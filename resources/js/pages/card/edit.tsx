@@ -15,7 +15,7 @@ import { type BreadcrumbItem, type Card as CardType, type DaySchedule, type Gall
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, ShieldAlert, Upload, X } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { Link } from '@inertiajs/react'
 
 
@@ -31,12 +31,13 @@ interface CardForm {
     phone: string;
     banner_color: string;
     links: LinkType[];
-    location: string;
-    address: string;
+    location: string | null;
+    address: string | null;
     headline: string;
     business_hours: DaySchedule[];
     galleries: Gallery[];
     services: Service[];
+    business_hours_enabled: boolean;
     [key: string]: any; // Add index signature to allow string indexing
 }
 
@@ -59,6 +60,26 @@ export default function EditCard({ card }: { card: CardType }) {
     const existingLinksMap = new Map(
         (card.links || []).map((link) => [link.name, link.url])
     );
+
+    const [removedLinks, setRemovedLinks] = useState<string[]>([]);
+
+    const removeLinkItem = (name: string) => {
+        setData(
+            'links',
+            data.links.filter((link: LinkType) => link.name !== name),
+        );
+        setRemovedLinks([...removedLinks, name]);
+    };
+
+    const addBackLink = (name: string) => {
+        const newLink = {
+            name: name,
+            url: '',
+            placeholder: `https://${name.toLowerCase()}.com/your-profile`,
+        };
+        setData('links', [...data.links, newLink]);
+        setRemovedLinks(removedLinks.filter(link => link !== name));
+    };
 
     const links = cardSocialLinks.map((linkName) => ({
         name: linkName,
@@ -96,8 +117,16 @@ export default function EditCard({ card }: { card: CardType }) {
         headline: card.headline,
         galleries: card.galleries?.length > 0 ? card.galleries : [],
         services: card.services?.length > 0 ? card.services : [],
-        business_hours: card.business_hours
-
+        business_hours_enabled: card.business_hours !== null,
+        business_hours: card.business_hours || [
+            { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '09:00', close: '17:00' },
+            { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '09:00', close: '17:00' },
+            { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '09:00', close: '17:00' },
+            { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '09:00', close: '17:00' },
+            { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '09:00', close: '17:00' },
+            { id: crypto.randomUUID(), day: 'Saturday', isOpen: false, open: '09:00', close: '17:00' },
+            { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '09:00', close: '17:00' }
+        ]
     });
 
 
@@ -107,7 +136,7 @@ export default function EditCard({ card }: { card: CardType }) {
         );
     };
 
-    const DisplayError = hasTabError(['avatar.file', 'banner.file', 'logo.file'], errors);
+    const DisplayError = hasTabError(['avatar.file', 'banner.file', 'banner.path','logo.file'], errors);
 
     
     const personalInformationError = hasTabError(
@@ -423,7 +452,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                     <CardContent className="space-y-4">
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="banner-upload" className="text-sm font-medium text-black">
-                                                Upload Your Banner
+                                                Upload Your Banner <span className="text-red-500 text-lg">*</span>
                                             </Label>
                                             {data.banner.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -458,7 +487,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Upload Your Avatar
+                                                Upload Your Avatar <span className="text-red-500 text-lg">*</span>
                                             </Label>
                                             {data.avatar.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -493,7 +522,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="logo-upload" className="text-sm font-medium text-black">
-                                                Upload Your Logo
+                                                Upload Your Logo <span className="text-red-500 text-lg">*</span>
                                             </Label>
                                             {data.logo.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -563,7 +592,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                         </div> */}
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="fname">First Name</Label>
+                                                <Label htmlFor="fname">First Name <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="fname"
                                                     value={data.first_name}
@@ -573,7 +602,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 <InputError message={errors.first_name} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="lname">Last Name</Label>
+                                                <Label htmlFor="lname">Last Name <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="lname"
                                                     value={data.last_name}
@@ -586,7 +615,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="organization">Organization</Label>
+                                                <Label htmlFor="organization">Organization <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="organization"
                                                     value={data.organization}
@@ -596,7 +625,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 <InputError message={errors.organization} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="jobtitle">Job Title</Label>
+                                                <Label htmlFor="jobtitle">Job Title <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="jobtitle"
                                                     value={data.job_title}
@@ -609,7 +638,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="phone">Phone</Label>
+                                                <Label htmlFor="phone">Phone <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="phone"
                                                     type="tel"
@@ -620,7 +649,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 <InputError message={errors.phone} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="email">Email</Label>
+                                                <Label htmlFor="email">Email <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="email"
                                                     type="email"
@@ -633,7 +662,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="headline">Headline</Label>
+                                            <Label htmlFor="headline">Headline <span className="text-red-500 text-lg">*</span></Label>
                                             <Textarea
                                                 id="headline"
                                                 className="h-30 w-full"
@@ -657,9 +686,21 @@ export default function EditCard({ card }: { card: CardType }) {
                                             const Icon = socialIconMap[link.name.toLowerCase()] || null;
                                             return (
                                                 <div key={index} className="space-y-2 rounded-lg border-2 border-dashed p-2">
-                                                    <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
-                                                        {Icon && <Icon className="h-6 w-6" />}
-                                                        {link.name}
+                                                    <div className="text-md flex h-[50px] flex-row items-center justify-between border-none px-4 font-bold">
+                                                        <div className="flex items-center gap-2">
+                                                            {Icon && <Icon className="h-6 w-6" />}
+                                                            {link.name}
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeLinkItem(link.name)}
+                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                        >
+                                                            <X className="h-5 w-5" />
+                                                            <span className="sr-only">Remove</span>
+                                                        </Button>
                                                     </div>
                                                     <Input
                                                         type="url"
@@ -677,6 +718,26 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 </div>
                                             );
                                         })}
+                                        {removedLinks.length > 0 && (
+                                            <div className="mt-4">
+                                                <h3 className="mb-2 text-sm font-medium">Removed Links</h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {removedLinks.map((linkName) => (
+                                                        <Button
+                                                            key={linkName}
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => addBackLink(linkName)}
+                                                            className="flex items-center gap-2"
+                                                        >
+                                                            <PlusCircle className="h-4 w-4" />
+                                                            {linkName}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </TabsContent>
@@ -713,99 +774,116 @@ export default function EditCard({ card }: { card: CardType }) {
                             <TabsContent value="business_hours">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Business Hours</CardTitle>
-                                        <CardDescription>Update the operating hours for your organization.</CardDescription>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <CardTitle>Business Hours</CardTitle>
+                                                <CardDescription>Update the operating hours for your organization.</CardDescription>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <Switch
+                                                    id="business-hours-toggle"
+                                                    checked={data.business_hours_enabled}
+                                                    onCheckedChange={(checked) => setData('business_hours_enabled', checked)}
+                                                />
+                                            </div>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
-                                        {data.business_hours.map((day: DaySchedule, index) => (
-                                            <div key={day.id} className="rounded-lg border p-4">
-                                                <div className="mb-4 flex items-center justify-between">
-                                                    <div className="flex items-center space-x-2">
-                                                        <Switch
-                                                            id={`${day.id}-toggle`}
-                                                            checked={day.isOpen}
-                                                            onCheckedChange={() => toggleDayOpen(day)}
-                                                        />
-                                                        <Label htmlFor={`${day.id}-toggle`} className="text-lg font-medium">
-                                                            {day.day}
-                                                        </Label>
-                                                    </div>
-                                                    {day.isOpen && (
-                                                        <div className="flex items-center gap-2">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => copyToAllDays(day)}
-                                                                className="flex items-center gap-2"
-                                                            >
-                                                                <Copy className="h-4 w-4 md:hidden" />
-                                                                <span className="hidden md:inline">Apply to all days</span>
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                {day.isOpen ? (
-                                                    <div className="space-y-3">
-                                                        <div className="flex flex-row items-center gap-2 md:flex-row">
-                                                            <div className="flex items-center">
-                                                                <Clock className="text-muted-foreground mr-2 hidden h-4 w-4 md:block" />
-                                                                <Select
-                                                                    value={day.open}
-                                                                    onValueChange={(value) => updateTimeSlot(day, 'open', value)}
-                                                                >
-                                                                    <SelectTrigger className="w-[100px] md:w-[150px]">
-                                                                        <SelectValue placeholder="Opening time" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {timeOptions.map((time) => (
-                                                                            <SelectItem key={`open-${time}`} value={time}>
-                                                                                {time}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            <span className="text-muted-foreground">to</span>
-                                                            <div className="flex items-center">
-                                                                <Select
-                                                                    value={day.close}
-                                                                    onValueChange={(value) => updateTimeSlot(day, 'close', value)}
-                                                                >
-                                                                    <SelectTrigger className="w-[100px] md:w-[150px]">
-                                                                        <SelectValue placeholder="Closing time" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {timeOptions.map((time) => (
-                                                                            <SelectItem key={`close-${time}`} value={time}>
-                                                                                {time}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                        </div>
-                                                        {errors[`business_hours.${index}.open`] && errors[`business_hours.${index}.close`] ? (
-                                                            <InputError
-                                                                message={`Please select both opening and closing time for ${day.day}`}
-                                                                className="mt-2"
+                                        {data.business_hours_enabled ? (
+                                            data.business_hours.map((day: DaySchedule, index) => (
+                                                <div key={day.id} className="rounded-lg border p-4">
+                                                    <div className="mb-4 flex items-center justify-between">
+                                                        <div className="flex items-center space-x-2">
+                                                            <Switch
+                                                                id={`${day.id}-toggle`}
+                                                                checked={day.isOpen}
+                                                                onCheckedChange={() => toggleDayOpen(day)}
                                                             />
-                                                        ) : (
-                                                            <>
-                                                                {errors[`business_hours.${index}.open`] && (
-                                                                    <InputError message={errors[`business_hours.${index}.open`]} className="mt-2" />
-                                                                )}
-                                                                {errors[`business_hours.${index}.close`] && (
-                                                                    <InputError message={errors[`business_hours.${index}.close`]} className="mt-2" />
-                                                                )}
-                                                            </>
+                                                            <Label htmlFor={`${day.id}-toggle`} className="text-lg font-medium">
+                                                                {day.day}
+                                                            </Label>
+                                                        </div>
+                                                        {day.isOpen && (
+                                                            <div className="flex items-center gap-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => copyToAllDays(day)}
+                                                                    className="flex items-center gap-2"
+                                                                >
+                                                                    <Copy className="h-4 w-4 md:hidden" />
+                                                                    <span className="hidden md:inline">Apply to all days</span>
+                                                                </Button>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                ) : (
-                                                    <div className="text-muted-foreground italic">Closed</div>
-                                                )}
+                                                    {day.isOpen ? (
+                                                        <div className="space-y-3">
+                                                            <div className="flex flex-row items-center gap-2 md:flex-row">
+                                                                <div className="flex items-center">
+                                                                    <Clock className="text-muted-foreground mr-2 hidden h-4 w-4 md:block" />
+                                                                    <Select
+                                                                        value={day.open}
+                                                                        onValueChange={(value) => updateTimeSlot(day, 'open', value)}
+                                                                    >
+                                                                        <SelectTrigger className="w-[100px] md:w-[150px]">
+                                                                            <SelectValue placeholder="Opening time" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {timeOptions.map((time) => (
+                                                                                <SelectItem key={`open-${time}`} value={time}>
+                                                                                    {time}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+                                                                <span className="text-muted-foreground">to</span>
+                                                                <div className="flex items-center">
+                                                                    <Select
+                                                                        value={day.close}
+                                                                        onValueChange={(value) => updateTimeSlot(day, 'close', value)}
+                                                                    >
+                                                                        <SelectTrigger className="w-[100px] md:w-[150px]">
+                                                                            <SelectValue placeholder="Closing time" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {timeOptions.map((time) => (
+                                                                                <SelectItem key={`close-${time}`} value={time}>
+                                                                                    {time}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+                                                            </div>
+                                                            {errors[`business_hours.${index}.open`] && errors[`business_hours.${index}.close`] ? (
+                                                                <InputError
+                                                                    message={`Please select both opening and closing time for ${day.day}`}
+                                                                    className="mt-2"
+                                                                />
+                                                            ) : (
+                                                                <>
+                                                                    {errors[`business_hours.${index}.open`] && (
+                                                                        <InputError message={errors[`business_hours.${index}.open`]} className="mt-2" />
+                                                                    )}
+                                                                    {errors[`business_hours.${index}.close`] && (
+                                                                        <InputError message={errors[`business_hours.${index}.close`]} className="mt-2" />
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-muted-foreground italic">Closed</div>
+                                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center text-muted-foreground">
+                                                Business hours are disabled. Enable the toggle above to set your business hours.
                                             </div>
-                                        ))}
+                                        )}
                                     </CardContent>
                                 </Card>
                             </TabsContent>

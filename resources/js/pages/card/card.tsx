@@ -21,8 +21,8 @@ type MuluCardProps = {
         url: string;
         placeholder: string;
     }[];
-    address: string;
-    location: string;
+    address: string | null;
+    location: string | null;
     galleries: Gallery[];
     services: Service[];
     business_hours: DaySchedule[];
@@ -185,6 +185,9 @@ export default function MuluCard({
                 )}
 
 
+                {address && location && (
+
+
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
                     <div className="flex items-center justify-center gap-2 p-2">
                         <MapPin className="h-8 w-8" color={banner_color} />
@@ -196,6 +199,7 @@ export default function MuluCard({
                         </a>
                     </div>
                 </div>
+                )}
             </CardContent>
         </Card>
     );

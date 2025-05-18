@@ -65,8 +65,8 @@ export interface Card {
         url: string;
         placeholder: string;
     }[];
-    location: string;
-    address: string;
+    location: string | null;
+    address: string | null;
     headline: string;
     galleries: Gallery[];
     services: Service[];

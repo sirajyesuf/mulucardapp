@@ -148,8 +148,6 @@ class CardController extends Controller
 
         $validated = $request->validated();
         $card = Card::findOrFail($id);
-        // dd($card);
-
 
 
         // Handle file uploads
