@@ -531,7 +531,7 @@ export default function CreateCard() {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Upload Your Banner
+                                                Upload Your Banner <span className="text-red-500 text-lg">*</span>
                                             </Label>
                                             {data.banner.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -567,7 +567,7 @@ export default function CreateCard() {
                                         {/* banner end */}
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Upload Your Avatar
+                                                Upload Your Avatar <span className="text-red-500 text-lg">*</span>
                                             </Label>
                                             {data.avatar.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -603,7 +603,7 @@ export default function CreateCard() {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Upload Your Logo
+                                                Upload Your Logo <span className="text-red-500 text-lg">*</span>
                                             </Label>
                                             {data.logo.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
