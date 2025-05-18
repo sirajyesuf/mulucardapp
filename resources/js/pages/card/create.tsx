@@ -14,7 +14,7 @@ import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
 import { Head, useForm,usePage } from '@inertiajs/react';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X ,ShieldAlert,Globe} from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -58,6 +58,25 @@ export default function CreateCard() {
         placeholder: `https://${link.toLowerCase()}.com/your-profile`,
     }));
 
+    const [removedLinks, setRemovedLinks] = useState<string[]>([]);
+
+    const removeLinkItem = (name: string) => {
+        setData(
+            'links',
+            data.links.filter((link: Link) => link.name !== name),
+        );
+        setRemovedLinks([...removedLinks, name]);
+    };
+
+    const addBackLink = (name: string) => {
+        const newLink = {
+            name: name,
+            url: '',
+            placeholder: `https://${name.toLowerCase()}.com/your-profile`,
+        };
+        setData('links', [...data.links, newLink]);
+        setRemovedLinks(removedLinks.filter(link => link !== name));
+    };
 
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
 
@@ -638,12 +657,12 @@ export default function CreateCard() {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Personal</CardTitle>
-                                        <CardDescription>Make changes to your account here.</CardDescription>
+                                        <CardDescription>Make changes to your personal information here.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="fname">First Name</Label>
+                                                <Label htmlFor="fname" className="flex items-center gap-1"><span>First Name</span> <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="fname"
                                                     value={data.first_name}
@@ -653,7 +672,7 @@ export default function CreateCard() {
                                                 <InputError message={errors.first_name} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="lname">Last Name</Label>
+                                                <Label htmlFor="lname" className="flex items-center gap-1"><span>Last Name</span> <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="lname"
                                                     value={data.last_name}
@@ -666,7 +685,7 @@ export default function CreateCard() {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="organization">Organization</Label>
+                                                <Label htmlFor="organization" className="flex items-center gap-1"><span>Organization</span> <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="organization"
                                                     value={data.organization}
@@ -676,7 +695,7 @@ export default function CreateCard() {
                                                 <InputError message={errors.organization} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="jobtitle">Job Title</Label>
+                                                <Label htmlFor="jobtitle" className="flex items-center gap-1"><span>Job Title</span> <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="jobtitle"
                                                     value={data.job_title}
@@ -690,7 +709,7 @@ export default function CreateCard() {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="phone">Phone</Label>
+                                                <Label htmlFor="phone" className="flex items-center gap-1"><span>Phone</span> <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="phone"
                                                     type="tel"
@@ -703,7 +722,7 @@ export default function CreateCard() {
                                             </div>
 
                                             <div className="space-y-1">
-                                                <Label htmlFor="email">Email</Label>
+                                                <Label htmlFor="email" className="flex items-center gap-1"><span>Email</span> <span className="text-red-500 text-lg">*</span></Label>
                                                 <Input
                                                     id="email"
                                                     type="email"
@@ -716,7 +735,9 @@ export default function CreateCard() {
                                             </div>
                                         </div>
 
-                                        <div>
+                                        <div className="border-2 border-dashed rounded-lg p-2">
+
+                                            <Label htmlFor="headline" className="flex items-center gap-1"><span>Headline</span> <span className="text-red-500 text-lg">*</span></Label>
                                             <Textarea
                                                 className="h-30 w-full"
                                                 placeholder="enter your headline text"
@@ -733,15 +754,45 @@ export default function CreateCard() {
                                     <CardHeader>
                                         <CardTitle>Links</CardTitle>
                                         <CardDescription>add social media links.</CardDescription>
+                                        {removedLinks.length > 0 && (
+                                            <div className="mt-4 space-y-2">
+                                                <h3 className="text-sm font-medium text-gray-500">Removed Links</h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {removedLinks.map((name) => (
+                                                        <Button
+                                                            key={name}
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => addBackLink(name)}
+                                                            className="flex items-center gap-2"
+                                                        >
+                                                            <PlusCircle className="h-4 w-4" />
+                                                            {name}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {data.links.map((link, index) => {
                                             const Icon = socialIconMap[link.name.toLowerCase()] || Globe;
                                             return (
                                                 <div key={index} className="space-y-2 rounded-lg border-2 border-dashed p-2">
-                                                    <div className="text-md flex h-[50px] flex-row items-center gap-2 border-none px-4 font-bold">
-                                                        <Icon className="h-6 w-6" />
-                                                        {link.name}
+                                                    <div className="text-md flex h-[50px] flex-row items-center justify-between gap-2 border-none px-4 font-bold">
+                                                        <div className="flex flex-row items-center gap-2">
+                                                            <Icon className="h-6 w-6" />
+                                                            {link.name}
+                                                        </div>
+                                                        <Button 
+                                                            type="button"
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            onClick={() => removeLinkItem(link.name)} 
+                                                            className='h-6 w-6 flex flex-row items-center justify-center hover:bg-red-500 hover:text-white'
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                     <Input
                                                         type="url"
@@ -755,7 +806,6 @@ export default function CreateCard() {
                                                         }}
                                                         disabled={processing}
                                                     />
-
                                                     <InputError message={errors[`links.${index}.url` as keyof typeof errors]} className="mt-2" />
                                                 </div>
                                             );

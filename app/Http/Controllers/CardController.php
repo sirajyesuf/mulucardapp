@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
-use App\Http\Requests\Card\CardRequest as Request;
+use App\Http\Requests\Card\CardRequest as StoreRequest;
 use App\Http\Requests\Card\UpdateCardRequest as UpdateRequest;
 use App\Models\Card;
 use Illuminate\Support\Facades\Storage;
@@ -61,11 +61,16 @@ class CardController extends Controller
     }
     }
 
-    public function  store(Request $request){
+    public function  store(StoreRequest $request){
+
+
 
 
 
         $validated = $request->validated();
+
+
+        // dd($validated);
 
         $bannerPath = $request->file('banner.file')
             ? Storage::url($request->file('banner.file')->store('banners', 'public'))
@@ -102,7 +107,7 @@ class CardController extends Controller
             'business_hours' => $request->business_hours,
         ]);
 
-        if(isset($validated['links'])){
+        if($validated['links'] and count($validated['links']) > 0){
             $this->storeCardLinks($validated['links'], $card);
         }
 

@@ -35,7 +35,7 @@ class CardRequest extends FormRequest
                 'organization' => 'required|string|max:255',
                 'job_title' => 'required|string|max:255',
                 'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
-                'links' => 'required|array|max:100',
+                'links' => 'array|max:100',
                 'links.*.name' => 'required|string|max:255',
                 'links.*.url' => "nullable|url:https",
                 'phone' => 'required|string|max:255',
@@ -63,7 +63,7 @@ class CardRequest extends FormRequest
                 'galleries.*.path' => 'required|string|max:255',
                 'galleries.*.description' => 'required|string|max:500',
 
-                //validation for services
+                // //validation for services
                 'services' => [
                     'nullable',
                     'array',
