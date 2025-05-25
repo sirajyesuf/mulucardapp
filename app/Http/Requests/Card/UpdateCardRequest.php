@@ -61,7 +61,31 @@ class UpdateCardRequest extends FormRequest
                     }
                 ],
                 'galleries.*.id' => 'required',
-                'galleries.*.file' => 'nullable|image|max:2048',
+                'galleries.*.file' => [
+                    'nullable',
+                    'image',
+                    'max:2048',
+                    function($attribute, $value, $fail) {
+                        // Get the gallery index from the attribute path
+                        preg_match('/galleries\.(\d+)\.file/', $attribute, $matches);
+                        $index = $matches[1] ?? null;
+                        
+                        if ($index !== null) {
+                            $galleries = request()->input('galleries', []);
+                            $gallery = $galleries[$index] ?? null;
+                            
+                            if ($gallery) {
+                                $galleryId = $gallery['id'] ?? null;
+                                $galleryPath = $gallery['path'] ?? null;
+                                
+                                // If this is a new gallery (UUID) and no file is provided and no existing path
+                                if ($galleryId && !is_numeric($galleryId) && !$value && !$galleryPath) {
+                                    $fail('The image file is required for new galleries.');
+                                }
+                            }
+                        }
+                    }
+                ],
                 'galleries.*.path' => 'nullable|string|max:255',
                 'galleries.*.description' => 'required|string|max:500',
 

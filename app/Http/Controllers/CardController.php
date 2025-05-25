@@ -353,15 +353,16 @@ class CardController extends Controller
 
         // Create new galleries
         foreach ($newGalleries as $gallery) {
+            // Skip galleries without files since images are required
+            if (!isset($gallery['file']) || $gallery['file'] === null) {
+                continue;
+            }
+            
+            $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
             $galleryData = [
                 'description' => $gallery['description'],
-                'path' => '/storage/galleries/default.jpg' // Default path when no file
+                'path' => Storage::url($path)
             ];
-            
-            if (isset($gallery['file']) && $gallery['file'] !== null) {
-                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
-                $galleryData['path'] = Storage::url($path);
-            }
             
             $card->galleries()->create($galleryData);
         }
