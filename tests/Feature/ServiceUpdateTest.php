@@ -105,4 +105,92 @@ class ServiceUpdateTest extends TestCase
         echo "- Removed service deleted correctly\n"; 
         echo "- New service created correctly\n";
     }
+
+    public function test_gallery_update_logic()
+    {
+        // Create a user and card manually
+        $user = User::create([
+            'name' => 'Test User',
+            'email' => 'test2@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        
+        $card = Card::create([
+            'user_id' => $user->id,
+            'url' => 'test-card-2',
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'test2@example.com',
+            'phone' => '1234567890',
+            'organization' => 'Test Org',
+            'job_title' => 'Developer',
+            'headline' => 'Test headline',
+            'banner_color' => '#000000',
+            'banner' => '/storage/banners/test-banner.jpg'
+        ]);
+        
+        // Create existing galleries
+        $gallery1 = $card->galleries()->create([
+            'description' => 'Gallery 1 Description',
+            'path' => '/storage/galleries/gallery1.jpg'
+        ]);
+        
+        $gallery2 = $card->galleries()->create([
+            'description' => 'Gallery 2 Description',
+            'path' => '/storage/galleries/gallery2.jpg'
+        ]);
+
+        // Simulate request data
+        $galleries = [
+            // Update existing gallery 1
+            [
+                'id' => (string)$gallery1->id, // Existing gallery (numeric ID as string)
+                'description' => 'Updated Gallery 1 Description',
+                'file' => null,
+                'path' => '/storage/galleries/gallery1.jpg'
+            ],
+            // Add new gallery (UUID)
+            [
+                'id' => '550e8400-e29b-41d4-a716-446655440001', // New gallery (UUID)
+                'description' => 'New Gallery Description',
+                'file' => null, // Simplified - no file upload for test
+                'path' => null
+            ]
+            // Note: gallery2 is not included, so it should be deleted
+        ];
+
+        // Test the logic
+        $controller = new \App\Http\Controllers\CardController();
+        $reflection = new \ReflectionClass($controller);
+        $method = $reflection->getMethod('updateGalleries');
+        $method->setAccessible(true);
+        
+        // Call the method
+        $method->invoke($controller, $card, $galleries);
+        
+        // Refresh the card to get updated galleries
+        $card->refresh();
+        $updatedGalleries = $card->galleries()->get();
+        
+        // Assertions
+        $this->assertEquals(2, $updatedGalleries->count(), 'Should have 2 galleries after update');
+        
+        // Check that gallery1 was updated
+        $updatedGallery1 = $updatedGalleries->where('id', $gallery1->id)->first();
+        $this->assertNotNull($updatedGallery1, 'Gallery 1 should still exist');
+        $this->assertEquals('Updated Gallery 1 Description', $updatedGallery1->description);
+        
+        // Check that gallery2 was deleted
+        $this->assertNull($updatedGalleries->where('id', $gallery2->id)->first(), 'Gallery 2 should be deleted');
+        
+        // Check that new gallery was created
+        $newGallery = $updatedGalleries->where('description', 'New Gallery Description')->first();
+        $this->assertNotNull($newGallery, 'New gallery should be created');
+        $this->assertEquals('New Gallery Description', $newGallery->description);
+        
+        echo "✅ Gallery update logic test passed!\n";
+        echo "- Existing gallery updated correctly\n";
+        echo "- Removed gallery deleted correctly\n"; 
+        echo "- New gallery created correctly\n";
+    }
 } 

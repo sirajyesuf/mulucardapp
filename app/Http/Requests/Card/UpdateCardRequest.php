@@ -62,7 +62,7 @@ class UpdateCardRequest extends FormRequest
                 ],
                 'galleries.*.id' => 'required',
                 'galleries.*.file' => 'nullable|image|max:2048',
-                'galleries.*.path' => 'required|string|max:255',
+                'galleries.*.path' => 'nullable|string|max:255',
                 'galleries.*.description' => 'required|string|max:500',
 
 

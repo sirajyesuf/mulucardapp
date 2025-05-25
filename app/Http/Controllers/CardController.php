@@ -313,44 +313,85 @@ class CardController extends Controller
 
 
     protected function updateGalleries($card, $galleries){
-
-        // pluck all gallery ids from the $galleries
-        $galleryIds = array_filter(array_column($galleries, 'id'));
-
-        foreach($card->galleries as $gallery){
-            
-            if(!in_array($gallery->id, $galleryIds)){
-                $gallery->delete();
-            }
+        // If no galleries provided, delete all existing galleries
+        if (empty($galleries)) {
+            $card->galleries()->delete();
+            return;
         }
 
-        $dbGalleryIds = $card->galleries->pluck('id')->filter()->toArray();
-
-        foreach($galleries as $gallery){
-
-            if($gallery['file'] === null){
-                $card->galleries()->where('id', $gallery['id'])->update([
-                    'description' => $gallery['description']
-                ]);
-            }
-
-            if($gallery['file'] !== null and !in_array($gallery['id'], $dbGalleryIds)){
-                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
-                $card->galleries()->create([
-                    'path' => Storage::url($path),
-                    'description' => $gallery['description']
-                ]);
-            }
-
-            if($gallery['file'] !== null and in_array($gallery['id'], $dbGalleryIds)){
-                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
-                $card->galleries()->where('id', $gallery['id'])->update([
-                    'path' => Storage::url($path),
-                    'description' => $gallery['description']
-                ]);
-            }
-        }
+        // Get existing gallery IDs from database
+        $existingGalleries = $card->galleries()->get();
+        $existingGalleryIds = $existingGalleries->pluck('id')->toArray();
         
+        // Collect gallery IDs from request that are numeric (existing galleries)
+        $requestExistingIds = [];
+        $newGalleries = [];
+        $updateGalleries = [];
+
+        foreach ($galleries as $gallery) {
+            if (is_numeric($gallery['id'])) {
+                // This is an existing gallery
+                $requestExistingIds[] = (int)$gallery['id'];
+                $updateGalleries[] = $gallery;
+            } else {
+                // This is a new gallery (has UUID or non-numeric ID)
+                $newGalleries[] = $gallery;
+            }
+        }
+
+        // Delete galleries that are no longer in the request
+        $galleriesToDelete = array_diff($existingGalleryIds, $requestExistingIds);
+        if (!empty($galleriesToDelete)) {
+            // Delete old files before deleting records
+            foreach ($existingGalleries->whereIn('id', $galleriesToDelete) as $gallery) {
+                if ($gallery->path) {
+                    $this->deleteOldImage($gallery->path);
+                }
+            }
+            $card->galleries()->whereIn('id', $galleriesToDelete)->delete();
+        }
+
+        // Create new galleries
+        foreach ($newGalleries as $gallery) {
+            $galleryData = [
+                'description' => $gallery['description'],
+                'path' => '/storage/galleries/default.jpg' // Default path when no file
+            ];
+            
+            if (isset($gallery['file']) && $gallery['file'] !== null) {
+                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
+                $galleryData['path'] = Storage::url($path);
+            }
+            
+            $card->galleries()->create($galleryData);
+        }
+
+        // Update existing galleries
+        foreach ($updateGalleries as $gallery) {
+            $galleryId = (int)$gallery['id'];
+            $existingGallery = $existingGalleries->where('id', $galleryId)->first();
+            
+            if (!$existingGallery) {
+                continue; // Skip if gallery doesn't exist
+            }
+
+            $galleryData = [
+                'description' => $gallery['description']
+            ];
+            
+            // Handle file update
+            if (isset($gallery['file']) && $gallery['file'] !== null) {
+                // Delete old file if exists
+                if ($existingGallery->path) {
+                    $this->deleteOldImage($existingGallery->path);
+                }
+                
+                $path = Storage::disk('public')->putFile('galleries', $gallery['file']);
+                $galleryData['path'] = Storage::url($path);
+            }
+            
+            $card->galleries()->where('id', $galleryId)->update($galleryData);
+        }
     }
 
     protected function updateSocialLinks($card, $validated){
