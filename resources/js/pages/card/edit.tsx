@@ -204,7 +204,11 @@ export default function EditCard({ card }: { card: CardType }) {
     const handleServiceFileChange = (id: string, file: File | null) => {
         const newService = data.services.map((item: Service) => {
             if (item.id === id) {
-                return { ...item, file, path: file ? URL.createObjectURL(file) : null };
+                return { 
+                    ...item, 
+                    file, 
+                    path: file ? URL.createObjectURL(file) : null
+                };
             }
             return item;
         });
@@ -215,7 +219,10 @@ export default function EditCard({ card }: { card: CardType }) {
     const handleServiceDescriptionChange = (id: string, description: string) => {
         const newService = data.services.map((item: Service) => {
             if (item.id === id) {
-                return { ...item, description };
+                return { 
+                    ...item, 
+                    description
+                };
             }
             return item;
         });
@@ -225,7 +232,10 @@ export default function EditCard({ card }: { card: CardType }) {
     const handleServiceNameChange = (id: string, name: string) => {
         const newService = data.services.map((item: Service) => {
             if (item.id === id) {
-                return { ...item, name };
+                return { 
+                    ...item, 
+                    name
+                };
             }
             return item;
         });
@@ -247,7 +257,13 @@ export default function EditCard({ card }: { card: CardType }) {
     };
 
     const addMoreServiceItem = () => {
-        setData('services', [...data.services, { id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }]);
+        setData('services', [...data.services, { 
+            id: crypto.randomUUID(), 
+            file: null, 
+            path: null, 
+            name: '', 
+            description: ''
+        }]);
     };
 
     const removeGalleryItem = (id: string) => {

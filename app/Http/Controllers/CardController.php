@@ -208,42 +208,106 @@ class CardController extends Controller
     }
 
     protected function updateCardService($card, $services){
-        // pluck all services ids belongs the card
-        $serviceIds = $card->services->pluck('id')->filter()->toArray();
+        \Log::info('updateCardService called', [
+            'card_id' => $card->id,
+            'services_count' => count($services),
+            'services' => $services
+        ]);
 
-        //services length zero delelte all services
-        if(count($services) === 0){
+        // If no services provided, delete all existing services
+        if (empty($services)) {
             $card->services()->delete();
             return;
         }
 
-        foreach($services as $service){
+        // Get existing service IDs from database
+        $existingServices = $card->services()->get();
+        $existingServiceIds = $existingServices->pluck('id')->toArray();
+        
+        \Log::info('Existing services', [
+            'existing_ids' => $existingServiceIds
+        ]);
+        
+        // Collect service IDs from request that are numeric (existing services)
+        $requestExistingIds = [];
+        $newServices = [];
+        $updateServices = [];
+
+        foreach ($services as $service) {
+            if (is_numeric($service['id'])) {
+                // This is an existing service
+                $requestExistingIds[] = (int)$service['id'];
+                $updateServices[] = $service;
+            } else {
+                // This is a new service (has UUID or non-numeric ID)
+                $newServices[] = $service;
+            }
+        }
+
+        \Log::info('Categorized services', [
+            'request_existing_ids' => $requestExistingIds,
+            'new_services_count' => count($newServices),
+            'update_services_count' => count($updateServices)
+        ]);
+
+        // Delete services that are no longer in the request
+        $servicesToDelete = array_diff($existingServiceIds, $requestExistingIds);
+        if (!empty($servicesToDelete)) {
+            \Log::info('Deleting services', ['ids' => $servicesToDelete]);
+            // Delete old files before deleting records
+            foreach ($existingServices->whereIn('id', $servicesToDelete) as $service) {
+                if ($service->path) {
+                    $this->deleteOldImage($service->path);
+                }
+            }
+            $card->services()->whereIn('id', $servicesToDelete)->delete();
+        }
+
+        // Create new services
+        foreach ($newServices as $service) {
+            \Log::info('Creating new service', ['service' => $service]);
+            $serviceData = [
+                'name' => $service['name'],
+                'description' => $service['description'],
+                'path' => '/storage/services/default.jpg' // Default path when no file
+            ];
             
-            if($service['file'] === null){
-
-                $card->services()->where('id', $service['id'])->update([
-                    'name' => $service['name'],
-                    'description' => $service['description']
-                ]);
-            }
-
-            if($service['file'] !== null and !in_array($service['id'], $serviceIds)){
+            if (isset($service['file']) && $service['file'] !== null) {
                 $path = Storage::disk('public')->putFile('services', $service['file']);
-                $card->services()->create([
-                    'path' => Storage::url($path),
-                    'name' => $service['name'],
-                    'description' => $service['description']
-                ]);
+                $serviceData['path'] = Storage::url($path);
+            }
+            
+            $card->services()->create($serviceData);
+        }
+
+        // Update existing services
+        foreach ($updateServices as $service) {
+            $serviceId = (int)$service['id'];
+            $existingService = $existingServices->where('id', $serviceId)->first();
+            
+            if (!$existingService) {
+                continue; // Skip if service doesn't exist
             }
 
-            if($service['file'] !== null and in_array($service['id'], $serviceIds)){
+            \Log::info('Updating existing service', ['id' => $serviceId, 'service' => $service]);
+
+            $serviceData = [
+                'name' => $service['name'],
+                'description' => $service['description']
+            ];
+            
+            // Handle file update
+            if (isset($service['file']) && $service['file'] !== null) {
+                // Delete old file if exists
+                if ($existingService->path) {
+                    $this->deleteOldImage($existingService->path);
+                }
+                
                 $path = Storage::disk('public')->putFile('services', $service['file']);
-                $card->services()->where('id', $service['id'])->update([
-                    'path' => Storage::url($path),
-                    'name' => $service['name'],
-                    'description' => $service['description']
-                ]);
+                $serviceData['path'] = Storage::url($path);
             }
+            
+            $card->services()->where('id', $serviceId)->update($serviceData);
         }
     }
 
