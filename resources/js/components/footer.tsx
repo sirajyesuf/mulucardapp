@@ -6,17 +6,17 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="relative border-t bg-white">
+        <footer className="relative border-t bg-white dark:bg-gray-900">
             <div className="container mx-auto max-w-7xl px-4 py-12">
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
                     <div className="md:col-span-1">
                         <a href="/" className="mb-4 inline-block">
                             <span className="flex items-center text-xl font-semibold">
                                 <span className="text-brand-purple">mulu</span>
-                                <span>card</span>
+                                <span className="text-gray-900 dark:text-gray-100">card</span>
                             </span>
                         </a>
-                        <p className="text-muted-foreground mb-4 text-sm">Modern digital business cards for professionals.</p>
+                        <p className="text-muted-foreground dark:text-gray-300 mb-4 text-sm">Modern digital business cards for professionals.</p>
                         <div className="flex space-x-1">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                                 <Twitter className="h-4 w-4" />
@@ -31,20 +31,20 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-semibold">Company</h3>
+                        <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Company</h3>
                         <ul className="space-y-3">
                             <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                <a href="#" className="text-muted-foreground dark:text-gray-300 hover:text-foreground text-sm transition-colors">
                                     About
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                <a href="#" className="text-muted-foreground dark:text-gray-300 hover:text-foreground text-sm transition-colors">
                                     Blog
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                <a href="#" className="text-muted-foreground dark:text-gray-300 hover:text-foreground text-sm transition-colors">
                                     Contact Us
                                 </a>
                             </li>
@@ -52,15 +52,15 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-semibold">Legal</h3>
+                        <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Legal</h3>
                         <ul className="space-y-3">
                             <li>
-                                <a href={route("privacy-policy")} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                <a href={route("privacy-policy")} className="text-muted-foreground dark:text-gray-300 hover:text-foreground text-sm transition-colors">
                                     Privacy Policy
                                 </a>
                             </li>
                             <li>
-                                <a href={route("terms")} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                                <a href={route("terms")} className="text-muted-foreground dark:text-gray-300 hover:text-foreground text-sm transition-colors">
                                     Terms of Service
                                 </a>
                             </li>
@@ -71,7 +71,7 @@ export default function Footer() {
                 <Separator className="my-8" />
 
                 <div className="flex flex-col items-center justify-between md:flex-row">
-                    <p className="text-muted-foreground text-sm">&copy; {currentYear} Mulucard. All rights reserved.</p>
+                    <p className="text-muted-foreground dark:text-gray-300 text-sm">&copy; {currentYear} Mulucard. All rights reserved.</p>
                 </div>
             </div>
 
