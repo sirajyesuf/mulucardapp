@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HelloController;
 use Inertia\Inertia;
 use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\MulucardProController;
 use App\Http\Middleware\RestrictAdminFromCustomerPortal;
 
 require __DIR__.'/settings.php';
@@ -15,6 +16,7 @@ require __DIR__.'/auth.php';
 
 
 Route::get('/',[LandingPageController::class,"index"])->name("home");
+Route::get('/mulucardpro',[MulucardProController::class,"index"])->name("mulucardpro");
 
 
 

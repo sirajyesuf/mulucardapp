@@ -48,6 +48,9 @@ export default function Navbar() {
                         <a href="#pricing" className="hover:text-brand-purple text-sm font-medium transition-colors">
                             Pricing
                         </a>
+                        <Link href={route('mulucardpro')} className="hover:text-brand-purple text-sm font-medium transition-colors">
+                            MuluCard <span style={{ backgroundColor: '#9b87f5', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>PRO</span>
+                        </Link>
                     </nav>
 
                     {auth.user ? (
@@ -88,6 +91,9 @@ export default function Navbar() {
                         <a href="#pricing" className="hover:text-brand-purple text-sm font-medium transition-colors" onClick={() => setIsMenuOpen(false)}>
                             Pricing
                         </a>
+                        <Link href={route('mulucardpro')} className="hover:text-brand-purple text-sm font-medium transition-colors" onClick={() => setIsMenuOpen(false)}>
+                            MuluCard <span style={{ backgroundColor: '#9b87f5', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>PRO</span>
+                        </Link>
                         {auth.user ? (
                             <div className="">
                                 <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
