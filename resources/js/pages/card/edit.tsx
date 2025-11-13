@@ -492,7 +492,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                     <CardContent className="space-y-4">
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="banner-upload" className="text-sm font-medium text-black">
-                                                Upload Your Banner <span className="text-red-500 text-lg">*</span>
+                                                Upload Your Banner
                                             </Label>
                                             {data.banner.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -562,7 +562,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="logo-upload" className="text-sm font-medium text-black">
-                                                Upload Your Logo <span className="text-red-500 text-lg">*</span>
+                                                Upload Your Logo
                                             </Label>
                                             {data.logo.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -655,7 +655,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="organization">Organization <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="organization">Organization</Label>
                                                 <Input
                                                     id="organization"
                                                     value={data.organization}
@@ -665,7 +665,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 <InputError message={errors.organization} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="jobtitle">Job Title <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="jobtitle">Job Title</Label>
                                                 <Input
                                                     id="jobtitle"
                                                     value={data.job_title}
@@ -678,7 +678,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="phone">Phone <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="phone">Phone</Label>
                                                 <Input
                                                     id="phone"
                                                     type="tel"
@@ -689,7 +689,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 <InputError message={errors.phone} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="email">Email <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="email">Email</Label>
                                                 <Input
                                                     id="email"
                                                     type="email"
@@ -702,7 +702,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="headline">Headline <span className="text-red-500 text-lg">*</span></Label>
+                                            <Label htmlFor="headline">Headline</Label>
                                             <Textarea
                                                 id="headline"
                                                 className="h-30 w-full"

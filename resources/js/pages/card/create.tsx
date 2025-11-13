@@ -14,7 +14,7 @@ import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
 import { Head, useForm,usePage } from '@inertiajs/react';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X ,ShieldAlert,Globe} from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { ChangeEvent, FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -53,30 +53,31 @@ export default function CreateCard() {
     const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
     const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
     const cardSocialLinks = usePage<SharedData>().props.cardSocialLinks;
-    const links =  cardSocialLinks.map((link) => ({
-        name: link,
+    const createLink = (name: string) => ({
+        name,
         url: '',
-        placeholder: `https://${link.toLowerCase()}.com/your-profile`,
-    }));
+        placeholder: `https://${name.toLowerCase()}.com/your-profile`,
+    });
 
-    const [removedLinks, setRemovedLinks] = useState<string[]>([]);
+    const [removedLinks, setRemovedLinks] = useState<string[]>(() => [...cardSocialLinks]);
 
     const removeLinkItem = (name: string) => {
         setData(
             'links',
             data.links.filter((link: Link) => link.name !== name),
         );
-        setRemovedLinks([...removedLinks, name]);
+        setRemovedLinks(prev => (prev.includes(name) ? prev : [...prev, name]));
     };
 
     const addBackLink = (name: string) => {
-        const newLink = {
-            name: name,
-            url: '',
-            placeholder: `https://${name.toLowerCase()}.com/your-profile`,
-        };
+        if (data.links.some(link => link.name === name)) {
+            setRemovedLinks(prev => prev.filter(link => link !== name));
+            return;
+        }
+
+        const newLink = createLink(name);
         setData('links', [...data.links, newLink]);
-        setRemovedLinks(removedLinks.filter(link => link !== name));
+        setRemovedLinks(prev => prev.filter(link => link !== name));
     };
 
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
@@ -158,7 +159,7 @@ export default function CreateCard() {
         phone: '',
         email: '',
         banner_color: colors[0],
-        links: links,
+        links: [],
         address: '',
         location: '',
         headline: '',
@@ -210,7 +211,6 @@ export default function CreateCard() {
     const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
     
 
-    console.log("personalInformationError", personalInformationError)
 
     const handleGalleryFileChange = (id: string, file: File | null) => {
         const newGallery = data.galleries.map((item: Gallery) => {
@@ -338,8 +338,8 @@ export default function CreateCard() {
     const validItems = data.galleries.filter((item: Gallery) => item.file && item.path);
     const ValidServiceItems = data.services.filter((item: Service) => item.file && item.path);
 
-    const handleFileChange = (field: 'avatar' | 'logo'|'banner') => (e) => {
-        const file = e.target.files?.[0];
+    const handleFileChange = (field: 'avatar' | 'logo' | 'banner') => (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] ?? null;
 
         if(field === 'banner'){
             const newBanner = {
@@ -411,6 +411,7 @@ export default function CreateCard() {
                     <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-none md:block">
                         <ScrollArea className="h-[800px] cursor-pointer rounded-md border-1">
                             <MuluCard
+                                business_hours_enabled={data.business_hours_enabled}
                                 url={data.url}
                                 avatar={data.avatar}
                                 logo={data.logo}
@@ -531,7 +532,7 @@ export default function CreateCard() {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Upload Your Banner <span className="text-red-500 text-lg">*</span>
+                                                Upload Your Banner
                                             </Label>
                                             {data.banner.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -603,7 +604,7 @@ export default function CreateCard() {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Upload Your Logo <span className="text-red-500 text-lg">*</span>
+                                                Upload Your Logo
                                             </Label>
                                             {data.logo.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -686,7 +687,7 @@ export default function CreateCard() {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="organization" className="flex items-center gap-1"><span>Organization</span> <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="organization" className="flex items-center gap-1"><span>Organization</span></Label>
                                                 <Input
                                                     id="organization"
                                                     value={data.organization}
@@ -696,7 +697,7 @@ export default function CreateCard() {
                                                 <InputError message={errors.organization} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="jobtitle" className="flex items-center gap-1"><span>Job Title</span> <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="jobtitle" className="flex items-center gap-1"><span>Job Title</span></Label>
                                                 <Input
                                                     id="jobtitle"
                                                     value={data.job_title}
@@ -710,7 +711,7 @@ export default function CreateCard() {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="phone" className="flex items-center gap-1"><span>Phone</span> <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="phone" className="flex items-center gap-1"><span>Phone</span></Label>
                                                 <Input
                                                     id="phone"
                                                     type="tel"
@@ -723,7 +724,7 @@ export default function CreateCard() {
                                             </div>
 
                                             <div className="space-y-1">
-                                                <Label htmlFor="email" className="flex items-center gap-1"><span>Email</span> <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="email" className="flex items-center gap-1"><span>Email</span></Label>
                                                 <Input
                                                     id="email"
                                                     type="email"
@@ -738,7 +739,7 @@ export default function CreateCard() {
 
                                         <div className="border-2 border-dashed rounded-lg p-2">
 
-                                            <Label htmlFor="headline" className="flex items-center gap-1"><span>Headline</span> <span className="text-red-500 text-lg">*</span></Label>
+                                            <Label htmlFor="headline" className="flex items-center gap-1"><span>Headline</span></Label>
                                             <Textarea
                                                 className="h-30 w-full"
                                                 placeholder="enter your headline text"
@@ -990,7 +991,7 @@ export default function CreateCard() {
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="absolute top-2 right-2"
+                                                                className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
                                                                 onClick={() => removeServiceItem(item.id)}
                                                             >
                                                                 <X className="h-5 w-5" />
@@ -1007,7 +1008,9 @@ export default function CreateCard() {
                                                                 <div className="flex flex-col gap-2">
                                                                     {item.file ? (
                                                                         <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                                            <span className="flex-1 truncate">{item.file.name}</span>
+                                                                            <span className="flex-1 truncate">
+                                                                                {typeof item.file === 'string' ? item.file : item.file.name}
+                                                                            </span>
                                                                             <Button
                                                                                 type="button"
                                                                                 variant="ghost"
@@ -1158,7 +1161,7 @@ export default function CreateCard() {
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="absolute top-2 right-2"
+                                                                className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
                                                                 onClick={() => removeGalleryItem(item.id)}
                                                             >
                                                                 <X className="h-5 w-5" />

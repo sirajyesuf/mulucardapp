@@ -28,20 +28,20 @@ class UpdateCardRequest extends FormRequest
 
         return [
                 'banner.file' => 'nullable|image|max:2048',
-                'banner.path' => 'required_if:banner.file,null|string',
+                'banner.path' => 'nullable|string|max:255',
                 'avatar.file' => 'nullable|image|max:2048',
                 'avatar.path' => 'required_if:avatar.file,null|string',
                 'logo.file' => 'nullable|image|max:2048',
-                'logo.path' => 'required_if:logo.file,null|string',
+                'logo.path' => 'nullable|string|max:255',
                 'banner_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i', 
 
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255',
-                'phone' => 'required|string|max:255',
-                'organization' => 'required|string|max:255',
-                'job_title' => 'required|string|max:255',
-                'headline' => 'required|string|max:255',
+                'email' => 'nullable|string|email|max:255',
+                'phone' => 'nullable|string|max:255',
+                'organization' => 'nullable|string|max:255',
+                'job_title' => 'nullable|string|max:255',
+                'headline' => 'nullable|string|max:255',
                 'address' => 'nullable|string|max:255',
                 'location' => 'nullable|string|max:255',
 
@@ -179,11 +179,8 @@ class UpdateCardRequest extends FormRequest
 
                 'logo.file.image' => 'The logo field must be a valid image file.',
                 'logo.file.max' => 'The logo field size must not exceed 2MB.',
-                'logo.path.required_if' => 'The logo  field is required.',
-
                 'banner.file.image' => 'The banner field must be a valid image file.',
                 'banner.file.max' => 'The banner file size must not exceed 2MB.',
-                'banner.path.required_if' => 'The banner  field is required.',
             ];
     }
 }

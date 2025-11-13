@@ -27,20 +27,20 @@ class CardRequest extends FormRequest
         $galleryLimit = request()->user()->activeSubscription()->with('plan')->first()->plan->number_of_gallery;
 
         return [
-                'banner.file' => 'required|image|max:2048|dimensions:max_width=1200,max_height=313',
-                'avatar.file' => 'required|image|max:2048',
-                'logo.file' => 'required|image|max:2048',
+                'banner.file' => 'nullable|image|max:2048',
+                'avatar.file' => 'required|image',
+                'logo.file' => 'nullable|image|max:2048',
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
-                'organization' => 'required|string|max:255',
-                'job_title' => 'required|string|max:255',
+                'organization' => 'nullable|string|max:255',
+                'job_title' => 'nullable|string|max:255',
                 'banner_color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
                 'links' => 'array|max:100',
                 'links.*.name' => 'required|string|max:255',
                 'links.*.url' => "required|url:https",
-                'phone' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255',
-                'headline' => 'required|string|max:255',
+                'phone' => 'nullable|string|max:255',
+                'email' => 'nullable|string|email|max:255',
+                'headline' => 'nullable|string|max:255',
                 'address' => 'nullable|string|max:255',
                 'location' => 'nullable|string|max:255',
                 'business_hours_enabled' => 'required|boolean',
@@ -121,7 +121,7 @@ class CardRequest extends FormRequest
 
         // --- Generate Link Messages Dynamically ---
         // Iterate over the actual submitted links data
-        foreach ($this->input('links', []) as $index => $linkData) {
+        foreach (request()->input('links', []) as $index => $linkData) {
             // Use the 'name' from the submitted data, default to generic if 'name' is missing
             $linkName = $linkData['name'] ?? "Link #{$index}";
             // Capitalize first letter for display
@@ -139,7 +139,6 @@ class CardRequest extends FormRequest
 
 
             return [
-            'banner.file.required' => 'The banner field is required.',
             'banner.file.image' => 'The banner field must be a valid image file.',
             'banner.file.max' => 'The banner file size must not exceed 2MB.',
             'banner.file.dimensions' => 'The banner image dimensions must be 1200x313.',
@@ -147,7 +146,6 @@ class CardRequest extends FormRequest
             'avatar.file.image' => 'The avatar field must be a valid image file.',
             'avatar.file.max' => 'The avatar file size must not exceed 2MB.',
 
-            'logo.file.required' => 'The logo field is required.',
             'logo.file.image' => 'The logo field must be a valid image file.',
             'logo.file.max' => 'The logo field size must not exceed 2MB.',
             ... $business_messages,
