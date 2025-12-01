@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 use App\Enums\CardSocialLinks;
 use App\Models\Card;
+use Tighten\Ziggy\Ziggy;
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -54,6 +55,10 @@ class HandleInertiaRequests extends Middleware
                 ]
             ],
             'cardSocialLinks' => CardSocialLinks::links(),
+            'ziggy' => fn () => [
+                ...(new Ziggy)->toArray(),
+                'location' => $request->url(),
+            ],
         ];
     }
 }
