@@ -12,8 +12,8 @@ import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
 import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
-import { Head, useForm,usePage } from '@inertiajs/react';
-import { Check, Clock, Copy, LoaderCircle, PlusCircle, Upload, X ,ShieldAlert,Globe} from 'lucide-react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Check, Clock, Copy, Globe, LoaderCircle, PlusCircle, ShieldAlert, Upload, X } from 'lucide-react';
 import { ChangeEvent, FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -47,7 +47,6 @@ interface CardForm {
 }
 
 export default function CreateCard() {
-
     const auth = usePage<SharedData>().props.auth;
     const activePlan = auth.activePlan;
     const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
@@ -66,18 +65,18 @@ export default function CreateCard() {
             'links',
             data.links.filter((link: Link) => link.name !== name),
         );
-        setRemovedLinks(prev => (prev.includes(name) ? prev : [...prev, name]));
+        setRemovedLinks((prev) => (prev.includes(name) ? prev : [...prev, name]));
     };
 
     const addBackLink = (name: string) => {
-        if (data.links.some(link => link.name === name)) {
-            setRemovedLinks(prev => prev.filter(link => link !== name));
+        if (data.links.some((link) => link.name === name)) {
+            setRemovedLinks((prev) => prev.filter((link) => link !== name));
             return;
         }
 
         const newLink = createLink(name);
         setData('links', [...data.links, newLink]);
-        setRemovedLinks(prev => prev.filter(link => link !== name));
+        setRemovedLinks((prev) => prev.filter((link) => link !== name));
     };
 
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
@@ -163,10 +162,8 @@ export default function CreateCard() {
         address: '',
         location: '',
         headline: '',
-        galleries: [{ id: crypto.randomUUID(), file: null, path: null, description: '' }],
-        services: [
-            { id: crypto.randomUUID(), file: null, path: null, name: '', description: '' }
-        ],
+        galleries: [],
+        services: [],
         business_hours_enabled: false,
         business_hours: [
             { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '03:00', close: '11:00' },
@@ -179,38 +176,25 @@ export default function CreateCard() {
         ],
     });
 
-
     // console.log(data.links)
 
-
     const hasTabError = (prefixes: string[], errors: Partial<Record<string, string>>) => {
-        return Object.keys(errors).some(key =>
-            prefixes.some(prefix => key.startsWith(prefix))
-        );
+        return Object.keys(errors).some((key) => prefixes.some((prefix) => key.startsWith(prefix)));
     };
 
     const DisplayError = hasTabError(['avatar.file', 'banner.file', 'logo.file'], errors);
 
-    
-    const personalInformationError = hasTabError(
-        ['first_name', 'last_name', 'organization', 'job_title', 'email', 'phone','headline'],
-        errors
-    );
-    
-    const linksError = hasTabError(
-        ['links.0', 'links.1', 'links.2', 'links.3', 'links.4', 'links.5'],
-        errors
-    );
-    
-    const locationError = hasTabError(['address', 'location'], errors);
-    
-    const galleryError = hasTabError(['galleries.0', 'galleries.1', 'galleries.2'], errors);
-    
-    const serviceError = hasTabError(['services.0', 'services.1', 'services.2'], errors);
-    
-    const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
-    
+    const personalInformationError = hasTabError(['first_name', 'last_name', 'organization', 'job_title', 'email', 'phone', 'headline'], errors);
 
+    const linksError = hasTabError(['links.0', 'links.1', 'links.2', 'links.3', 'links.4', 'links.5'], errors);
+
+    const locationError = hasTabError(['address', 'location'], errors);
+
+    const galleryError = hasTabError(['galleries.0', 'galleries.1', 'galleries.2'], errors);
+
+    const serviceError = hasTabError(['services.0', 'services.1', 'services.2'], errors);
+
+    const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
 
     const handleGalleryFileChange = (id: string, file: File | null) => {
         const newGallery = data.galleries.map((item: Gallery) => {
@@ -295,20 +279,20 @@ export default function CreateCard() {
 
     const removeGalleryItem = (id: string) => {
         // if (data.galleries.length > 1) {
-            setData(
-                'galleries',
-                data.galleries.filter((item: Gallery) => item.id !== id),
-            );
+        setData(
+            'galleries',
+            data.galleries.filter((item: Gallery) => item.id !== id),
+        );
         // }
     };
 
     const removeServiceItem = (id: string) => {
         // if (data.services.length > 1) {
-            setData(
-                'services',
-                data.services.filter((item: Service) => item.id !== id),
-            );
-// }
+        setData(
+            'services',
+            data.services.filter((item: Service) => item.id !== id),
+        );
+        // }
     };
 
     const removeGalleryFile = (id: string) => {
@@ -341,7 +325,7 @@ export default function CreateCard() {
     const handleFileChange = (field: 'avatar' | 'logo' | 'banner') => (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] ?? null;
 
-        if(field === 'banner'){
+        if (field === 'banner') {
             const newBanner = {
                 file: file,
                 path: file ? URL.createObjectURL(file) : null,
@@ -400,8 +384,6 @@ export default function CreateCard() {
             <Head title="Dashboard" />
             <form onSubmit={submit} className="min-h-screen">
                 <div className="m-2 flex flex-row justify-end rounded-lg border-2 p-2 shadow-none">
-                  
-
                     <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Create Card
@@ -429,7 +411,7 @@ export default function CreateCard() {
                                 galleries={validItems}
                                 services={ValidServiceItems}
                                 business_hours={data.business_hours}
-                                banner = {data.banner}
+                                banner={data.banner}
                             />
                         </ScrollArea>
                     </div>
@@ -438,88 +420,33 @@ export default function CreateCard() {
                         <Tabs defaultValue="display">
                             <TabsList className="h- flex h-auto w-full flex-row flex-wrap justify-around">
                                 <TabsTrigger value="display">
-                                    {
-                                        DisplayError ? (
-                                            <span className="text-red-500">
-                                                Display
-                                                </span>
-                                        ) : (
-                                            <span className="">Display</span>
-                                        )
-                                    }
-
+                                    {DisplayError ? <span className="text-red-500">Display</span> : <span className="">Display</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="personal_information">
-                                    
-                                    {
-                                        personalInformationError ? (
-                                            <span className="text-red-500">
-                                                Information
-                                                </span>
-                                        ) : (
-                                            <span className=""> Information</span>
-                                        )
-                                    }
+                                    {personalInformationError ? (
+                                        <span className="text-red-500">Information</span>
+                                    ) : (
+                                        <span className=""> Information</span>
+                                    )}
                                 </TabsTrigger>
                                 <TabsTrigger value="links">
-                                    
-                                    {
-                                        linksError ? (
-                                            <span className="text-red-500">
-                                                Social Links
-                                                </span>
-                                        ) : (
-                                            <span className=""> Social Links</span>
-                                        )
-                                    }
+                                    {linksError ? <span className="text-red-500">Social Links</span> : <span className=""> Social Links</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="location">
-                                    
-                                    {
-                                        locationError ? (
-                                            <span className="text-red-500">
-                                                Location
-                                                </span>
-                                        ) : (
-                                            <span className=""> Location</span>
-                                        )
-                                    }
+                                    {locationError ? <span className="text-red-500">Location</span> : <span className=""> Location</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="business_hours">
-                                    
-                                    {
-                                        businessHoursError ? (
-                                            <span className="text-red-500">
-                                                Business Hours
-                                                </span>
-                                        ) : (
-                                            <span className=""> Business Hours</span>
-                                        )
-                                    }
+                                    {businessHoursError ? (
+                                        <span className="text-red-500">Business Hours</span>
+                                    ) : (
+                                        <span className=""> Business Hours</span>
+                                    )}
                                 </TabsTrigger>
                                 <TabsTrigger value="service">
-                                    
-                                    {
-                                        serviceError ? (
-                                            <span className="text-red-500">
-                                                Services
-                                                </span>
-                                        ) : (
-                                            <span className=""> Services</span>
-                                        )
-                                    }
+                                    {serviceError ? <span className="text-red-500">Services</span> : <span className=""> Services</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="gallery">
-                                    
-                                    {
-                                        galleryError ? (
-                                            <span className="text-red-500">
-                                                Galleries
-                                                </span>
-                                        ) : (
-                                            <span className=""> Galleries</span>
-                                        )
-                                    }
+                                    {galleryError ? <span className="text-red-500">Galleries</span> : <span className=""> Galleries</span>}
                                 </TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
@@ -529,7 +456,6 @@ export default function CreateCard() {
                                         <CardDescription>Make changes to your account here.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
                                                 Upload Your Banner
@@ -568,7 +494,7 @@ export default function CreateCard() {
                                         {/* banner end */}
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
-                                                Upload Your Avatar <span className="text-red-500 text-lg">*</span>
+                                                Upload Your Avatar <span className="text-lg text-red-500">*</span>
                                             </Label>
                                             {data.avatar.file ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -664,7 +590,9 @@ export default function CreateCard() {
                                     <CardContent className="space-y-4">
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="fname" className="flex items-center gap-1"><span>First Name</span> <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="fname" className="flex items-center gap-1">
+                                                    <span>First Name</span> <span className="text-lg text-red-500">*</span>
+                                                </Label>
                                                 <Input
                                                     id="fname"
                                                     value={data.first_name}
@@ -674,7 +602,9 @@ export default function CreateCard() {
                                                 <InputError message={errors.first_name} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="lname" className="flex items-center gap-1"><span>Last Name</span> <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="lname" className="flex items-center gap-1">
+                                                    <span>Last Name</span> <span className="text-lg text-red-500">*</span>
+                                                </Label>
                                                 <Input
                                                     id="lname"
                                                     value={data.last_name}
@@ -687,7 +617,9 @@ export default function CreateCard() {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="organization" className="flex items-center gap-1"><span>Organization</span></Label>
+                                                <Label htmlFor="organization" className="flex items-center gap-1">
+                                                    <span>Organization</span>
+                                                </Label>
                                                 <Input
                                                     id="organization"
                                                     value={data.organization}
@@ -697,7 +629,9 @@ export default function CreateCard() {
                                                 <InputError message={errors.organization} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="jobtitle" className="flex items-center gap-1"><span>Job Title</span></Label>
+                                                <Label htmlFor="jobtitle" className="flex items-center gap-1">
+                                                    <span>Job Title</span>
+                                                </Label>
                                                 <Input
                                                     id="jobtitle"
                                                     value={data.job_title}
@@ -711,7 +645,9 @@ export default function CreateCard() {
 
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="phone" className="flex items-center gap-1"><span>Phone</span></Label>
+                                                <Label htmlFor="phone" className="flex items-center gap-1">
+                                                    <span>Phone</span>
+                                                </Label>
                                                 <Input
                                                     id="phone"
                                                     type="tel"
@@ -724,7 +660,9 @@ export default function CreateCard() {
                                             </div>
 
                                             <div className="space-y-1">
-                                                <Label htmlFor="email" className="flex items-center gap-1"><span>Email</span></Label>
+                                                <Label htmlFor="email" className="flex items-center gap-1">
+                                                    <span>Email</span>
+                                                </Label>
                                                 <Input
                                                     id="email"
                                                     type="email"
@@ -737,9 +675,10 @@ export default function CreateCard() {
                                             </div>
                                         </div>
 
-                                        <div className="border-2 border-dashed rounded-lg p-2">
-
-                                            <Label htmlFor="headline" className="flex items-center gap-1"><span>Headline</span></Label>
+                                        <div className="rounded-lg border-2 border-dashed p-2">
+                                            <Label htmlFor="headline" className="flex items-center gap-1">
+                                                <span>Headline</span>
+                                            </Label>
                                             <Textarea
                                                 className="h-30 w-full"
                                                 placeholder="enter your headline text"
@@ -791,7 +730,7 @@ export default function CreateCard() {
                                                             variant="ghost"
                                                             size="icon"
                                                             onClick={() => removeLinkItem(link.name)}
-                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
                                                         >
                                                             <X className="h-5 w-5" />
                                                             <span className="sr-only">Remove</span>
@@ -851,7 +790,7 @@ export default function CreateCard() {
                             <TabsContent value="business_hours">
                                 <Card>
                                     <CardHeader>
-                                        <div className="flex items-center  justify-between">
+                                        <div className="flex items-center justify-between">
                                             <div>
                                                 <CardTitle>Business Hours</CardTitle>
                                                 <CardDescription>Set the operating hours for your organization</CardDescription>
@@ -966,7 +905,7 @@ export default function CreateCard() {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center text-muted-foreground">
+                                            <div className="text-muted-foreground text-center">
                                                 Business hours are disabled. Enable the toggle above to set your business hours.
                                             </div>
                                         )}
@@ -979,164 +918,170 @@ export default function CreateCard() {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Service</CardTitle>
-                                        <CardDescription>add all service</CardDescription>
+                                        <CardDescription>add all your services</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                         <div className="space-y-6">
-                                            {data.services.map((item, index) => (
-                                                <Card key={item.id} className="relative">
-                                                    <CardContent className="p-6">
-                                                        {/* {data.services.length > 1 && ( */}
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                                onClick={() => removeServiceItem(item.id)}
-                                                            >
-                                                                <X className="h-5 w-5" />
-                                                                <span className="sr-only">Remove</span>
-                                                            </Button>
-                                                        {/* )} */}
-
-                                                        <div className="space-y-4">
-                                                            <div>
-                                                                <Label htmlFor={`image-${item.id}`} className="text-sm font-medium text-black flex items-center gap-1">
-                                                                    <span>Upload Your Image</span>
-                                                                    <span className="text-red-500 text-lg">*</span>
-                                                                </Label>
-                                                                <div className="flex flex-col gap-2">
-                                                                    {item.file ? (
-                                                                        <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                                            <span className="flex-1 truncate">
-                                                                                {typeof item.file === 'string' ? item.file : item.file.name}
-                                                                            </span>
-                                                                            <Button
-                                                                                type="button"
-                                                                                variant="ghost"
-                                                                                size="icon"
-                                                                                onClick={() => removeServiceFile(item.id)}
-                                                                            >
-                                                                                <X className="h-4 w-4" />
-                                                                                <span className="sr-only">Remove file</span>
-                                                                            </Button>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="flex items-center">
-                                                                            <Input
-                                                                                id={`image-${item.id}`}
-                                                                                type="file"
-                                                                                accept="image/*"
-                                                                                className="hidden"
-                                                                                onChange={(e) => {
-                                                                                    const file = e.target.files?.[0] || null;
-                                                                                    handleServiceFileChange(item.id, file);
-                                                                                }}
-                                                                            />
-                                                                            <Button
-                                                                                type="button"
-                                                                                variant="outline"
-                                                                                onClick={() => document.getElementById(`image-${item.id}`)?.click()}
-                                                                                className="flex items-center gap-2"
-                                                                            >
-                                                                                <Upload className="h-4 w-4" />
-                                                                                Select Image
-                                                                            </Button>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                                <InputError
-                                                                    message={errors[`services.${index}.file` as keyof typeof errors]}
-                                                                    className="mt-2"
-                                                                />
-                                                            </div>
-
-                                                            <div>
-                                                                <Label htmlFor="name" className="mb-2 block flex items-center gap-1">
-                                                                    <span>Name</span>
-                                                                    <span className="text-red-500 text-lg">*</span>
-                                                                </Label>
-                                                                <Input
-                                                                    id="name"
-                                                                    placeholder="name"
-                                                                    value={item.name}
-                                                                    onChange={(e) => handleServiceNameChange(item.id, e.target.value)}
-                                                                />
-
-                                                                <InputError
-                                                                    message={errors[`services.${index}.name` as keyof typeof errors]}
-                                                                    className="mt-2"
-                                                                />
-                                                            </div>
-
-                                                            <div>
-                                                                <Label htmlFor={`description-${item.id}`} className="mb-2 block flex items-center gap-1">
-                                                                    <span>Description</span>
-                                                                    <span className="text-red-500 text-lg">*</span>
-                                                                </Label>
-                                                                <Textarea
-                                                                    id={`description-${item.id}`}
-                                                                    placeholder="Enter a description for this image"
-                                                                    value={item.description}
-                                                                    onChange={(e) => handleServiceDescriptionChange(item.id, e.target.value)}
-                                                                    className="min-h-24"
-                                                                />
-                                                                <InputError
-                                                                    message={errors[`services.${index}.description` as keyof typeof errors]}
-                                                                    className="mt-2"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
-
-                                            {
-                                                data.services.length >= serviceLimit && (
-                                                    <InputError
-                                                        message={errors.services}
-                                                        className="mt-2"
-                                                    />
-                                                )
-                                            }
-
-                                            {/* {
-                                               data.services.length < serviceLimit && (
-
-                                                    <div className="flex flex-col gap-4 sm:flex-row">
+                                            {data.services.length === 0 ? (
+                                                <div className="py-8 text-center">
+                                                    <p className="text-muted-foreground mb-4">No services added yet</p>
                                                     <Button
                                                         type="button"
                                                         variant="outline"
                                                         onClick={addMoreServiceItem}
-                                                        className="flex items-center gap-2"
+                                                        className="mx-auto flex items-center gap-2"
+                                                        disabled={data.services.length >= serviceLimit}
                                                     >
                                                         <PlusCircle className="h-5 w-5" />
-                                                        Add More
+                                                        Add Service
                                                     </Button>
+                                                    {data.services.length >= serviceLimit && (
+                                                        <div className="mt-4 flex items-center gap-2 text-yellow-600">
+                                                            <ShieldAlert className="h-8 w-8" />
+                                                            <span>Service limit reached. Upgrade your plan to add more services.</span>
+                                                        </div>
+                                                    )}
                                                 </div>
+                                            ) : (
+                                                <>
+                                                    {data.services.map((item, index) => (
+                                                        <Card key={item.id} className="relative">
+                                                            <CardContent className="p-6">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="absolute top-2 right-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                                    onClick={() => removeServiceItem(item.id)}
+                                                                >
+                                                                    <X className="h-5 w-5" />
+                                                                    <span className="sr-only">Remove</span>
+                                                                </Button>
 
-                                                )
-                                            } */}
+                                                                <div className="space-y-4">
+                                                                    <div>
+                                                                        <Label
+                                                                            htmlFor={`image-${item.id}`}
+                                                                            className="flex items-center gap-1 text-sm font-medium text-black"
+                                                                        >
+                                                                            <span>Upload Your Image</span>
+                                                                            <span className="text-lg text-red-500">*</span>
+                                                                        </Label>
+                                                                        <div className="flex flex-col gap-2">
+                                                                            {item.file ? (
+                                                                                <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
+                                                                                    <span className="flex-1 truncate">
+                                                                                        {typeof item.file === 'string' ? item.file : item.file.name}
+                                                                                    </span>
+                                                                                    <Button
+                                                                                        type="button"
+                                                                                        variant="ghost"
+                                                                                        size="icon"
+                                                                                        onClick={() => removeServiceFile(item.id)}
+                                                                                    >
+                                                                                        <X className="h-4 w-4" />
+                                                                                        <span className="sr-only">Remove file</span>
+                                                                                    </Button>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="flex items-center">
+                                                                                    <Input
+                                                                                        id={`image-${item.id}`}
+                                                                                        type="file"
+                                                                                        accept="image/*"
+                                                                                        className="hidden"
+                                                                                        onChange={(e) => {
+                                                                                            const file = e.target.files?.[0] || null;
+                                                                                            handleServiceFileChange(item.id, file);
+                                                                                        }}
+                                                                                    />
+                                                                                    <Button
+                                                                                        type="button"
+                                                                                        variant="outline"
+                                                                                        onClick={() =>
+                                                                                            document.getElementById(`image-${item.id}`)?.click()
+                                                                                        }
+                                                                                        className="flex items-center gap-2"
+                                                                                    >
+                                                                                        <Upload className="h-4 w-4" />
+                                                                                        Select Image
+                                                                                    </Button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        <InputError
+                                                                            message={errors[`services.${index}.file` as keyof typeof errors]}
+                                                                            className="mt-2"
+                                                                        />
+                                                                    </div>
 
-                                            <div className="flex flex-col gap-4 sm:flex-row">
-                                            <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={addMoreServiceItem}
-                                            className="flex items-center gap-2"
-                                            disabled={data.services.length >= serviceLimit}
-                                            >
-                                            <PlusCircle className="h-5 w-5" />
-                                            Add More
-                                            </Button>
-                                            {data.services.length >= serviceLimit && (
-                                            <div className="flex items-center gap-2 text-yellow-600">
-                                            <ShieldAlert className="h-8 w-8" />
-                                            <span>Service limit reached. Upgrade your plan to add more services.</span>
-                                            </div>
+                                                                    <div>
+                                                                        <Label htmlFor="name" className="mb-2 block flex items-center gap-1">
+                                                                            <span>Name</span>
+                                                                            <span className="text-lg text-red-500">*</span>
+                                                                        </Label>
+                                                                        <Input
+                                                                            id="name"
+                                                                            placeholder="name"
+                                                                            value={item.name}
+                                                                            onChange={(e) => handleServiceNameChange(item.id, e.target.value)}
+                                                                        />
+
+                                                                        <InputError
+                                                                            message={errors[`services.${index}.name` as keyof typeof errors]}
+                                                                            className="mt-2"
+                                                                        />
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label
+                                                                            htmlFor={`description-${item.id}`}
+                                                                            className="mb-2 block flex items-center gap-1"
+                                                                        >
+                                                                            <span>Description</span>
+                                                                            <span className="text-lg text-red-500">*</span>
+                                                                        </Label>
+                                                                        <Textarea
+                                                                            id={`description-${item.id}`}
+                                                                            placeholder="Enter a description for this image"
+                                                                            value={item.description}
+                                                                            onChange={(e) => handleServiceDescriptionChange(item.id, e.target.value)}
+                                                                            className="min-h-24"
+                                                                        />
+                                                                        <InputError
+                                                                            message={errors[`services.${index}.description` as keyof typeof errors]}
+                                                                            className="mt-2"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+                                                    ))}
+
+                                                    {data.services.length >= serviceLimit && (
+                                                        <InputError message={errors.services} className="mt-2" />
+                                                    )}
+
+                                                    <div className="flex flex-col gap-4 sm:flex-row">
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={addMoreServiceItem}
+                                                            className="flex items-center gap-2"
+                                                            disabled={data.services.length >= serviceLimit}
+                                                        >
+                                                            <PlusCircle className="h-5 w-5" />
+                                                            Add Service
+                                                        </Button>
+                                                        {data.services.length >= serviceLimit && (
+                                                            <div className="flex items-center gap-2 text-yellow-600">
+                                                                <ShieldAlert className="h-8 w-8" />
+                                                                <span>Service limit reached. Upgrade your plan to add more services.</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </>
                                             )}
-                                            </div>
-
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -1149,143 +1094,150 @@ export default function CreateCard() {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Gallery</CardTitle>
-                                        <CardDescription>enter your pictures</CardDescription>
+                                        <CardDescription>add all your images</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                         <div className="space-y-6">
-                                            {data.galleries.map((item, index) => (
-                                                <Card key={item.id} className="relative">
-                                                    <CardContent className="p-6">
-                                                        {/* {data.galleries.length > 1 && ( */}
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                                onClick={() => removeGalleryItem(item.id)}
-                                                            >
-                                                                <X className="h-5 w-5" />
-                                                                <span className="sr-only">Remove</span>
-                                                            </Button>
-                                                        {/* )} */}
-
-                                                        <div className="space-y-4">
-                                                            <div>
-                                                                <Label htmlFor={`image-${item.id}`} className="text-sm font-medium text-black flex items-center gap-1">
-                                                                    <span>Upload Your Image</span>
-                                                                    <span className="text-red-500 text-lg">*</span>
-                                                                </Label>
-                                                                <div className="flex flex-col gap-2">
-                                                                    {item.file ? (
-                                                                        <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
-                                                                            <span className="flex-1 truncate">{item.file.name}</span>
-                                                                            <Button
-                                                                                type="button"
-                                                                                variant="ghost"
-                                                                                size="icon"
-                                                                                onClick={() => removeGalleryFile(item.id)}
-                                                                            >
-                                                                                <X className="h-4 w-4" />
-                                                                                <span className="sr-only">Remove file</span>
-                                                                            </Button>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="flex items-center">
-                                                                            <Input
-                                                                                id={`image-${item.id}`}
-                                                                                type="file"
-                                                                                accept="image/*"
-                                                                                className="hidden"
-                                                                                onChange={(e) => {
-                                                                                    const file = e.target.files?.[0] || null;
-                                                                                    handleGalleryFileChange(item.id, file);
-                                                                                }}
-                                                                            />
-                                                                            <Button
-                                                                                type="button"
-                                                                                variant="outline"
-                                                                                onClick={() => document.getElementById(`image-${item.id}`)?.click()}
-                                                                                className="flex items-center gap-2"
-                                                                            >
-                                                                                <Upload className="h-4 w-4" />
-                                                                                Select Image
-                                                                            </Button>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                                <InputError
-                                                                    message={errors[`galleries.${index}.file` as keyof typeof errors]}
-                                                                    className="mt-2"
-                                                                />
-                                                            </div>
-
-                                                            <div>
-                                                                <Label htmlFor={`description-${item.id}`} className="mb-2 block flex items-center gap-1">
-                                                                    <span>Description</span>
-                                                                    <span className="text-red-500 text-lg">*</span>
-                                                                </Label>
-                                                                <Textarea
-                                                                    id={`description-${item.id}`}
-                                                                    placeholder="Enter a description for this image"
-                                                                    value={item.description}
-                                                                    onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
-                                                                    className="min-h-24"
-                                                                />
-                                                                <InputError
-                                                                    message={errors[`galleries.${index}.description` as keyof typeof errors]}
-                                                                    className="mt-2"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
-
-{
-                                                data.galleries.length >= galleryLimit && (
-                                                    <InputError
-                                                        message={errors.galleries}
-                                                        className="mt-2"
-                                                    />
-                                                )
-                                            }
-
-                                            {/* {
-                                                data.galleries.length < galleryLimit && (
-
-                                                    <div className="flex flex-col gap-4 sm:flex-row">
+                                            {data.galleries.length === 0 ? (
+                                                <div className="py-8 text-center">
+                                                    <p className="text-muted-foreground mb-4">No images added yet</p>
                                                     <Button
                                                         type="button"
                                                         variant="outline"
                                                         onClick={addMoreItem}
-                                                        className="flex items-center gap-2"
+                                                        className="mx-auto flex items-center gap-2"
+                                                        disabled={data.galleries.length >= galleryLimit}
                                                     >
                                                         <PlusCircle className="h-5 w-5" />
-                                                        Add More
+                                                        Add Image
                                                     </Button>
+                                                    {data.galleries.length >= galleryLimit && (
+                                                        <div className="mt-4 flex items-center gap-2 text-yellow-600">
+                                                            <ShieldAlert className="h-6 w-6" />
+                                                            <span>Gallery limit reached. Upgrade your plan to add more images.</span>
+                                                        </div>
+                                                    )}
                                                 </div>
+                                            ) : (
+                                                <>
+                                                    {data.galleries.map((item, index) => (
+                                                        <Card key={item.id} className="relative">
+                                                            <CardContent className="p-6">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="absolute top-2 right-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                                    onClick={() => removeGalleryItem(item.id)}
+                                                                >
+                                                                    <X className="h-5 w-5" />
+                                                                    <span className="sr-only">Remove</span>
+                                                                </Button>
 
-                                                )
-                                            } */}
+                                                                <div className="space-y-4">
+                                                                    <div>
+                                                                        <Label
+                                                                            htmlFor={`image-${item.id}`}
+                                                                            className="flex items-center gap-1 text-sm font-medium text-black"
+                                                                        >
+                                                                            <span>Upload Your Image</span>
+                                                                            <span className="text-lg text-red-500">*</span>
+                                                                        </Label>
+                                                                        <div className="flex flex-col gap-2">
+                                                                            {item.file ? (
+                                                                                <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
+                                                                                    <span className="flex-1 truncate">{item.file.name}</span>
+                                                                                    <Button
+                                                                                        type="button"
+                                                                                        variant="ghost"
+                                                                                        size="icon"
+                                                                                        onClick={() => removeGalleryFile(item.id)}
+                                                                                    >
+                                                                                        <X className="h-4 w-4" />
+                                                                                        <span className="sr-only">Remove file</span>
+                                                                                    </Button>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="flex items-center">
+                                                                                    <Input
+                                                                                        id={`image-${item.id}`}
+                                                                                        type="file"
+                                                                                        accept="image/*"
+                                                                                        className="hidden"
+                                                                                        onChange={(e) => {
+                                                                                            const file = e.target.files?.[0] || null;
+                                                                                            handleGalleryFileChange(item.id, file);
+                                                                                        }}
+                                                                                    />
+                                                                                    <Button
+                                                                                        type="button"
+                                                                                        variant="outline"
+                                                                                        onClick={() =>
+                                                                                            document.getElementById(`image-${item.id}`)?.click()
+                                                                                        }
+                                                                                        className="flex items-center gap-2"
+                                                                                    >
+                                                                                        <Upload className="h-4 w-4" />
+                                                                                        Select Image
+                                                                                    </Button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        <InputError
+                                                                            message={errors[`galleries.${index}.file` as keyof typeof errors]}
+                                                                            className="mt-2"
+                                                                        />
+                                                                    </div>
 
-                                            <div className="flex flex-col gap-4 sm:flex-row">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={addMoreItem}
-                                                    className="flex items-center gap-2"
-                                                    disabled={data.galleries.length >= galleryLimit}
-                                                >
-                                                    <PlusCircle className="h-5 w-5" />
-                                                    Add More
-                                                </Button>
-                                                {data.galleries.length >= galleryLimit && (
-                                                    <div className="flex items-center gap-2 text-yellow-600">
-                                                        <ShieldAlert className="h-6 w-6" />
-                                                        <span>Gallery limit reached. Upgrade your plan to add more images.</span>
+                                                                    <div>
+                                                                        <Label
+                                                                            htmlFor={`description-${item.id}`}
+                                                                            className="mb-2 block flex items-center gap-1"
+                                                                        >
+                                                                            <span>Description</span>
+                                                                            <span className="text-lg text-red-500">*</span>
+                                                                        </Label>
+                                                                        <Textarea
+                                                                            id={`description-${item.id}`}
+                                                                            placeholder="Enter a description for this image"
+                                                                            value={item.description}
+                                                                            onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
+                                                                            className="min-h-24"
+                                                                        />
+                                                                        <InputError
+                                                                            message={errors[`galleries.${index}.description` as keyof typeof errors]}
+                                                                            className="mt-2"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+                                                    ))}
+
+                                                    {data.galleries.length >= galleryLimit && (
+                                                        <InputError message={errors.galleries} className="mt-2" />
+                                                    )}
+
+                                                    <div className="flex flex-col gap-4 sm:flex-row">
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={addMoreItem}
+                                                            className="flex items-center gap-2"
+                                                            disabled={data.galleries.length >= galleryLimit}
+                                                        >
+                                                            <PlusCircle className="h-5 w-5" />
+                                                            Add Image
+                                                        </Button>
+                                                        {data.galleries.length >= galleryLimit && (
+                                                            <div className="flex items-center gap-2 text-yellow-600">
+                                                                <ShieldAlert className="h-6 w-6" />
+                                                                <span>Gallery limit reached. Upgrade your plan to add more images.</span>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
+                                                </>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>
