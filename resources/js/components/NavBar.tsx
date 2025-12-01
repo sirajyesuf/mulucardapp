@@ -1,10 +1,10 @@
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -40,18 +40,21 @@ export default function Navbar() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden items-center gap-8 md:flex">
-                        <a href="#features" className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300">
+                        <a
+                            href="#features"
+                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                        >
                             Features
                         </a>
-                        <a href="#how-it-works" className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300">
+                        <a
+                            href="#how-it-works"
+                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                        >
                             How It Works
                         </a>
-                        <a href="#pricing" className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300">
+                        <a href="#pricing" className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300">
                             Pricing
                         </a>
-                        <Link href={route('mulucardpro')} className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300">
-                            MuluCard <span style={{ backgroundColor: '#9b87f5', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>PRO</span>
-                        </Link>
                     </nav>
 
                     {auth.user ? (
@@ -74,7 +77,7 @@ export default function Navbar() {
                     )}
 
                     {/* Mobile Menu Button */}
-                    <button className="md:hidden text-gray-700 dark:text-gray-300" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <button className="text-gray-700 md:hidden dark:text-gray-300" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
                 </div>
@@ -82,21 +85,30 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="glass animate-fade-in absolute top-full right-0 left-0 h-screen bg-gray-50 dark:bg-gray-900 p-4 shadow-md md:hidden">
+                <div className="glass animate-fade-in absolute top-full right-0 left-0 h-screen bg-gray-50 p-4 shadow-md md:hidden dark:bg-gray-900">
                     {/* <nav className="flex flex-col gap-2 py-4"> */}
                     <nav className="flex flex-col items-start gap-8 border-none">
-                        <a href="#features" className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300" onClick={() => setIsMenuOpen(false)}>
+                        <a
+                            href="#features"
+                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
                             Features
                         </a>
-                        <a href="#how-it-works" className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300" onClick={() => setIsMenuOpen(false)}>
+                        <a
+                            href="#how-it-works"
+                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
                             How It Works
                         </a>
-                        <a href="#pricing" className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300" onClick={() => setIsMenuOpen(false)}>
+                        <a
+                            href="#pricing"
+                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
                             Pricing
                         </a>
-                        <Link href={route('mulucardpro')} className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300" onClick={() => setIsMenuOpen(false)}>
-                            MuluCard <span style={{ backgroundColor: '#9b87f5', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>PRO</span>
-                        </Link>
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme:</span>
                             <AppearanceToggleDropdown />
