@@ -2,12 +2,12 @@ import BusinessHoursPreview from '@/components/business-hours';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { socialIconMap } from '@/lib/socialIcons';
 import { Gallery, Service, type DaySchedule, type Image } from '@/types';
-import { MapPin,Globe } from 'lucide-react';
+import { Globe, MapPin } from 'lucide-react';
 type MuluCardProps = {
     url: string;
-    banner:Image;
+    banner: Image;
     avatar: Image;
-    logo: Image;
+    logo: Image | null;
     first_name: string;
     last_name: string;
     organization: string;
@@ -60,13 +60,17 @@ export default function MuluCard({
                 >
                     {banner.path && <img src={banner.path} alt="" className="h-full w-full border-none object-cover" />}
                 </div>
-                <div className="relative -mt-14 flex flex-row justify-between border-none px-4">
-                    <div className="bordr-white flex h-[100px] w-[100px] items-center justify-center rounded-full border-4 border-gray-500 bg-white">
-                        <img src={avatar.path} alt="" className="h-full w-full rounded-full border-none object-contain" />
+                <div className={`relative -mt-14 flex flex-row ${logo && logo.path ? 'justify-between' : 'justify-center'} border-none px-4`}>
+                    <div
+                        className={`bordr-white flex h-[100px] w-[100px] items-center justify-center rounded-full border-4 border-gray-500 bg-white ${logo && logo.path ? '' : 'mx-auto'}`}
+                    >
+                        <img src={avatar.path || ''} alt="" className="h-full w-full rounded-full border-none object-contain" />
                     </div>
-                    <div className="flex h-[100px] w-[100px] items-center justify-center rounded-lg border-4 border-gray-500 bg-white">
-                        <img src={logo.path} alt="" className="h-full w-full rounded-full border-none object-contain" />
-                    </div>
+                    {logo && logo.path && (
+                        <div className="flex h-[100px] w-[100px] items-center justify-center rounded-lg border-4 border-gray-500 bg-white">
+                            <img src={logo.path} alt="" className="h-full w-full rounded-full border-none object-contain" />
+                        </div>
+                    )}
                 </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-4 border-none bg-gray-50 p-2">
@@ -106,30 +110,34 @@ export default function MuluCard({
                     })}
                 </div>
                 <div className="flex w-full flex-col gap-4 border-none p-2 text-center font-bold text-white capitalize">
-                    <div
-                        className="rounded-4xl border-none p-2"
-                        style={{
-                            backgroundColor: banner_color,
-                        }}
-                    >
-                        <a href={`tel:${phone}`}>call me</a>
-                    </div>
-                    <div
-                        className="rounded-4xl border-2 p-2"
-                        style={{
-                            backgroundColor: banner_color,
-                        }}
-                    >
-                        <a href={`mailto:${email}`}>email me</a>
-                    </div>
-                    <div
+                    {phone && (
+                        <div
+                            className="rounded-4xl border-none p-2"
+                            style={{
+                                backgroundColor: banner_color,
+                            }}
+                        >
+                            <a href={`tel:${phone}`}>call me</a>
+                        </div>
+                    )}
+                    {email && (
+                        <div
+                            className="rounded-4xl border-2 p-2"
+                            style={{
+                                backgroundColor: banner_color,
+                            }}
+                        >
+                            <a href={`mailto:${email}`}>email me</a>
+                        </div>
+                    )}
+                    {/* <div
                         className="rounded-4xl border-none p-2"
                         style={{
                             backgroundColor: banner_color,
                         }}
                     >
                         visit website
-                    </div>
+                    </div> */}
                 </div>
 
                 {services.length > 0 && (
@@ -181,27 +189,23 @@ export default function MuluCard({
                     </Card>
                 )}
 
-                {business_hours_enabled && (
-                    <BusinessHoursPreview business_hours={business_hours} />
-                )}
-
+                {business_hours_enabled && <BusinessHoursPreview business_hours={business_hours} />}
 
                 {/* {address || location && ( */}
 
-
                 <div className="flex flex-col gap-2 rounded-lg border-none p-2 shadow-none">
-                    {address  && (
-                    <div className="flex items-center justify-center gap-2 p-2">
-                        <MapPin className="h-8 w-8" color={banner_color} />
-                        <p className="font-mute text-md">{address}</p>
-                    </div>
+                    {address && (
+                        <div className="flex items-center justify-center gap-2 p-2">
+                            <MapPin className="h-8 w-8" color={banner_color} />
+                            <p className="font-mute text-md">{address}</p>
+                        </div>
                     )}
                     {location && (
-                    <div className="cursor-pointer rounded-4xl p-2 text-center font-bold text-white" style={{ backgroundColor: banner_color }}>
-                        <a href={location} target="_blank" className="capitalize">
-                            view on google map
-                        </a>
-                    </div>
+                        <div className="cursor-pointer rounded-4xl p-2 text-center font-bold text-white" style={{ backgroundColor: banner_color }}>
+                            <a href={location} target="_blank" className="capitalize">
+                                view on google map
+                            </a>
+                        </div>
                     )}
                 </div>
                 {/* )} */}
