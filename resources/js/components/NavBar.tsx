@@ -4,6 +4,7 @@ import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -55,12 +56,14 @@ export default function Navbar() {
 
                     {auth.user ? (
                         <div className="hidden items-center gap-4 md:flex">
+                            <AppearanceToggleDropdown />
                             <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
                                 <Link href={route('dashboard')}>Dashboard</Link>
                             </Button>
                         </div>
                     ) : (
                         <div className="hidden items-center gap-4 md:flex">
+                            <AppearanceToggleDropdown />
                             <Button variant="ghost" className="font-medium">
                                 <Link href={route('login')}>Log in</Link>
                             </Button>
@@ -94,6 +97,10 @@ export default function Navbar() {
                         <Link href={route('mulucardpro')} className="hover:text-brand-purple text-sm font-medium transition-colors text-gray-700 dark:text-gray-300" onClick={() => setIsMenuOpen(false)}>
                             MuluCard <span style={{ backgroundColor: '#9b87f5', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>PRO</span>
                         </Link>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme:</span>
+                            <AppearanceToggleDropdown />
+                        </div>
                         {auth.user ? (
                             <div className="">
                                 <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">

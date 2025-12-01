@@ -22,7 +22,7 @@ const MostPopularBadge = () => (
 
 const PricingDisplay = ({ plan }: { plan: Plan }) => (
     <div className="mt-4">
-        <span className="text-4xl font-bold">
+        <span className="text-4xl font-bold text-foreground">
             {plan.price < 0 ? 'Custom Pricing' : plan.price === 0 ? 'Free' : `Birr ${plan.price}`}
         </span>
         <span className="text-muted-foreground ml-2">
@@ -40,7 +40,7 @@ const FeatureItem = ({ feature }: { feature: string }) => (
                 clipRule="evenodd"
             />
         </svg>
-        <span>{feature}</span>
+        <span className="text-foreground">{feature}</span>
     </li>
 );
 
@@ -51,7 +51,7 @@ export default function PlanCard({
 }: PlanCardProps) {
     return (
         <div
-            className={`animate-fade-in relative rounded-xl border bg-white p-8 shadow-sm ${
+            className={`animate-fade-in relative rounded-xl border bg-white dark:bg-card p-8 shadow-sm ${
                 plan.most_popular ? 'border-brand-purple border-2 shadow-md' : 'border-border'
             }`}
             style={{ animationDelay: ANIMATION_DELAY }}
@@ -59,7 +59,7 @@ export default function PlanCard({
             {plan.most_popular === true && <MostPopularBadge />}
 
             <div className="mb-6">
-                <h3 className="text-xl font-semibold">{plan.name}</h3>
+                <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
                 <PricingDisplay plan={plan} />
                 <p className="text-muted-foreground mt-3">{plan.description}</p>
             </div>

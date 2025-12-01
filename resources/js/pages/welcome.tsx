@@ -15,15 +15,15 @@ const DEFAULT_REDIRECTS = {
 
 const Hero = () => {
     return (
-        <section className="relative overflow-hidden pt-24 pb-20 md:pt-36 md:pb-32">
+        <section className="relative overflow-hidden bg-background pt-24 pb-20 md:pt-36 md:pb-32">
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
                     <div className="animate-fade-in-left max-w-2xl space-y-8 lg:max-w-none">
                         <div>
-                            <div className="bg-brand-purple/10 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
+                            <div className="bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
                                 Your digital identity, reimagined
                             </div>
-                            <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+                            <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
                                 Digital Business Cards for Modern Professionals
                             </h1>
                             <p className="text-muted-foreground mt-6 text-lg">
@@ -86,13 +86,13 @@ const features = [
 
 const Features = () => {
     return (
-        <section id="features" className="bg-secondary/50 py-20">
+        <section id="features" className="bg-secondary/50 dark:bg-secondary py-20">
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="animate-fade-in mx-auto mb-16 max-w-3xl text-center">
-                    <div className="bg-brand-purple/10 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
+                    <div className="bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
                         Why choose mulucard
                     </div>
-                    <h2 className="text-3xl font-bold md:text-4xl">Features designed for professionals</h2>
+                    <h2 className="text-3xl font-bold text-foreground md:text-4xl">Features designed for professionals</h2>
                     <p className="text-muted-foreground mt-4 text-lg">
                         Our digital business cards come packed with features to help you stand out and connect effectively.
                     </p>
@@ -102,11 +102,11 @@ const Features = () => {
                     {features.map((feature, index) => (
                         <div
                             key={index}
-                            className="border-border/50 animate-fade-in rounded-xl border bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+                            className="border-border/50 animate-fade-in rounded-xl border bg-white dark:bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
                             style={{ animationDelay: `${index * 0.1}s` }}
                         >
-                            <div className="bg-brand-purple/10 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">{feature.icon}</div>
-                            <h3 className="mb-2 text-xl font-semibold">{feature.title}</h3>
+                            <div className="bg-brand-purple/10 dark:bg-brand-purple/20 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">{feature.icon}</div>
+                            <h3 className="mb-2 text-xl font-semibold text-foreground">{feature.title}</h3>
                             <p className="text-muted-foreground">{feature.description}</p>
                         </div>
                     ))}
@@ -128,21 +128,21 @@ function Index({ plans }: { plans: Plan[] }) {
     }, []);
 
     return (
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col bg-background">
             <NavBar />
 
-            <main>
+            <main className="bg-background">
                 <Hero />
                 <Features />
 
                 {/* How It Works Section */}
-                <section id="how-it-works" className="py-20">
+                <section id="how-it-works" className="bg-background py-20">
                     <div className="container mx-auto max-w-7xl px-4">
                         <div className="animate-fade-in mx-auto mb-16 max-w-3xl text-center">
-                            <div className="bg-brand-purple/10 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
+                            <div className="bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
                                 Simple process
                             </div>
-                            <h2 className="text-3xl font-bold md:text-4xl">How It Works</h2>
+                            <h2 className="text-3xl font-bold text-foreground md:text-4xl">How It Works</h2>
                             <p className="text-muted-foreground mt-4 text-lg">Create and share your digital business card in minutes.</p>
                         </div>
 
@@ -151,7 +151,7 @@ function Index({ plans }: { plans: Plan[] }) {
                                 <div className="bg-brand-purple mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full text-xl text-white">
                                     1
                                 </div>
-                                <h3 className="mb-3 text-xl font-semibold">Create your card</h3>
+                                <h3 className="mb-3 text-xl font-semibold text-foreground">Create your card</h3>
                                 <p className="text-muted-foreground">
                                     Sign up and use our intuitive editor to create your perfect digital business card.
                                 </p>
@@ -161,7 +161,7 @@ function Index({ plans }: { plans: Plan[] }) {
                                 <div className="bg-brand-purple mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full text-xl text-white">
                                     2
                                 </div>
-                                <h3 className="mb-3 text-xl font-semibold">Customize design</h3>
+                                <h3 className="mb-3 text-xl font-semibold text-foreground">Customize design</h3>
                                 <p className="text-muted-foreground">
                                     Add your details, social profiles, and customize the design to match your brand.
                                 </p>
@@ -171,7 +171,7 @@ function Index({ plans }: { plans: Plan[] }) {
                                 <div className="bg-brand-purple mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full text-xl text-white">
                                     3
                                 </div>
-                                <h3 className="mb-3 text-xl font-semibold">Share instantly</h3>
+                                <h3 className="mb-3 text-xl font-semibold text-foreground">Share instantly</h3>
                                 <p className="text-muted-foreground">Share via QR code, NFC, email, or direct link. Connect with anyone, anywhere.</p>
                             </div>
                         </div>
@@ -186,13 +186,13 @@ function Index({ plans }: { plans: Plan[] }) {
                 </section>
 
                 {/* Pricing Section */}
-                <section id="pricing" className="bg-secondary/50 py-20">
+                <section id="pricing" className="bg-secondary/50 dark:bg-secondary py-20">
                     <div className="container mx-auto max-w-7xl px-4">
                         <div className="animate-fade-in mx-auto mb-16 max-w-3xl text-center">
-                            <div className="bg-brand-purple/10 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
+                            <div className="bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-medium">
                                 Pricing plans
                             </div>
-                            <h2 className="text-3xl font-bold md:text-4xl">Simple, transparent pricing</h2>
+                            <h2 className="text-3xl font-bold text-foreground md:text-4xl">Simple, transparent pricing</h2>
                             <p className="text-muted-foreground mt-4 text-lg">Choose the perfect plan for your needs with no hidden fees.</p>
                         </div>
 
@@ -217,14 +217,14 @@ function Index({ plans }: { plans: Plan[] }) {
                 </section>
 
                 {/* CTA Section */}
-                <section className="py-20">
+                <section className="bg-background py-20">
                     <div className="container mx-auto max-w-7xl px-4">
                         <div className="bg-brand-purple animate-fade-in mx-auto max-w-4xl rounded-2xl p-10 text-center text-white md:p-16">
                             <h2 className="mb-6 text-3xl font-bold md:text-4xl">Ready to go digital?</h2>
                             <p className="mb-8 text-lg opacity-90">
                                 Join thousands of professionals who are already using mulucard to make connections that matter.
                             </p>
-                            <Button size="lg" variant="secondary" className="text-brand-purple bg-white hover:bg-white/90">
+                            <Button size="lg" variant="secondary" className="text-brand-purple bg-white hover:bg-white/90 dark:bg-white dark:hover:bg-white/90">
                                 <Link href={route('register')}>Create Your Free Card</Link>
                             </Button>
                         </div>
