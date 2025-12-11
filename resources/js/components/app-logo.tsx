@@ -11,7 +11,7 @@ export default function AppLogo() {
             </div> */}
 
             <div className="flex items-center gap-[1px] text-xl font-semibold">
-                <span className="text-brand-purple">Mulu</span>
+                <span className="text-primary">Mulu</span>
                 <span>Card</span>
             </div>
         </>

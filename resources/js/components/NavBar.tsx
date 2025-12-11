@@ -35,24 +35,18 @@ export default function Navbar() {
                 <div className="flex items-center justify-between">
                     <a href="/" className="flex items-center gap-[1px] text-xl font-semibold">
                         <span className="text-brand-purple">Mulu</span>
-                        <span className="text-gray-900 dark:text-gray-100">Card</span>
+                        <span className="text-foreground">Card</span>
                     </a>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden items-center gap-8 md:flex">
-                        <a
-                            href="#features"
-                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
-                        >
+                        <a href="#features" className="hover:text-primary text-foreground text-sm font-medium transition-colors">
                             Features
                         </a>
-                        <a
-                            href="#how-it-works"
-                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
-                        >
+                        <a href="#how-it-works" className="hover:text-primary text-foreground text-sm font-medium transition-colors">
                             How It Works
                         </a>
-                        <a href="#pricing" className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300">
+                        <a href="#pricing" className="hover:text-primary text-foreground text-sm font-medium transition-colors">
                             Pricing
                         </a>
                     </nav>
@@ -77,7 +71,7 @@ export default function Navbar() {
                     )}
 
                     {/* Mobile Menu Button */}
-                    <button className="text-gray-700 md:hidden dark:text-gray-300" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <button className="text-foreground md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
                 </div>
@@ -85,32 +79,32 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="glass animate-fade-in absolute top-full right-0 left-0 h-screen bg-gray-50 p-4 shadow-md md:hidden dark:bg-gray-900">
+                <div className="glass animate-fade-in bg-background absolute top-full right-0 left-0 h-screen p-4 shadow-md md:hidden">
                     {/* <nav className="flex flex-col gap-2 py-4"> */}
                     <nav className="flex flex-col items-start gap-8 border-none">
                         <a
                             href="#features"
-                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                            className="hover:text-primary text-foreground text-sm font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Features
                         </a>
                         <a
                             href="#how-it-works"
-                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                            className="hover:text-primary text-foreground text-sm font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             How It Works
                         </a>
                         <a
                             href="#pricing"
-                            className="hover:text-brand-purple text-sm font-medium text-gray-700 transition-colors dark:text-gray-300"
+                            className="hover:text-primary text-foreground text-sm font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Pricing
                         </a>
                         <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme:</span>
+                            <span className="text-foreground text-sm font-medium">Theme:</span>
                             <AppearanceToggleDropdown />
                         </div>
                         {auth.user ? (

@@ -11,20 +11,20 @@ export default function Dashboardfooter() {
 
             <div className="flex flex-row items-center justify-center gap-4 border-none p-0">
                 <div className="bg-brand-purple flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
-                    <a href="/" className="text-xl font-bold text-black">
-                        <Facebook className="h-5 w-5 text-white" />
+                    <a href="/" className="text-foreground text-xl font-bold">
+                        <Facebook className="text-primary-foreground h-5 w-5" />
                     </a>
                 </div>
 
                 <div className="bg-brand-purple flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
-                    <a href="/" className="text-xl font-bold text-black">
-                        <Twitter className="h-5 w-5 text-white" />
+                    <a href="/" className="text-foreground text-xl font-bold">
+                        <Twitter className="text-primary-foreground h-5 w-5" />
                     </a>
                 </div>
 
                 <div className="bg-brand-purple flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#ff8c39]">
-                    <a href="/" className="text-xl font-bold text-black">
-                        <Instagram className="h-5 w-5 text-white" />
+                    <a href="/" className="text-foreground text-xl font-bold">
+                        <Instagram className="text-primary-foreground h-5 w-5" />
                     </a>
                 </div>
             </div>
