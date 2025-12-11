@@ -40,13 +40,13 @@ export default function Navbar() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden items-center gap-8 md:flex">
-                        <a href="#features" className="hover:text-primary text-foreground text-sm font-medium transition-colors">
+                        <a href="#features" className="text-foreground text-sm font-medium transition-colors">
                             Features
                         </a>
-                        <a href="#how-it-works" className="hover:text-primary text-foreground text-sm font-medium transition-colors">
+                        <a href="#how-it-works" className="text-foreground text-sm font-medium transition-colors">
                             How It Works
                         </a>
-                        <a href="#pricing" className="hover:text-primary text-foreground text-sm font-medium transition-colors">
+                        <a href="#pricing" className="text-foreground text-sm font-medium transition-colors">
                             Pricing
                         </a>
                     </nav>
@@ -54,7 +54,7 @@ export default function Navbar() {
                     {auth.user ? (
                         <div className="hidden items-center gap-4 md:flex">
                             <AppearanceToggleDropdown />
-                            <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
+                            <Button className="text-white transition-colors">
                                 <Link href={route('dashboard')}>Dashboard</Link>
                             </Button>
                         </div>
@@ -64,7 +64,7 @@ export default function Navbar() {
                             <Button variant="ghost" className="font-medium">
                                 <Link href={route('login')}>Log in</Link>
                             </Button>
-                            <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
+                            <Button className="text-white transition-colors">
                                 <Link href={route('register')}>Get Started</Link>
                             </Button>
                         </div>
@@ -79,37 +79,34 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="glass animate-fade-in bg-background absolute top-full right-0 left-0 h-screen p-4 shadow-md md:hidden">
+                <div className="glass animate-fade-in bg-background/95 absolute top-full right-0 left-0 h-screen p-4 shadow-md md:hidden backdrop-blur-lg">
                     {/* <nav className="flex flex-col gap-2 py-4"> */}
                     <nav className="flex flex-col items-start gap-8 border-none">
                         <a
                             href="#features"
-                            className="hover:text-primary text-foreground text-sm font-medium transition-colors"
+                            className="text-foreground text-sm font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Features
                         </a>
                         <a
                             href="#how-it-works"
-                            className="hover:text-primary text-foreground text-sm font-medium transition-colors"
+                            className="text-foreground text-sm font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             How It Works
                         </a>
                         <a
                             href="#pricing"
-                            className="hover:text-primary text-foreground text-sm font-medium transition-colors"
+                            className="text-foreground text-sm font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Pricing
                         </a>
-                        <div className="flex items-center gap-2">
-                            <span className="text-foreground text-sm font-medium">Theme:</span>
-                            <AppearanceToggleDropdown />
-                        </div>
+                        <AppearanceToggleDropdown />
                         {auth.user ? (
                             <div className="">
-                                <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
+                                <Button className="text-white transition-colors">
                                     <Link href={route('dashboard')}>Dashboard</Link>
                                 </Button>
                             </div>
@@ -118,7 +115,7 @@ export default function Navbar() {
                                 <Button variant="outline" className="font-medium">
                                     <Link href={route('login')}>Log in</Link>
                                 </Button>
-                                <Button className="bg-brand-purple hover:bg-brand-purple-dark transition-colors">
+                                <Button className="text-white transition-colors">
                                     <Link href={route('register')}>Get Started</Link>
                                 </Button>
                             </div>

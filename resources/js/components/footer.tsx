@@ -16,7 +16,7 @@ export default function Footer() {
                                 <span className="text-foreground">card</span>
                             </span>
                         </a>
-                        <p className="mb-4 text-sm">Modern digital business cards for professionals.</p>
+                        <p className="mb-4 text-sm text-foreground">Modern digital business cards for professionals.</p>
                         <div className="flex space-x-1">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                                 <Twitter className="h-4 w-4" />
@@ -31,7 +31,7 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-semibold">Company</h3>
+                        <h3 className="mb-4 font-semibold text-foreground">Company</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className="hover:text-foreground text-sm transition-colors">
@@ -52,7 +52,7 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-semibold">Legal</h3>
+                        <h3 className="mb-4 font-semibold text-foreground">Legal</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href={route('privacy-policy')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">

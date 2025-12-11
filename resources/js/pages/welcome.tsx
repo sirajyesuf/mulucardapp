@@ -88,8 +88,8 @@ const Features = () => {
                     {features.map((feature, index) => (
                         <div key={index} className="bg-card rounded-xl border p-6 shadow-sm">
                             <div className="bg-primary/10 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">{feature.icon}</div>
-                            <h3 className="mb-2 text-xl font-semibold">{feature.title}</h3>
-                            <p>{feature.description}</p>
+                            <h3 className="mb-2 text-xl font-semibold text-foreground">{feature.title}</h3>
+                            <p className="text-foreground">{feature.description}</p>
                         </div>
                     ))}
                 </div>
