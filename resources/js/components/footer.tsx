@@ -18,12 +18,12 @@ export default function Footer() {
                         </a>
                         <p className="mb-4 text-sm text-foreground">Modern digital business cards for professionals.</p>
                         <div className="flex space-x-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                            <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full">
                                 <Twitter className="h-4 w-4" />
                                 <span className="sr-only">Twitter</span>
                             </Button>
 
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                            <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full">
                                 <Instagram className="h-4 w-4" />
                                 <span className="sr-only">Instagram</span>
                             </Button>
@@ -34,12 +34,12 @@ export default function Footer() {
                         <h3 className="mb-4 font-semibold text-foreground">Company</h3>
                         <ul className="space-y-3">
                             <li>
-                                <a href="#" className="hover:text-foreground text-sm transition-colors">
+                                <a href="#" className="text-foreground text-sm transition-colors">
                                     About
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-foreground text-sm transition-colors dark:text-black">
+                                <a href="#" className="text-foreground text-sm transition-colors">
                                     Blog
                                 </a>
                             </li>

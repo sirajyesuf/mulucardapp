@@ -12,7 +12,7 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
 
     return (
         <div className={className} {...props}>
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md" onClick={toggleTheme}>
+            <Button variant="secondary" size="icon" className="h-9 w-9 rounded-md" onClick={toggleTheme}>
                 {appearance === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 <span className="sr-only">Toggle theme</span>
             </Button>

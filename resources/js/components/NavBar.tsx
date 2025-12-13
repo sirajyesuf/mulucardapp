@@ -34,7 +34,7 @@ export default function Navbar() {
             <div className="container mx-auto max-w-7xl">
                 <div className="flex items-center justify-between">
                     <a href="/" className="flex items-center gap-[1px] text-xl font-semibold">
-                        <span className="text-brand-purple">Mulu</span>
+                        <span className="text-primary">Mulu</span>
                         <span className="text-foreground">Card</span>
                     </a>
 
@@ -61,7 +61,7 @@ export default function Navbar() {
                     ) : (
                         <div className="hidden items-center gap-4 md:flex">
                             <AppearanceToggleDropdown />
-                            <Button variant="ghost" className="font-medium">
+                            <Button variant="secondary" className="font-medium">
                                 <Link href={route('login')}>Log in</Link>
                             </Button>
                             <Button className="text-white transition-colors">
@@ -112,7 +112,7 @@ export default function Navbar() {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4 border-none">
-                                <Button variant="outline" className="font-medium">
+                                <Button variant="secondary" className="font-medium">
                                     <Link href={route('login')}>Log in</Link>
                                 </Button>
                                 <Button className="text-white transition-colors">

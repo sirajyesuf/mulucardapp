@@ -79,7 +79,7 @@ const Features = () => {
                         Why choose mulucard
                     </div>
                     <h2 className="text-foreground text-3xl font-bold md:text-4xl">Features designed for professionals</h2>
-                    <p className="mt-4 text-lg">
+                    <p className="mt-4 text-foreground">
                         Our digital business cards come packed with features to help you stand out and connect effectively.
                     </p>
                 </div>
@@ -125,7 +125,7 @@ function Index({ plans }: { plans: Plan[] }) {
                                 Simple process
                             </div>
                             <h2 className="text-foreground text-3xl font-bold md:text-4xl">How It Works</h2>
-                            <p className="mt-4 text-lg" style={{ color: 'var(--foreground)' }}>
+                            <p className="mt-4 text-lg text-foreground">
                                 Create and share your digital business card in minutes.
                             </p>
                         </div>
