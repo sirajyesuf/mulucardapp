@@ -35,7 +35,7 @@ const SubscriptionCard = ({ subscription }: { subscription: Subscription }) => {
 
     return (
         <Card
-            className="animate-fade-up overflow-hidden border-gray-200 bg-white/90 p-6 shadow-none backdrop-blur-sm transition-all duration-300 hover:bg-white/95 "
+            className="animate-fade-up overflow-hidden   p-6 shadow-none backdrop-blur-sm transition-all duration-300"
             style={{
                 animationDelay: '0.1s',
             }}
@@ -44,11 +44,11 @@ const SubscriptionCard = ({ subscription }: { subscription: Subscription }) => {
                 <div className="flex items-start justify-between">
                     <div>
                         <h3 className="text-lg font-medium">{subscription.plan.name}</h3>
-                        <p className="text-muted-foreground text-sm">Annual Subscription</p>
+                        <p className="text-foreground text-sm">Annual Subscription</p>
                     </div>
                     <div className="text-right">
                         <p className="font-semibold">{formatCurrency(subscription.plan.price)}</p>
-                        <p className="text-muted-foreground text-sm">Billed on {new Date(subscription.start_date).toLocaleDateString()}</p>
+                        <p className="text-foreground text-sm">Billed on {new Date(subscription.start_date).toLocaleDateString()}</p>
                     </div>
                 </div>
 
@@ -92,7 +92,7 @@ export default function Subscription33({ subscriptions }: { subscriptions: Subsc
                         {(['all', 'active', 'expired'] as const).map((status, index) => (
                             <Button
                                 key={status}
-                                variant={filter === status ? 'default' : 'outline'}
+                                variant={filter === status ? 'default' : 'secondary'}
                                 size="sm"
                                 onClick={() => setFilter(status)}
                                 className={cn('capitalize', filter === status ? '' : 'bg-white/50 hover:bg-white/80', 'animate-fade-in')}
@@ -112,8 +112,8 @@ export default function Subscription33({ subscriptions }: { subscriptions: Subsc
                             ))
                         ) : (
                             <div className="animate-fade-in py-16 text-center">
-                                <h3 className="mb-2 text-lg font-medium">No subscriptions found</h3>
-                                <p className="text-muted-foreground">
+                                <h3 className="mb-2 text-lg font-medium text-foreground">No subscriptions found</h3>
+                                <p className="text-foreground">
                                     You don't have any {filter !== 'all' ? filter : ''} subscriptions at the moment.
                                 </p>
                             </div>
