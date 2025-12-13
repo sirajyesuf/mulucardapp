@@ -176,8 +176,6 @@ export default function CreateCard() {
         ],
     });
 
-    // console.log(data.links)
-
     const hasTabError = (prefixes: string[], errors: Partial<Record<string, string>>) => {
         return Object.keys(errors).some((key) => prefixes.some((prefix) => key.startsWith(prefix)));
     };
@@ -418,7 +416,7 @@ export default function CreateCard() {
 
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
-                            <TabsList className="h- flex h-auto w-full flex-row flex-wrap justify-around">
+                            <TabsList className="flex h-auto flex-row flex-wrap justify-start">
                                 <TabsTrigger value="display">
                                     {DisplayError ? <span className="text-red-500">Display</span> : <span className="">Display</span>}
                                 </TabsTrigger>
