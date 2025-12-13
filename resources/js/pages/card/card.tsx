@@ -50,7 +50,7 @@ export default function MuluCard({
     business_hours_enabled,
 }: MuluCardProps) {
     return (
-        <Card className="w-full rounded-lg bg-gray-50 p-0 shadow-none">
+        <Card className="w-full rounded-lg bg-gray-50 p-2 shadow-none">
             <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
                 <div
                     className="h-[200px] w-full"

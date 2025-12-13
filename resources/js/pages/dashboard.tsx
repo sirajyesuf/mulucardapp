@@ -84,7 +84,7 @@ export default function Dashboard() {
                 
             
                 <div className="flex flex-col items-center justify-center gap-4 rounded-xl border-none p-2">
-                    <h1 className="text-xl font-bold capitalize">No cards found</h1>
+                    <h1 className="text-xl font-bold text-foreground capitalize">No cards found</h1>
                     <p className="text-gray-500">You have no cards. Create one now.</p>
                 </div>
 
@@ -92,7 +92,7 @@ export default function Dashboard() {
                     className="flex flex-row items-center justify-center gap-4 rounded-lg p-0 text-black shadow-none hover:bg-gray-100"
                     href="card/create"
                 >
-                    <Button size="lg" className="bg-brand-purple hover:bg-brand-purple-dark group transition-colors">
+                    <Button size="lg" className="group transition-colors">
                         <span>Create New Card</span>
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
@@ -109,7 +109,7 @@ export default function Dashboard() {
                         className="flex flex-row items-center justify-center gap-4 rounded-lg bg-gray-50 p-0 text-black shadow-none hover:bg-gray-100"
                         href="card/create"
                     >
-                        <Button size="lg" className="bg-brand-purple hover:bg-brand-purple-dark group transition-colors">
+                        <Button size="lg" className="group transition-colors">
                             <span>Create New Card</span>
                             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Button>
@@ -117,18 +117,18 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <div className="grid grid-cols-3 gap-2 rounded-none border-none p-1 md:px-8 md:grid-cols-3">
-                <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
+            <div className="grid grid-cols-3 gap-2 rounded-2 border-none p-1 md:px-8 md:grid-cols-3">
+                <Card className="flex flex-col items-center justify-center border-2 shadow-2">
                     <h1 className="text-sm font-bold  text-center">Number of Cards</h1>
                     <p className="text-4xl font-extrabold">{reports.total_cards}</p>
                 </Card>
 
-                <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
+                <Card className="flex flex-col items-center justify-center border-2 shadow-2">
                     <h1 className="text-sm font-bold  text-center">Number of Active Cards</h1>
                     <p className="text-4xl font-extrabold">{reports.active_cards}</p>
                 </Card>
 
-                <Card className="flex flex-col items-center justify-center border-none bg-[#9b87f5] text-[#e8f1fa] shadow-none">
+                <Card className="flex flex-col items-center justify-center border-2 shadow-2">
                     <h1 className="text-sm font-bold  text-center">Number of Inactive Cards</h1>
                     <p className="text-4xl font-extrabold">{reports.inactive_cards}</p>
                 </Card>

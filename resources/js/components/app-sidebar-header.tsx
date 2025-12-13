@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
-
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 
 import NotificationPanel from "@/components/notification-panel"
@@ -14,8 +14,10 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
-            <div>
-                <NotificationPanel />
+
+            <div className='flex gap-2'>
+            <AppearanceToggleDropdown/>
+            <NotificationPanel />
             </div>
         </header>
     );

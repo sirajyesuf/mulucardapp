@@ -16,7 +16,7 @@ export default function AuthCardLayout({
             <div className="flex w-full max-w-md flex-col gap-6">
                 <Link href={route('home')} className="flex items-center gap-2 self-center font-medium">
                     <div className="flex items-center gap-[1px] text-xl font-semibold">
-                        <span className="text-brand-purple">Mulu</span>
+                        <span className="text-primary">Mulu</span>
                         <span>Card</span>
                     </div>
                 </Link>
