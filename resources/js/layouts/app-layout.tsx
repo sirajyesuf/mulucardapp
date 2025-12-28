@@ -14,6 +14,6 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
         <TooltipProvider>
             <main className="flex-grow">{children}</main>
         </TooltipProvider>
-        <Dashboardfooter />
+        {/* <Dashboardfooter /> */}
     </AppLayoutTemplate>
 );

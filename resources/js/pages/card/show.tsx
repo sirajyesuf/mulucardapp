@@ -29,7 +29,6 @@ export default function ShowCard() {
 
     const { props } = usePage();
     const card = props.card as CardType;
-    console.log(card)
 
     const { data, setData,  post,   get,  errors, reset } = useForm({
         personalizedurl: card.url.split('/').pop(),
