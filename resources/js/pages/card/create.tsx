@@ -455,7 +455,7 @@ export default function CreateCard() {
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
+                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text">
                                                 Upload Your Banner
                                             </Label>
                                             {data.banner.file ? (
@@ -491,7 +491,7 @@ export default function CreateCard() {
                                         </div>
                                         {/* banner end */}
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
+                                            <Label htmlFor="avatar-upload" className="text-sm font-medium">
                                                 Upload Your Avatar <span className="text-lg text-red-500">*</span>
                                             </Label>
                                             {data.avatar.file ? (
@@ -527,7 +527,7 @@ export default function CreateCard() {
                                         </div>
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
+                                            <Label htmlFor="avatar-upload" className="text-sm font-medium">
                                                 Upload Your Logo
                                             </Label>
                                             {data.logo.file ? (

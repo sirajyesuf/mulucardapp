@@ -491,7 +491,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="banner-upload" className="text-sm font-medium text-black">
+                                            <Label htmlFor="banner-upload" className="text-sm font-medium">
                                                 Upload Your Banner
                                             </Label>
                                             {data.banner.path ? (
@@ -526,7 +526,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                         </div>
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text-black">
+                                            <Label htmlFor="avatar-upload" className="text-sm font-medium">
                                                 Upload Your Avatar <span className="text-red-500 text-lg">*</span>
                                             </Label>
                                             {data.avatar.path ? (
@@ -561,7 +561,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                         </div>
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="logo-upload" className="text-sm font-medium text-black">
+                                            <Label htmlFor="logo-upload" className="text-sm font-medium">
                                                 Upload Your Logo
                                             </Label>
                                             {data.logo.path ? (
