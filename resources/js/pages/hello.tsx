@@ -5,6 +5,7 @@ import axios from 'axios';
 import ShareButton from '@/components/share-button';
 import MuluCard from './card/card';
 import { Button } from '@/components/ui/button';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 export default function Hello() {
 
@@ -109,7 +110,10 @@ export default function Hello() {
 
     return (
         <>
-            <div className="flex min-h-svh flex-col justify-between gap-4 bg-white p-1">
+            <div className="fixed top-4 right-4 z-50">
+                <AppearanceToggleDropdown />
+            </div>
+            <div className="flex min-h-svh flex-col justify-between gap-4 bg-background p-1">
                 <div className="mx-auto mt-0 mb-24 md:mb-10 rounded-lg md:border-4 border-none p-1 md:w-[500px]">
                     <MuluCard
                         url={card?.url}
@@ -133,7 +137,7 @@ export default function Hello() {
                         banner={card?.banner}
                     />
                 </div>
-                <div className="items-top fixed bottom-0 -mb-8 flex h-16 w-xl justify-center self-center rounded-4xl border-none bg-[#9f77e3] pt-2 text-white">
+                <div className="items-top fixed bottom-0 -mb-8 flex h-16 w-xl justify-center self-center rounded-4xl border-none bg-primary pt-2 text-primary-foreground">
                     a free digital business card from MuluCard
                 </div>
             </div>
@@ -146,7 +150,7 @@ export default function Hello() {
                         />
 
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => downloadVCard()} >
+                    <Button variant="default" size="sm" onClick={() => downloadVCard()} >
                     <Contact className="h-4 w-4" />
                     Add To Contact
                     </Button>

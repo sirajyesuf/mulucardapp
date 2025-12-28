@@ -50,8 +50,8 @@ export default function MuluCard({
     business_hours_enabled,
 }: MuluCardProps) {
     return (
-        <Card className="w-full rounded-lg bg-gray-50 p-2 shadow-none">
-            <CardHeader className="h-[200px] w-full rounded-lg border-none bg-gray-50 p-0">
+        <Card className="bg-background w-full rounded-lg p-2 shadow-none">
+            <CardHeader className="bg-background h-[200px] w-full rounded-lg border-none p-0">
                 <div
                     className="h-[200px] w-full"
                     // style={{
@@ -62,31 +62,31 @@ export default function MuluCard({
                 </div>
                 <div className={`relative -mt-14 flex flex-row ${logo && logo.path ? 'justify-between' : 'justify-center'} border-none px-4`}>
                     <div
-                        className={`bordr-white flex h-[100px] w-[100px] items-center justify-center rounded-full border-4 border-gray-500 bg-white ${logo && logo.path ? '' : 'mx-auto'}`}
+                        className={`bordr-card border-border bg-card flex h-[100px] w-[100px] items-center justify-center rounded-full border-4 ${logo && logo.path ? '' : 'mx-auto'}`}
                     >
                         <img src={avatar.path || ''} alt="" className="h-full w-full rounded-full border-none object-contain" />
                     </div>
                     {logo && logo.path && (
-                        <div className="flex h-[100px] w-[100px] items-center justify-center rounded-lg border-4 border-gray-500 bg-white">
+                        <div className="border-border bg-card flex h-[100px] w-[100px] items-center justify-center rounded-lg border-4">
                             <img src={logo.path} alt="" className="h-full w-full rounded-full border-none object-contain" />
                         </div>
                     )}
                 </div>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4 border-none bg-gray-50 p-2">
+            <CardContent className="bg-background flex flex-col gap-4 border-none p-2">
                 <div className="mb-8 flex flex-col items-center border-none">
-                    <div className="font-norma flex flex-row space-x-4 text-2xl capitalize">
+                    <div className="font-norma text-foreground flex flex-row space-x-4 text-2xl capitalize">
                         <p>{first_name}</p>
 
                         <p>{last_name}</p>
                     </div>
                     <div>
-                        <p className="text-md font-bold capitalize">{organization}</p>
-                        <p className="text-md font-bold capitalize">{job_title}</p>
+                        <p className="text-md text-card-foreground font-bold capitalize">{organization}</p>
+                        <p className="text-md text-card-foreground font-bold capitalize">{job_title}</p>
                     </div>
                 </div>
 
-                <div className="font-mute p-2 text-center">{headline}</div>
+                <div className="text-muted-foreground p-2 text-center">{headline}</div>
 
                 <div className="flex flex-row flex-wrap items-start justify-center gap-2 border-none">
                     {links?.map((link, index) => {
@@ -149,14 +149,12 @@ export default function MuluCard({
                             <div className="space-y-6">
                                 {services.map((item) => (
                                     <div key={item.id} className="space-y-2">
-                                        <div className="aspect-video w-full overflow-hidden rounded-lg border bg-white">
+                                        <div className="bg-card aspect-video w-full overflow-hidden rounded-lg border">
                                             {item.path && <img src={item.path} alt={item.name} className="h-full w-full object-contain" />}
                                         </div>
                                         <div className="mt-2">
-                                            <h3 className="font-medium">{item.name}</h3>
-                                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                {item.description || 'No description provided'}
-                                            </p>
+                                            <h3 className="text-foreground font-medium">{item.name}</h3>
+                                            <p className="text-muted-foreground mt-1 text-sm">{item.description || 'No description provided'}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -174,13 +172,11 @@ export default function MuluCard({
                             <div className="space-y-6">
                                 {galleries.map((item) => (
                                     <div key={item.id} className="space-y-2">
-                                        <div className="aspect-video w-full overflow-hidden rounded-lg border bg-white">
+                                        <div className="bg-card aspect-video w-full overflow-hidden rounded-lg border">
                                             {item.path && <img src={item.path} alt={item.description} className="h-full w-full object-contain" />}
                                         </div>
                                         <div className="mt-2">
-                                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                {item.description || 'No description provided'}
-                                            </p>
+                                            <p className="text-muted-foreground mt-1 text-sm">{item.description || 'No description provided'}</p>
                                         </div>
                                     </div>
                                 ))}
