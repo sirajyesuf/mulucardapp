@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Image } from '@/types';
-import { Copy, Download, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Copy, Download, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 
 interface CardPreviewProps {
     banner: Image;
@@ -16,6 +16,7 @@ interface CardPreviewProps {
     onCopyLink?: () => void;
     onDownloadQR?: () => void;
     onEdit?: () => void;
+    onShow?: () => void;
 }
 
 export default function CardPreview({
@@ -30,6 +31,7 @@ export default function CardPreview({
     onCopyLink,
     onDownloadQR,
     onEdit,
+    onShow,
 }: CardPreviewProps) {
     return (
         <Card className="group bg-card relative w-full overflow-hidden border">
@@ -44,7 +46,20 @@ export default function CardPreview({
                 )}
 
                 {/* Quick Actions */}
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-2 right-2 flex gap-2">
+                    
+                    <Button
+                        variant="default"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0"
+                        onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onShow();
+                        }}
+                    >
+                        <Eye className="h-4 w-4" />
+                    </Button>
+                
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
@@ -134,7 +149,7 @@ export default function CardPreview({
             {onEdit && (
                 <div className="absolute right-2 bottom-2">
                     <Button
-                        variant="secondary"
+                        variant="default"
                         size="sm"
                         className="bg-primary text-primary-foreground h-10 w-10 rounded-full p-0"
                         onClick={(e: React.MouseEvent) => {

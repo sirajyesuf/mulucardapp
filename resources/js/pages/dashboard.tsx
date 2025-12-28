@@ -146,6 +146,7 @@ export default function Dashboard() {
                                 onCopyLink={() => copyCardLink(card.url)}
                                 onDownloadQR={() => downloadQRCode(card)}
                                 onEdit={() => editCard(card.id)}
+                                onShow={() =>showCardDetail(card.id) }
                             />
                         ))}
                     </div>

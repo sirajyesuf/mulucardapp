@@ -114,7 +114,7 @@ export default function ShowCard() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="grid h-full flex-1 grid-cols-1 gap-2 rounded-xl border-none p-4 md:grid-cols-3">
-                <div className="col-span-1 hidden rounded-sm border-2 p-0 md:block">
+                <div className="col-span-1 hidden rounded-sm border-0 p-0 md:block">
                     <ScrollArea className="h-[800px] pr-2">
                         <MuluCard
                             url={card?.url}
@@ -196,7 +196,7 @@ export default function ShowCard() {
                                                 onClick={handleCopy}
                                             >
                                                 {isCopied ? <Check size={100} className="text-green-500" /> : <Copy size={100} />}
-                                                <span className="text-lg font-extrabold text-black capitalize">
+                                                <span className="text-lg font-extrabold text-foreground capitalize">
                                                     {isCopied ? 'copied!' : 'copy link'}
                                                 </span>
                                             </Button>
@@ -252,15 +252,15 @@ export default function ShowCard() {
                                             </Label>
                                         </div>
                                     </div>
-                                    <div className="flex flex-row items-center justify-between rounded-lg border-2 border-red-400 bg-red-50 px-4 py-4">
+                                    <div className="flex flex-row items-center justify-between rounded-lg border-2 border-red-400 bg-card px-4 py-4">
                                         <div className="flex flex-col">
-                                            <p className="font-extrabold">Delete</p>
-                                            {/* <p className="text-mute font-normal">Delete this card permanently.</p> */}
+                                            <p className="font-extrabold text-foreground">Delete</p>
+                                            <p className="text-mute font-normal">Delete this card permanently.</p>
                                         </div>
 
                                         <Button
                                             variant="outline"
-                                            className="cursor-pointer border-2 border-red-400 font-extrabold text-red-500 hover:text-red-700"
+                                            className="cursor-pointer border-2 border-red-400 font-extrabold text-foreground hover:text-red-700"
                                             onClick={() => deleteCard()}
                                         >
                                             Delete Card
