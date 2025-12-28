@@ -122,7 +122,7 @@ export default function MuluCard({
                     )}
                     {email && (
                         <div
-                            className="rounded-4xl border-2 p-2"
+                            className="rounded-4xl border-none p-2"
                             style={{
                                 backgroundColor: banner_color,
                             }}

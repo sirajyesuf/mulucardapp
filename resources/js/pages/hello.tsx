@@ -111,10 +111,12 @@ export default function Hello() {
     return (
         <>
             <div className="fixed top-4 right-4 z-50">
-                <AppearanceToggleDropdown />
+                <div className="bg-popover border-0 rounded-md shadow-lg">
+                    <AppearanceToggleDropdown />
+                </div>
             </div>
             <div className="flex min-h-svh flex-col justify-between gap-4 bg-background p-1">
-                <div className="mx-auto mt-0 mb-24 md:mb-10 rounded-lg md:border-4 border-none p-1 md:w-[500px]">
+                <div className="mx-auto mt-0 mb-24 md:mb-10 rounded-lg md:border-4 border-none p-1 md:w-[500px] w-full">
                     <MuluCard
                         url={card?.url}
                         avatar={card?.avatar}
