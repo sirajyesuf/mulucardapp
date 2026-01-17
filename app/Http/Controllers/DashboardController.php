@@ -20,12 +20,19 @@ class DashboardController extends Controller
         $activeCards = $cardsCollection->where('status', CardStatus::Active);
         $inactiveCards = $cardsCollection->where('status', CardStatus::InActive);
 
+        $topViewedCards = $cardsCollection->sortByDesc('total_views')->take(5)->values();
+
         $reports = [
             'total_cards' => $cardsCollection->count(),
             'active_cards' => $activeCards->count(),
             'inactive_cards' => $inactiveCards->count()
         ];
-        return Inertia::render('dashboard', ['cards' => $cardsCollection,'reports' => $reports]);
+
+        return Inertia::render('dashboard', [
+            'cards' => $cardsCollection,
+            'reports' => $reports,
+            'topViewedCards' => $topViewedCards
+        ]);
     }
 
 
