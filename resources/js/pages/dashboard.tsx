@@ -30,7 +30,12 @@ export default function Dashboard() {
         router.get(route('card.show', { id: id }));
     }
 
-    function deleteCard(card:CardType) {
+    function showHelloCard(card:CardType){
+        console.log("fucnk you")
+        router.get(card.url)
+    }
+
+    function deleteCard(card: CardType) {
         if (confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
             router.get(route('card.delete', { id: card.id }), {
                 onFinish: () => {
@@ -38,18 +43,17 @@ export default function Dashboard() {
                 },
                 onSuccess: () => {
                     toast.success('Card has been deleted successfully');
-    
-                }
+                },
             });
         }
     }
 
-    async function copyCardLink(card_url:string) {
+    async function copyCardLink(card_url: string) {
         await navigator.clipboard.writeText(card_url);
     }
 
-    function downloadQRCode(card:CardType) {
-        const link = document.createElement("a");
+    function downloadQRCode(card: CardType) {
+        const link = document.createElement('a');
         link.href = `/storage/${card?.qr_code}`;
         link.download = 'qr_code.png';
         link.click();
@@ -141,12 +145,12 @@ export default function Dashboard() {
                                 first_name={card.first_name}
                                 last_name={card.last_name}
                                 banner_color={card.banner_color}
-                                onClick={() => showCardDetail(card.id)}
+                                onShowCardDetail={() => showCardDetail(card.id)}
+                                onHelloCard={() => showHelloCard(card)}
                                 onDelete={() => deleteCard(card)}
                                 onCopyLink={() => copyCardLink(card.url)}
                                 onDownloadQR={() => downloadQRCode(card)}
                                 onEdit={() => editCard(card.id)}
-                                onShow={() =>showCardDetail(card.id) }
                             />
                         ))}
                     </div>

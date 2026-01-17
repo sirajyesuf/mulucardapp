@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Image } from '@/types';
-import { Copy, Download, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Copy, Download, Edit, Eye, Globe, MoreHorizontal, Trash2 } from 'lucide-react';
 
 interface CardPreviewProps {
     banner: Image;
@@ -11,12 +11,12 @@ interface CardPreviewProps {
     first_name: string;
     last_name: string;
     banner_color: string;
-    onClick?: () => void;
-    onDelete?: () => void;
-    onCopyLink?: () => void;
-    onDownloadQR?: () => void;
-    onEdit?: () => void;
-    onShow?: () => void;
+    onShowCardDetail: () => void;
+    onDelete: () => void;
+    onCopyLink: () => void;
+    onDownloadQR: () => void;
+    onEdit: () => void;
+    onHelloCard: () => void;
 }
 
 export default function CardPreview({
@@ -26,12 +26,12 @@ export default function CardPreview({
     first_name,
     last_name,
     banner_color,
-    onClick,
+    onShowCardDetail,
     onDelete,
     onCopyLink,
     onDownloadQR,
+    onHelloCard,
     onEdit,
-    onShow,
 }: CardPreviewProps) {
     return (
         <Card className="group bg-card relative w-full overflow-hidden border">
@@ -47,19 +47,18 @@ export default function CardPreview({
 
                 {/* Quick Actions */}
                 <div className="absolute top-2 right-2 flex gap-2">
-                    
                     <Button
                         variant="default"
                         size="sm"
                         className="h-8 w-8 rounded-full p-0"
                         onClick={(e: React.MouseEvent) => {
                             e.stopPropagation();
-                            onShow();
+                            onHelloCard();
                         }}
                     >
-                        <Eye className="h-4 w-4" />
+                        <Globe className="h-4 w-4" />
                     </Button>
-                
+
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
@@ -112,7 +111,7 @@ export default function CardPreview({
             </div>
 
             {/* Avatar and Logo */}
-            <div className="relative px-4 pb-4">
+            <div className="relative px-4 pb-4 mb-4">
                 <div className={`${banner.path ? '-mt-12' : ''} flex items-end justify-between`}>
                     {/* Avatar */}
                     <div className="relative">
@@ -139,15 +138,15 @@ export default function CardPreview({
 
                 {/* Name */}
                 <div className="mt-3 text-center">
-                    <h3 className="text-foreground cursor-pointer text-lg font-semibold" onClick={onClick}>
+                    <h3 className="text-foreground cursor-pointer text-lg font-semibold" onClick={onShowCardDetail}>
                         {first_name} {last_name}
                     </h3>
                 </div>
             </div>
 
-            {/* Floating Edit Button */}
-            {onEdit && (
-                <div className="absolute right-2 bottom-2">
+            {/* Floating Action Buttons */}
+            <div className="absolute right-2 bottom-2   flex gap-2">
+                {onEdit && (
                     <Button
                         variant="default"
                         size="sm"
@@ -159,8 +158,19 @@ export default function CardPreview({
                     >
                         <Edit className="h-4 w-4" />
                     </Button>
-                </div>
-            )}
+                )}
+                <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-primary text-primary-foreground h-10 w-10 rounded-full p-0"
+                    onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        onShowCardDetail();
+                    }}
+                >
+                    <Eye className="h-4 w-4" />
+                </Button>
+            </div>
         </Card>
     );
 }
