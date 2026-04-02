@@ -8,6 +8,7 @@ import { type BreadcrumbItem, type Card as CardType, type SharedData } from '@/t
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, CheckCircle, CreditCard, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,25 +41,26 @@ export default function Dashboard() {
     }
 
     function showHelloCard(card: CardType) {
-        console.log('fucnk you');
         router.get(card.url);
     }
 
     function deleteCard(card: CardType) {
         if (confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
             router.get(route('card.delete', { id: card.id }), {
-                onFinish: () => {
-                    toast.success('Card has been deleted');
-                },
                 onSuccess: () => {
-                    toast.success('Card has been deleted successfully');
+                    toast.success('Card deleted');
                 },
             });
         }
     }
 
     async function copyCardLink(card_url: string) {
-        await navigator.clipboard.writeText(card_url);
+        try {
+            await navigator.clipboard.writeText(card_url);
+            toast.success('Link copied to clipboard');
+        } catch {
+            toast.error('Could not copy link');
+        }
     }
 
     function downloadQRCode(card: CardType) {
@@ -161,10 +163,10 @@ export default function Dashboard() {
                         </Card>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {cards.map((card, index) => (
+                    <div className="grid grid-cols-1 gap-5 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {cards.map((card) => (
                             <CardPreview
-                                key={index}
+                                key={card.id}
                                 banner={card.banner}
                                 avatar={card.avatar}
                                 logo={card.logo}
