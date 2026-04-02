@@ -178,3 +178,17 @@
   body {
     letter-spacing: var(--tracking-normal);
   }
+
+  /**
+   * Bare `border` utilities default to currentColor in CSS; with `text-foreground` / `text-card-foreground`
+   * that reads as black. Pin the default border paint to the shadcn border token so primitives keep working
+   * without editing components/ui. Explicit utilities (`border-border`, `border-input`, `border-transparent`, …)
+   * still override this in the utilities layer.
+   */
+  @layer base {
+    *,
+    ::before,
+    ::after {
+      border-color: var(--border);
+    }
+  }

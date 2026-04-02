@@ -60,6 +60,7 @@ export interface Card {
     email: string;
     phone: string;
     banner_color: string;
+    template: 'classic' | 'modern' | 'bold';
     links: {
         name: string;
         url: string;

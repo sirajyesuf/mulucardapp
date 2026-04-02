@@ -16,7 +16,7 @@ export default function Footer() {
                                 <span className="text-foreground">card</span>
                             </span>
                         </a>
-                        <p className="mb-4 text-sm text-foreground">Modern digital business cards for professionals.</p>
+                        <p className="text-foreground mb-4 text-sm">Modern digital business cards for professionals.</p>
                         <div className="flex space-x-1">
                             <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full">
                                 <Twitter className="h-4 w-4" />
@@ -31,7 +31,7 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-semibold text-foreground">Company</h3>
+                        <h3 className="text-foreground mb-4 font-semibold">Company</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className="text-foreground text-sm transition-colors">
@@ -52,7 +52,7 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-semibold text-foreground">Legal</h3>
+                        <h3 className="text-foreground mb-4 font-semibold">Legal</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href={route('privacy-policy')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
@@ -75,10 +75,9 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Fixed banner at the bottom of the screen */}
-            <div className="pointer-events-none fixed right-0 bottom-0 left-0 z-50 flex justify-center">
-                <div className="bg-primary text-primary-foreground mx-auto mb-4 flex h-12 w-auto items-center justify-center rounded-full border-none px-6 text-xs">
-                    a free digital business card from mulucard
+            <div className="border-t border-slate-200/70 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-950/70">
+                <div className="container mx-auto max-w-7xl px-4 py-4 text-center text-xs text-slate-500 dark:text-slate-400">
+                    a digital business card from MuluCard
                 </div>
             </div>
         </footer>

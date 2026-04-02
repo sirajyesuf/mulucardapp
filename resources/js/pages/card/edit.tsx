@@ -10,7 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
+import { CardTemplateSelector } from '@/pages/card/card-template-selector';
 import MuluCard from '@/pages/card/card';
+import type { CardTemplateId } from '@/pages/card/mulu-card-props';
 import { type BreadcrumbItem, type Card as CardType, type DaySchedule, type Gallery, type Service, type SharedData,type Image, type Link as LinkType } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -38,6 +40,7 @@ interface CardForm {
     galleries: Gallery[];
     services: Service[];
     business_hours_enabled: boolean;
+    template: CardTemplateId;
     [key: string]: any; 
 }
 
@@ -122,6 +125,7 @@ export default function EditCard({ card }: { card: CardType }) {
         galleries: card.galleries?.length > 0 ? card.galleries : [],
         services: card.services?.length > 0 ? card.services : [],
         business_hours_enabled: card.business_hours_enabled,
+        template: (card.template ?? 'classic') as CardTemplateId,
         business_hours: card.business_hours || [
             { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '09:00', close: '17:00' },
             { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '09:00', close: '17:00' },
@@ -369,9 +373,16 @@ export default function EditCard({ card }: { card: CardType }) {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-none md:block">
-                        <ScrollArea className="h-[800px] cursor-pointer rounded-md border-1">
+                    <div className="col-span-2 hidden flex-col gap-3 rounded-lg border-none p-0 shadow-none md:flex md:h-[820px]">
+                        <CardTemplateSelector
+                            value={data.template}
+                            onChange={(id) => setData('template', id)}
+                            disabled={processing}
+                            className="w-full shrink-0"
+                        />
+                        <ScrollArea className="min-h-0 flex-1 cursor-pointer rounded-md border">
                             <MuluCard
+                                template={data.template}
                                 avatar={data.avatar}
                                 logo={data.logo}
                                 first_name={data.first_name}

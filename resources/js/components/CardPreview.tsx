@@ -34,7 +34,7 @@ export default function CardPreview({
     onEdit,
 }: CardPreviewProps) {
     return (
-        <Card className="group bg-card relative w-full overflow-hidden border">
+        <Card className="group bg-card relative w-full overflow-hidden border-0 shadow-sm ring-1 ring-slate-200/70 transition-all hover:-translate-y-0.5 hover:shadow-md dark:ring-slate-800">
             {/* Banner with gradient overlay */}
             <div className="relative">
                 {banner.path ? (
@@ -42,7 +42,7 @@ export default function CardPreview({
                         <img src={banner.path} alt="Banner" className="h-full w-full object-cover" />
                     </div>
                 ) : (
-                    <div className="h-16 w-full" />
+                    <div className="h-16 w-full bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900" />
                 )}
 
                 {/* Quick Actions */}
@@ -111,7 +111,7 @@ export default function CardPreview({
             </div>
 
             {/* Avatar and Logo */}
-            <div className="relative px-4 pb-4 mb-4">
+            <div className="relative mb-4 px-4 pb-4">
                 <div className={`${banner.path ? '-mt-12' : ''} flex items-end justify-between`}>
                     {/* Avatar */}
                     <div className="relative">
@@ -145,7 +145,7 @@ export default function CardPreview({
             </div>
 
             {/* Floating Action Buttons */}
-            <div className="absolute right-2 bottom-2   flex gap-2">
+            <div className="absolute right-2 bottom-2 flex gap-2">
                 {onEdit && (
                     <Button
                         variant="default"

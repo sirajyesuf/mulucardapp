@@ -39,6 +39,7 @@ class CardResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'banner_color' => $this->banner_color,
+            'template' => $this->template ?? 'classic',
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'links' => $this->socialLinks,

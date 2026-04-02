@@ -117,6 +117,7 @@ export default function ShowCard() {
                 <div className="col-span-1 hidden rounded-sm border-0 p-0 md:block">
                     <ScrollArea className="h-[800px] pr-2">
                         <MuluCard
+                            template={card.template ?? 'classic'}
                             url={card?.url}
                             avatar={card?.avatar}
                             logo={card?.logo}
@@ -133,6 +134,7 @@ export default function ShowCard() {
                             headline={card?.headline}
                             services={card?.services}
                             galleries={card?.galleries}
+                            business_hours_enabled={card.business_hours_enabled}
                             business_hours={card.business_hours}
                             banner={card?.banner}
                         />

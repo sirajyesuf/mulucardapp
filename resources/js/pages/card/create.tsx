@@ -10,7 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
+import { CardTemplateSelector } from '@/pages/card/card-template-selector';
+import { buildCreatePreviewProps } from '@/pages/card/build-create-preview-props';
 import MuluCard from '@/pages/card/card';
+import type { CardTemplateId } from '@/pages/card/mulu-card-props';
 import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Check, Clock, Copy, Globe, LoaderCircle, PlusCircle, ShieldAlert, Upload, X } from 'lucide-react';
@@ -43,6 +46,7 @@ interface CardForm {
     galleries: Gallery[];
     services: Service[];
     business_hours_enabled: boolean;
+    template: CardTemplateId;
     [key: string]: any; // Add index signature to allow string indexing
 }
 
@@ -165,6 +169,7 @@ export default function CreateCard() {
         galleries: [],
         services: [],
         business_hours_enabled: false,
+        template: 'classic',
         business_hours: [
             { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '03:00', close: '11:00' },
             { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '03:00', close: '11:00' },
@@ -319,6 +324,7 @@ export default function CreateCard() {
 
     const validItems = data.galleries.filter((item: Gallery) => item.file && item.path);
     const ValidServiceItems = data.services.filter((item: Service) => item.file && item.path);
+    const previewProps = buildCreatePreviewProps(data, validItems, ValidServiceItems);
 
     const handleFileChange = (field: 'avatar' | 'logo' | 'banner') => (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] ?? null;
@@ -388,35 +394,26 @@ export default function CreateCard() {
                     </Button>
                 </div>
                 <div className="m-2 grid h-full flex-1 grid-cols-1 gap-4 rounded-xl border-none p-4 md:grid-cols-5">
-                    <div className="col-span-2 hidden h-[820px] rounded-lg border-none border-red-500 p-0 shadow-none md:block">
-                        <ScrollArea className="h-[800px] cursor-pointer rounded-md border-1">
-                            <MuluCard
-                                business_hours_enabled={data.business_hours_enabled}
-                                url={data.url}
-                                avatar={data.avatar}
-                                logo={data.logo}
-                                first_name={data.first_name}
-                                last_name={data.last_name}
-                                organization={data.organization}
-                                job_title={data.job_title}
-                                phone={data.phone}
-                                email={data.email}
-                                banner_color={data.banner_color}
-                                links={data.links}
-                                address={data.address}
-                                location={data.location}
-                                headline={data.headline}
-                                galleries={validItems}
-                                services={ValidServiceItems}
-                                business_hours={data.business_hours}
-                                banner={data.banner}
+                    <div className="col-span-2 hidden flex-col gap-3 rounded-lg border-none p-0 shadow-none md:flex md:h-[820px]">
+                        <div className="flex w-full shrink-0 flex-col gap-1">
+                            <CardTemplateSelector
+                                value={data.template}
+                                onChange={(id) => setData('template', id)}
+                                disabled={processing}
+                                className="w-full shrink-0"
                             />
+                            <p className="text-muted-foreground px-0.5 text-xs leading-snug">
+                                Empty fields show sample content in the preview only.
+                            </p>
+                        </div>
+                        <ScrollArea className="min-h-0 flex-1 cursor-pointer rounded-md border">
+                            <MuluCard template={data.template} {...previewProps} />
                         </ScrollArea>
                     </div>
 
                     <div className="col-span-3 border-none p-2">
                         <Tabs defaultValue="display">
-                            <TabsList className="flex h-auto flex-row flex-wrap justify-start">
+                            <TabsList className="mb-2 flex h-auto flex-row flex-wrap justify-start">
                                 <TabsTrigger value="display">
                                     {DisplayError ? <span className="text-red-500">Display</span> : <span className="">Display</span>}
                                 </TabsTrigger>

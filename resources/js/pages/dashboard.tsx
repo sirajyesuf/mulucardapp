@@ -1,4 +1,6 @@
 import CardPreview from '@/components/CardPreview';
+import DoughnutChart from '@/components/charts/DoughnutChart';
+import TopViewedChart from '@/components/charts/TopViewedChart';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
@@ -20,6 +22,13 @@ type Reports = {
     total_cards: number;
 };
 
+type TopViewedCard = {
+    id: number;
+    first_name: string;
+    last_name: string;
+    total_views: number;
+};
+
 type CardList = CardType[];
 
 export default function Dashboard() {
@@ -30,9 +39,9 @@ export default function Dashboard() {
         router.get(route('card.show', { id: id }));
     }
 
-    function showHelloCard(card:CardType){
-        console.log("fucnk you")
-        router.get(card.url)
+    function showHelloCard(card: CardType) {
+        console.log('fucnk you');
+        router.get(card.url);
     }
 
     function deleteCard(card: CardType) {
@@ -66,6 +75,7 @@ export default function Dashboard() {
     const { props } = usePage();
     const cards = props.cards as CardList;
     const reports = props.reports as Reports;
+    const topViewedCards = (props.topViewedCards as TopViewedCard[]) || [];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -132,6 +142,22 @@ export default function Dashboard() {
                                 <p className="mt-2 text-3xl font-bold text-red-900 dark:text-red-100">{reports.inactive_cards}</p>
                                 <p className="mt-1 text-xs text-red-600 dark:text-red-400">Hidden or disabled cards</p>
                             </div>
+                        </Card>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 md:px-8">
+                        <Card className="border-0 bg-gradient-to-br from-slate-50 via-white to-slate-100/70 p-4 shadow-sm dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+                            <div className="mb-3">
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Card Status Distribution</h3>
+                            </div>
+                            <DoughnutChart activeCards={reports.active_cards} inactiveCards={reports.inactive_cards} />
+                        </Card>
+
+                        <Card className="border-0 bg-gradient-to-br from-slate-50 via-white to-slate-100/70 p-4 shadow-sm dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+                            <div className="mb-3">
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Top 5 Most Viewed Cards</h3>
+                            </div>
+                            <TopViewedChart cards={topViewedCards} />
                         </Card>
                     </div>
 
