@@ -27,6 +27,7 @@ class UpdateCardRequest extends FormRequest
         $galleryLimit = request()->user()->activeSubscription()->with('plan')->first()->plan->number_of_gallery;
 
         return [
+                'template' => ['required', Rule::in(['classic', 'modern', 'bold'])],
                 'banner.file' => 'nullable|image|max:2048',
                 'banner.path' => 'nullable|string|max:255',
                 'avatar.file' => 'nullable|image|max:2048',

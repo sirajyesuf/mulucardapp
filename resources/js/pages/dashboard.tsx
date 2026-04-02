@@ -146,13 +146,17 @@ export default function Dashboard() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 md:px-8">
-                        <Card className="p-4">
-                            <h3 className="mb-4 text-lg font-semibold">Card Status Distribution</h3>
+                        <Card className="border-0 bg-gradient-to-br from-slate-50 via-white to-slate-100/70 p-4 shadow-sm dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+                            <div className="mb-3">
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Card Status Distribution</h3>
+                            </div>
                             <DoughnutChart activeCards={reports.active_cards} inactiveCards={reports.inactive_cards} />
                         </Card>
 
-                        <Card className="p-4">
-                            <h3 className="mb-4 text-lg font-semibold">Top 5 Most Viewed Cards</h3>
+                        <Card className="border-0 bg-gradient-to-br from-slate-50 via-white to-slate-100/70 p-4 shadow-sm dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+                            <div className="mb-3">
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Top 5 Most Viewed Cards</h3>
+                            </div>
                             <TopViewedChart cards={topViewedCards} />
                         </Card>
                     </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Card;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use App\Enums\CardSocialLinks;
 
 class CardRequest extends FormRequest
@@ -27,6 +28,7 @@ class CardRequest extends FormRequest
         $galleryLimit = request()->user()->activeSubscription()->with('plan')->first()->plan->number_of_gallery;
 
         return [
+                'template' => ['required', Rule::in(['classic', 'modern', 'bold'])],
                 'banner.file' => 'nullable|image|max:2048',
                 'avatar.file' => 'required|image',
                 'logo.file' => 'nullable|image|max:2048',

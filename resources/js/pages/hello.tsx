@@ -1,17 +1,16 @@
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
+import ShareButton from '@/components/share-button';
+import { Button } from '@/components/ui/button';
 import { type Card } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { Contact } from 'lucide-react';
 import axios from 'axios';
-import ShareButton from '@/components/share-button';
+import { Contact } from 'lucide-react';
 import MuluCard from './card/card';
-import { Button } from '@/components/ui/button';
-import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 export default function Hello() {
-
     const { props } = usePage();
     const card = props.card as Card;
-    console.log(card)
+    console.log(card);
 
     // Function to generate vCard content string based on Card type
     function generateVCardContent(cardData: Card): string {
@@ -52,14 +51,12 @@ export default function Hello() {
         //    if (link.url) lines.push(`URL:${link.url}`);
         // });
 
-
         // Headline as Note
         if (cardData.headline) lines.push(`NOTE:${cardData.headline.replace(/\n/g, '\\n')}`); // Escape newlines
 
         // Avatar URL (using the path property)
         // vCard standard: PHOTO;VALUE=URI:<url>
         if (cardData.avatar && cardData.avatar.path) {
-        
             lines.push(`PHOTO;VALUE=URI:${cardData.avatar.path}`);
         }
 
@@ -77,7 +74,6 @@ export default function Hello() {
         //    lines.push(`NOTE;X-BUSINESS-HOURS:${bizHoursNote}`); // Could add to existing NOTE or use custom X- field
         // }
 
-
         lines.push('END:VCARD');
         return lines.join('\r\n'); // Use CRLF line endings
     }
@@ -86,9 +82,8 @@ export default function Hello() {
         const vCardString = generateVCardContent(card);
 
         // Make request to increment view count
-        axios.post(route('card.updatetotalsaves', {id:card.id}))
-        .catch(error => {
-                console.error('Error updating view count:', error);
+        axios.post(route('card.updatetotalsaves', { id: card.id })).catch((error) => {
+            console.error('Error updating view count:', error);
         });
 
         // Create a Blob with the vCard content
@@ -106,18 +101,18 @@ export default function Hello() {
 
         URL.revokeObjectURL(url);
     }
- 
 
     return (
         <>
             <div className="fixed top-4 right-4 z-50">
-                <div className="bg-popover border-0 rounded-md shadow-lg">
+                <div className="bg-popover rounded-md border-0 shadow-lg">
                     <AppearanceToggleDropdown />
                 </div>
             </div>
-            <div className="flex min-h-svh flex-col justify-between gap-4 bg-background p-1">
-                <div className="mx-auto mt-0 mb-24 md:mb-10 rounded-lg md:border-4 border-none p-1 md:w-[500px] w-full">
+            <div className="bg-background flex min-h-svh flex-col justify-between gap-4 p-1">
+                <div className="mx-auto mt-0 mb-24 w-full rounded-2xl p-1 md:mb-10 md:w-[500px] md:bg-white/80 md:shadow-sm md:ring-1 md:ring-slate-200/70 md:backdrop-blur-sm dark:md:bg-slate-900/70 dark:md:shadow-black/20 dark:md:ring-white/10">
                     <MuluCard
+                        template={card.template ?? 'classic'}
                         url={card?.url}
                         avatar={card?.avatar}
                         logo={card?.logo}
@@ -139,22 +134,21 @@ export default function Hello() {
                         banner={card?.banner}
                     />
                 </div>
-                <div className="items-top fixed bottom-0 -mb-8 flex h-16 w-xl justify-center self-center rounded-4xl border-none bg-primary pt-2 text-primary-foreground">
-                    a free digital business card from MuluCard
+                <div className="items-top bg-primary text-primary-foreground fixed bottom-0 -mb-8 flex h-16 w-xl justify-center self-center rounded-4xl border-none pt-2">
+                    a digital business card from MuluCard
                 </div>
             </div>
-            <div className="fixed bottom-0 h-24  w-full border-none p-0">
+            <div className="fixed bottom-0 h-24 w-full border-none p-0">
                 <div className="flex w-full flex-row justify-between p-2">
                     <div className="">
                         <ShareButton
                             title="Check out this awesome content!"
                             description="I found this really interesting article that I thought you might enjoy."
                         />
-
                     </div>
-                    <Button variant="default" size="sm" onClick={() => downloadVCard()} >
-                    <Contact className="h-4 w-4" />
-                    Add To Contact
+                    <Button variant="default" size="sm" onClick={() => downloadVCard()}>
+                        <Contact className="h-4 w-4" />
+                        Add To Contact
                     </Button>
                 </div>
             </div>

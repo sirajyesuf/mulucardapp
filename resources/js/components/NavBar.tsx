@@ -46,6 +46,9 @@ export default function Navbar() {
                         <a href="#how-it-works" className="text-foreground text-sm font-medium transition-colors">
                             How It Works
                         </a>
+                        <a href="#templates" className="text-foreground text-sm font-medium transition-colors">
+                            Templates
+                        </a>
                         <a href="#pricing" className="text-foreground text-sm font-medium transition-colors">
                             Pricing
                         </a>
@@ -95,6 +98,13 @@ export default function Navbar() {
                             onClick={() => setIsMenuOpen(false)}
                         >
                             How It Works
+                        </a>
+                        <a
+                            href="#templates"
+                            className="text-foreground text-sm font-medium transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Templates
                         </a>
                         <a
                             href="#pricing"
