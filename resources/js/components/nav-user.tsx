@@ -17,19 +17,23 @@ export function NavUser() {
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <div className={`p-1 ${state === 'collapsed' ? '' : 'rounded-xl border-2'}`}>
-                            <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group">
+                        <div
+                            className={`p-1 ${state === 'collapsed' ? '' : 'rounded-xl border-2 border-sidebar-border/70 bg-sidebar-accent/30'}`}
+                        >
+                            <SidebarMenuButton size="lg" className="group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent">
                                 <UserInfo user={auth.user} />
-                                <ChevronsUpDown className="ml-auto size-4" />
+                                <ChevronsUpDown className="ml-auto size-4 opacity-70" />
                             </SidebarMenuButton>
                             {state !== 'collapsed' && (
                                 <>
                                     {auth.activePlan && (
                                         <>
-                                            <hr />
-                                            <div className="flex flex-row items-center justify-center gap-4 p-1">
-                                                <BadgeCheck color="#6265f1" className="size-6" />
-                                                <p className="text-sm font-bold text-[#6265f1] capitalize">{auth.activePlan.plan.name} plan</p>
+                                            <hr className="border-sidebar-border/60" />
+                                            <div className="flex flex-row items-center justify-center gap-3 p-1.5">
+                                                <BadgeCheck className="size-5 shrink-0 text-primary" aria-hidden />
+                                                <p className="text-primary text-sm font-semibold capitalize">
+                                                    {auth.activePlan.plan.name} plan
+                                                </p>
                                             </div>
                                         </>
                                     )}

@@ -9,6 +9,10 @@ export function NavFooter({
 }: React.ComponentPropsWithoutRef<typeof SidebarGroup> & {
     items: NavItem[];
 }) {
+    if (items.length === 0) {
+        return null;
+    }
+
     return (
         <SidebarGroup {...props} className={`group-data-[collapsible=icon]:p-0 ${className || ''}`}>
             <SidebarGroupContent>
