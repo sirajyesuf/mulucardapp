@@ -443,6 +443,9 @@ export default function CreateCard() {
                                 <TabsTrigger value="gallery">
                                     {galleryError ? <span className="text-red-500">Galleries</span> : <span className=""> Galleries</span>}
                                 </TabsTrigger>
+                                <TabsTrigger value="preview" className="md:hidden">
+                                    <span>Preview</span>
+                                </TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
                                 <Card>
@@ -1238,6 +1241,29 @@ export default function CreateCard() {
                                 </Card>
                             </TabsContent>
                             {/* galleries tab end */}
+
+                            <TabsContent value="preview" className="md:hidden">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Preview</CardTitle>
+                                        <CardDescription>Choose a layout and see how your card looks.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <CardTemplateSelector
+                                            value={data.template}
+                                            onChange={(id) => setData('template', id)}
+                                            disabled={processing}
+                                            className="w-full shrink-0"
+                                        />
+                                        <p className="text-muted-foreground px-0.5 text-xs leading-snug">
+                                            Empty fields show sample content in the preview only.
+                                        </p>
+                                        <ScrollArea className="h-[min(70vh,820px)] cursor-pointer rounded-md border">
+                                            <MuluCard template={data.template} {...previewProps} />
+                                        </ScrollArea>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
                         </Tabs>
                     </div>
                 </div>

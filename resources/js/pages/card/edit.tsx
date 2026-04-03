@@ -493,6 +493,9 @@ export default function EditCard({ card }: { card: CardType }) {
                                         )
                                     }
                                 </TabsTrigger>
+                                <TabsTrigger value="preview" className="md:hidden">
+                                    <span>Preview</span>
+                                </TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
                                 <Card>
@@ -1164,6 +1167,49 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 )}
                                             </div>
                                         </div>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                            <TabsContent value="preview" className="md:hidden">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Preview</CardTitle>
+                                        <CardDescription>Choose a layout and see how your card looks.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <CardTemplateSelector
+                                            value={data.template}
+                                            onChange={(id) => setData('template', id)}
+                                            disabled={processing}
+                                            className="w-full shrink-0"
+                                        />
+                                        <p className="text-muted-foreground px-0.5 text-xs leading-snug">
+                                            Empty fields show sample content in the preview only.
+                                        </p>
+                                        <ScrollArea className="h-[min(70vh,820px)] cursor-pointer rounded-md border">
+                                            <MuluCard
+                                                template={data.template}
+                                                avatar={data.avatar}
+                                                logo={data.logo}
+                                                first_name={data.first_name}
+                                                last_name={data.last_name}
+                                                organization={data.organization}
+                                                job_title={data.job_title}
+                                                phone={data.phone}
+                                                email={data.email}
+                                                banner_color={data.banner_color}
+                                                links={data.links}
+                                                address={data.address}
+                                                location={data.location}
+                                                headline={data.headline}
+                                                galleries={data.galleries}
+                                                services={data.services}
+                                                business_hours={data.business_hours}
+                                                business_hours_enabled={data.business_hours_enabled}
+                                                banner={data.banner}
+                                                url={data.url}
+                                            />
+                                        </ScrollArea>
                                     </CardContent>
                                 </Card>
                             </TabsContent>
