@@ -1,5 +1,5 @@
 import { CheckCircle2, CircleOff } from 'lucide-react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 
 interface DoughnutChartProps {
     activeCards: number;
@@ -42,13 +42,6 @@ export default function DoughnutChart({ activeCards, inactiveCards }: DoughnutCh
                                     <Cell key={`cell-${index}`} fill={entry.color} />
                                 ))}
                             </Pie>
-                            <Tooltip
-                                contentStyle={{
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(148, 163, 184, 0.2)',
-                                    boxShadow: '0 12px 30px rgba(15, 23, 42, 0.08)',
-                                }}
-                            />
                         </PieChart>
                     </ResponsiveContainer>
 

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { type Card } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Contact } from 'lucide-react';
+import { Contact, Download } from 'lucide-react';
 import MuluCard from './card/card';
 
 export default function Hello() {
@@ -102,11 +102,31 @@ export default function Hello() {
         URL.revokeObjectURL(url);
     }
 
+    function downloadQRCode() {
+        if (!card?.qr_code) return;
+
+        const link = document.createElement('a');
+        link.href = `/storage/${card.qr_code}`;
+        link.download = 'qr_code.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     return (
         <>
             <div className="fixed top-4 right-4 z-50">
-                <div className="bg-popover rounded-md border-0 shadow-lg">
-                    <AppearanceToggleDropdown />
+                <div className="flex items-center gap-1 rounded-md border border-border bg-popover/90 p-1 shadow-lg backdrop-blur-sm">
+                    <Button
+                        variant="secondary"
+                        size="icon"
+                        className="h-9 w-9 shrink-0 rounded-md"
+                        onClick={() => downloadQRCode()}
+                        aria-label="Download QR code"
+                    >
+                        <Download className="h-5 w-5" />
+                    </Button>
+                    <AppearanceToggleDropdown className="shrink-0" />
                 </div>
             </div>
             <div className="bg-background flex min-h-svh flex-col justify-between gap-4 p-1">

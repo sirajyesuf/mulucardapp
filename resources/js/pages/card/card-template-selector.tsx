@@ -22,18 +22,22 @@ export function CardTemplateSelector({ value, onChange, disabled, className }: C
             <Select value={value} onValueChange={(next) => onChange(next as CardTemplateId)} disabled={disabled}>
                 <SelectTrigger
                     id={selectId}
-                    className="h-9 w-full min-w-0 sm:max-w-[240px]"
+                    className="h-9 w-full min-w-0 border-border bg-background text-foreground shadow-xs sm:max-w-[240px]"
                     aria-label="Card preview layout"
                 >
                     <SelectValue placeholder="Choose layout" />
                 </SelectTrigger>
-                <SelectContent align="start" className="min-w-[var(--radix-select-trigger-width)]">
+                <SelectContent
+                    align="start"
+                    className="min-w-[var(--radix-select-trigger-width)] border-border shadow-md ring-1 ring-black/5 dark:shadow-[0_12px_40px_rgba(0,0,0,0.55)] dark:ring-white/10"
+                >
                     {CARD_TEMPLATE_OPTIONS.map((opt) => (
                         <SelectItem
                             key={opt.id}
                             value={opt.id}
                             title={opt.description}
                             textValue={opt.description ? `${opt.label} — ${opt.description}` : opt.label}
+                            className="text-popover-foreground focus:bg-muted focus:text-foreground dark:focus:bg-muted/80"
                         >
                             {opt.label}
                         </SelectItem>

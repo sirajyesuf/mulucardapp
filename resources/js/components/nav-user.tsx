@@ -18,11 +18,18 @@ export function NavUser() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <div
-                            className={`p-1 ${state === 'collapsed' ? '' : 'rounded-xl border-2 border-sidebar-border/70 bg-sidebar-accent/30'}`}
+                            className={
+                                state === 'collapsed'
+                                    ? 'rounded-full p-0'
+                                    : 'rounded-xl border-2 border-sidebar-border/70 bg-sidebar-accent/30 p-1'
+                            }
                         >
-                            <SidebarMenuButton size="lg" className="group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent">
+                            <SidebarMenuButton
+                                size="lg"
+                                className="group text-sidebar-accent-foreground hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent active:text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground data-[state=open]:active:bg-sidebar-accent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-full"
+                            >
                                 <UserInfo user={auth.user} />
-                                <ChevronsUpDown className="ml-auto size-4 opacity-70" />
+                                <ChevronsUpDown className="ml-auto size-4 opacity-70 group-data-[collapsible=icon]:hidden" />
                             </SidebarMenuButton>
                             {state !== 'collapsed' && (
                                 <>

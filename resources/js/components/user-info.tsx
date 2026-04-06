@@ -9,9 +9,9 @@ export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: 
         <>
             <Avatar className="h-8 w-8 overflow-hidden rounded-full">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-muted text-foreground rounded-lg">{getInitials(user.name)}</AvatarFallback>
+                <AvatarFallback className="rounded-full bg-muted text-foreground">{getInitials(user.name)}</AvatarFallback>
             </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
+            <div className="grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]/sidebar-wrapper:hidden">
                 <span className="truncate font-medium">{user.name}</span>
                 {showEmail && <span className="text-muted-foreground truncate text-xs">{user.email}</span>}
             </div>
