@@ -23,7 +23,7 @@ export const CARD_TEMPLATE_OPTIONS: CardTemplateOption[] = [
     {
         id: 'bold',
         label: 'Bold',
-        description: 'Tall hero, brand-color headline strip, squircle photos, and square social tiles',
+        description: 'Cinematic hero with color wash, glass profile panel, editorial type, and outline actions',
     },
 ];
 
