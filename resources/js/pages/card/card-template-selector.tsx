@@ -17,15 +17,15 @@ export function CardTemplateSelector({ value, onChange, disabled, className }: C
     return (
         <div className={cn('flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3', className)}>
             <Label htmlFor={selectId} className="text-muted-foreground shrink-0 text-xs font-medium sm:pt-0.5 sm:text-sm">
-                Preview layout
+                Template
             </Label>
             <Select value={value} onValueChange={(next) => onChange(next as CardTemplateId)} disabled={disabled}>
                 <SelectTrigger
                     id={selectId}
                     className="h-9 w-full min-w-0 border-border bg-background text-foreground shadow-xs sm:max-w-[240px]"
-                    aria-label="Card preview layout"
+                    aria-label="Card template"
                 >
-                    <SelectValue placeholder="Choose layout" />
+                    <SelectValue placeholder="Choose template" />
                 </SelectTrigger>
                 <SelectContent
                     align="start"

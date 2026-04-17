@@ -144,7 +144,7 @@ export default function EditCard({ card }: { card: CardType }) {
         );
     };
 
-    const DisplayError = hasTabError(['avatar.file', 'banner.file', 'banner.path','logo.file'], errors);
+    const DisplayError = hasTabError(['avatar.file', 'banner.file', 'banner.path', 'logo.file'], errors);
 
     
     const personalInformationError = hasTabError(
@@ -165,6 +165,7 @@ export default function EditCard({ card }: { card: CardType }) {
     
     const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
 
+    const templateTabError = hasTabError(['template'], errors);
 
     const copyToAllDays = (day: DaySchedule) => {
         const updatedSchedule = data.business_hours.map((item) => ({
@@ -380,6 +381,7 @@ export default function EditCard({ card }: { card: CardType }) {
                             disabled={processing}
                             className="w-full shrink-0"
                         />
+                        <InputError message={errors.template} className="px-0.5" />
                         <ScrollArea className="min-h-0 flex-1 cursor-pointer rounded-md border">
                             <MuluCard
                                 template={data.template}
@@ -493,8 +495,8 @@ export default function EditCard({ card }: { card: CardType }) {
                                         )
                                     }
                                 </TabsTrigger>
-                                <TabsTrigger value="preview" className="md:hidden">
-                                    <span>Preview</span>
+                                <TabsTrigger value="template" className="md:hidden">
+                                    {templateTabError ? <span className="text-red-500">Template</span> : <span>Template</span>}
                                 </TabsTrigger>
                             </TabsList>
                             <TabsContent value="display">
@@ -1170,11 +1172,11 @@ export default function EditCard({ card }: { card: CardType }) {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
-                            <TabsContent value="preview" className="md:hidden">
+                            <TabsContent value="template" className="md:hidden">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Preview</CardTitle>
-                                        <CardDescription>Choose a layout and see how your card looks.</CardDescription>
+                                        <CardTitle>Template</CardTitle>
+                                        <CardDescription>See how your card looks with the selected template. Adjust images and colors on Display.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <CardTemplateSelector
@@ -1183,8 +1185,9 @@ export default function EditCard({ card }: { card: CardType }) {
                                             disabled={processing}
                                             className="w-full shrink-0"
                                         />
+                                        <InputError message={errors.template} className="px-0.5" />
                                         <p className="text-muted-foreground px-0.5 text-xs leading-snug">
-                                            Empty fields show sample content in the preview only.
+                                            Empty fields show sample content in the template view only.
                                         </p>
                                         <ScrollArea className="h-[min(70vh,820px)] cursor-pointer rounded-md border">
                                             <MuluCard
