@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use  Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Plan extends Model
 {
-
     use HasFactory;
 
     protected $guarded = [];
@@ -17,16 +16,13 @@ class Plan extends Model
     {
         return [
             'features' => 'array',
+            'is_public' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
-    
-
-    
-
-
-
-    
-
-
+    public function scopeAvailableToCustomers(Builder $query): Builder
+    {
+        return $query->where('is_public', true)->where('is_active', true);
+    }
 }

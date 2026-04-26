@@ -1,11 +1,9 @@
 <?php
+
 namespace Database\Seeders;
+
 use App\Models\Plan;
-use App\Models\Order;
-use App\Models\Subscription;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class PlanSeeder extends Seeder
 {
@@ -21,6 +19,8 @@ class PlanSeeder extends Seeder
                 'number_of_gallery' => 1,
                 'number_of_service' => 1,
                 'most_popular' => false,
+                'is_public' => true,
+                'is_active' => true,
                 'features' => [
                     'Personal Information',
                     'Avatar, Logo and Banner Images',
@@ -30,7 +30,7 @@ class PlanSeeder extends Seeder
                     'Basic Analytics',
                     '24/7 Email Support',
                     'Mobile-Friendly Design',
-                ]
+                ],
             ],
             [
                 'name' => 'Professional',
@@ -41,6 +41,8 @@ class PlanSeeder extends Seeder
                 'number_of_gallery' => 3,
                 'number_of_service' => 3,
                 'most_popular' => true,
+                'is_public' => true,
+                'is_active' => true,
                 'features' => [
                     'Personal Information',
                     'Avatar, Logo and Banner Images',
@@ -50,8 +52,8 @@ class PlanSeeder extends Seeder
                     'Basic Analytics',
                     '24/7 Email Support',
                     'Mobile-Friendly Design',
-                    'more nfc business card on additional payment'
-                ]
+                    'more nfc business card on additional payment',
+                ],
             ],
             [
                 'name' => 'Enterprise',
@@ -62,6 +64,8 @@ class PlanSeeder extends Seeder
                 'number_of_gallery' => null,
                 'number_of_service' => null,
                 'most_popular' => false,
+                'is_public' => true,
+                'is_active' => true,
                 'features' => [
                     'Everything in Professional Plan',
                     'NFC Business Cards',
@@ -69,21 +73,34 @@ class PlanSeeder extends Seeder
                     'Custom Themes & Dynamic Colors',
                     'Priority Support',
                     'Custom Themes',
-                    'Custom Branding'
-                ]
-            ]
+                    'Custom Branding',
+                ],
+            ],
+            [
+                'name' => 'Admin Unlimited',
+                'price' => -1,
+                'description' => 'Internal admin-only plan with unlimited card creation',
+                'number_of_digital_business_card' => -1,
+                'number_of_nfc_business_card' => -1,
+                'number_of_gallery' => -1,
+                'number_of_service' => -1,
+                'most_popular' => false,
+                'is_public' => false,
+                'is_active' => true,
+                'features' => [
+                    'Unlimited digital business cards',
+                    'Unlimited galleries',
+                    'Unlimited services',
+                    'Admin-only internal use',
+                ],
+            ],
         ];
 
-        // 🔐 Safe deletion
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Subscription::query()->delete();
-        Order::query()->delete();
-        Plan::query()->delete();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        // 🔁 Seeding
         foreach ($plans as $plan) {
-            Plan::create($plan);
+            Plan::firstOrCreate(
+                ['name' => $plan['name']],
+                $plan
+            );
         }
     }
 }

@@ -2,11 +2,10 @@
 
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\SubscriptionController;
+use App\Models\Plan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Models\Plan;
-use App\Http\Controllers\SubscriptionController;
-use App\Models\Subscription;
 
 Route::middleware('auth')->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -23,11 +22,12 @@ Route::middleware('auth')->group(function () {
     })->name('appearance');
 
     Route::get('settings/plansandpricing', function () {
-        $plans = Plan::all();
+        $plans = Plan::availableToCustomers()->get();
+
         return Inertia::render('settings/plan', [
-            'plans' => $plans
+            'plans' => $plans,
         ]);
     })->name('settings.plans');
 
-    Route::get('settings/subscription',[SubscriptionController::class,'index'])->name('settings.subscription');
+    Route::get('settings/subscription', [SubscriptionController::class, 'index'])->name('settings.subscription');
 });
