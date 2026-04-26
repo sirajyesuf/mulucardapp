@@ -9,11 +9,17 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
+    \App\Models\Plan::create([
+        'name' => 'Free',
+        'price' => 0,
+        'description' => 'Free plan',
+        'features' => [],
+    ]);
+
     $response = $this->post('/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',
-        'password_confirmation' => 'password',
     ]);
 
     $this->assertAuthenticated();
