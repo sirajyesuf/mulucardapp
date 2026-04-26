@@ -10,19 +10,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
-import { CardTemplateSelector } from '@/pages/card/card-template-selector';
 import MuluCard from '@/pages/card/card';
+import { CardTemplateSelector } from '@/pages/card/card-template-selector';
 import type { CardTemplateId } from '@/pages/card/mulu-card-props';
-import { type BreadcrumbItem, type Card as CardType, type DaySchedule, type Gallery, type Service, type SharedData,type Image, type Link as LinkType } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { toast } from 'sonner';
+import {
+    type BreadcrumbItem,
+    type Card as CardType,
+    type DaySchedule,
+    type Gallery,
+    type Image,
+    type Link as LinkType,
+    type Service,
+    type SharedData,
+} from '@/types';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Check, Clock, Copy, LoaderCircle, PlusCircle, ShieldAlert, Upload, X } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
-import { Link } from '@inertiajs/react'
+import { ChangeEvent, FormEventHandler, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_IMAGE_SIZE_MESSAGE = 'The image file size must not exceed 2MB.';
 
 interface CardForm {
-    banner: Image;  
+    banner: Image;
     avatar: Image;
     logo: Image;
     first_name: string;
@@ -36,12 +46,13 @@ interface CardForm {
     location: string | null;
     address: string | null;
     headline: string;
-    business_hours: DaySchedule[] | null;
+    business_hours: DaySchedule[];
     galleries: Gallery[];
     services: Service[];
     business_hours_enabled: boolean;
     template: CardTemplateId;
-    [key: string]: any; 
+    url: string;
+    [key: string]: any;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -56,15 +67,13 @@ export default function EditCard({ card }: { card: CardType }) {
     const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
     const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
     const cardSocialLinks = props.cardSocialLinks;
-    const existingLinksMap = new Map(
-        (card.links || []).map((link) => [link.name, link.url])
-    );
+    const existingLinksMap = new Map((card.links || []).map((link) => [link.name, link.url]));
 
     // Get all social links that exist in the card
-    const existingLinks = cardSocialLinks.filter(linkName => existingLinksMap.has(linkName));
-    
+    const existingLinks = cardSocialLinks.filter((linkName) => existingLinksMap.has(linkName));
+
     // Add the rest to removedLinks
-    const initialRemovedLinks = cardSocialLinks.filter(linkName => !existingLinksMap.has(linkName));
+    const initialRemovedLinks = cardSocialLinks.filter((linkName) => !existingLinksMap.has(linkName));
 
     const [removedLinks, setRemovedLinks] = useState<string[]>(initialRemovedLinks);
 
@@ -73,17 +82,22 @@ export default function EditCard({ card }: { card: CardType }) {
             'links',
             data.links.filter((link: LinkType) => link.name !== name),
         );
-        setRemovedLinks([...removedLinks, name]);
+        setRemovedLinks((prev) => (prev.includes(name) ? prev : [...prev, name]));
     };
 
     const addBackLink = (name: string) => {
+        if (data.links.some((link) => link.name === name)) {
+            setRemovedLinks((prev) => prev.filter((link) => link !== name));
+            return;
+        }
+
         const newLink = {
             name: name,
             url: '',
             placeholder: `https://${name.toLowerCase()}.com/your-profile`,
         };
         setData('links', [...data.links, newLink]);
-        setRemovedLinks(removedLinks.filter(link => link !== name));
+        setRemovedLinks((prev) => prev.filter((link) => link !== name));
     };
 
     const links = existingLinks.map((linkName) => ({
@@ -92,11 +106,21 @@ export default function EditCard({ card }: { card: CardType }) {
         placeholder: `https://${linkName.toLowerCase()}.com/your-profile`,
     }));
 
-    useState<string[]>(initialRemovedLinks);
-
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
+    const objectUrls = useRef<Set<string>>(new Set());
 
-    console.log(card);  
+    const createPreviewUrl = (file: File) => {
+        const url = URL.createObjectURL(file);
+        objectUrls.current.add(url);
+        return url;
+    };
+
+    const revokePreviewUrl = (path: string | null) => {
+        if (path?.startsWith('blob:')) {
+            URL.revokeObjectURL(path);
+            objectUrls.current.delete(path);
+        }
+    };
 
     const timeOptions: string[] = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -107,7 +131,7 @@ export default function EditCard({ card }: { card: CardType }) {
         }
     }
 
-    const { data, setData, post, processing, errors } = useForm<CardForm>({
+    const { data, setData, post, processing, errors, setError, clearErrors } = useForm<CardForm>({
         banner: card.banner,
         avatar: card.avatar,
         logo: card.logo,
@@ -126,6 +150,7 @@ export default function EditCard({ card }: { card: CardType }) {
         services: card.services?.length > 0 ? card.services : [],
         business_hours_enabled: card.business_hours_enabled,
         template: (card.template ?? 'classic') as CardTemplateId,
+        url: card.url,
         business_hours: card.business_hours || [
             { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '09:00', close: '17:00' },
             { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '09:00', close: '17:00' },
@@ -133,39 +158,38 @@ export default function EditCard({ card }: { card: CardType }) {
             { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '09:00', close: '17:00' },
             { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '09:00', close: '17:00' },
             { id: crypto.randomUUID(), day: 'Saturday', isOpen: false, open: '09:00', close: '17:00' },
-            { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '09:00', close: '17:00' }
-        ]
+            { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '09:00', close: '17:00' },
+        ],
     });
 
+    useEffect(() => {
+        return () => {
+            objectUrls.current.forEach((url) => URL.revokeObjectURL(url));
+            objectUrls.current.clear();
+        };
+    }, []);
 
     const hasTabError = (prefixes: string[], errors: Partial<Record<string, string>>) => {
-        return Object.keys(errors).some(key =>
-            prefixes.some(prefix => key.startsWith(prefix))
-        );
+        return Object.keys(errors).some((key) => prefixes.some((prefix) => key.startsWith(prefix)));
     };
 
     const DisplayError = hasTabError(['avatar.file', 'banner.file', 'banner.path', 'logo.file'], errors);
 
-    
-    const personalInformationError = hasTabError(
-        ['first_name', 'last_name', 'organization', 'job_title', 'email', 'phone','headline'],
-        errors
-    );
-    
-    const linksError = hasTabError(
-        ['links.0', 'links.1', 'links.2', 'links.3', 'links.4', 'links.5'],
-        errors
-    );
-    
+    const personalInformationError = hasTabError(['first_name', 'last_name', 'organization', 'job_title', 'email', 'phone', 'headline'], errors);
+
+    const linksError = hasTabError(['links'], errors);
+
     const locationError = hasTabError(['address', 'location'], errors);
-    
-    const galleryError = hasTabError(['galleries.0', 'galleries.1', 'galleries.2'], errors);
-    
-    const serviceError = hasTabError(['services.0', 'services.1', 'services.2'], errors);
-    
-    const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
+
+    const galleryError = hasTabError(['galleries'], errors);
+
+    const serviceError = hasTabError(['services'], errors);
+
+    const businessHoursError = hasTabError(['business_hours'], errors);
 
     const templateTabError = hasTabError(['template'], errors);
+
+    const isImageTooLarge = (file: File | null) => file !== null && file.size > MAX_IMAGE_SIZE_BYTES;
 
     const copyToAllDays = (day: DaySchedule) => {
         const updatedSchedule = data.business_hours.map((item) => ({
@@ -197,9 +221,22 @@ export default function EditCard({ card }: { card: CardType }) {
     };
 
     const handleGalleryFileChange = (id: string, file: File | null) => {
+        const itemIndex = data.galleries.findIndex((item: Gallery) => item.id === id);
+        const errorKey = `galleries.${itemIndex}.file`;
+
+        if (itemIndex !== -1 && isImageTooLarge(file)) {
+            setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+            return;
+        }
+
+        if (itemIndex !== -1) {
+            clearErrors(errorKey, `galleries.${itemIndex}.path`);
+        }
+
         const newGallery = data.galleries.map((item: Gallery) => {
             if (item.id === id) {
-                return { ...item, file, path: file ? URL.createObjectURL(file) : null };
+                revokePreviewUrl(item.path);
+                return { ...item, file, path: file ? createPreviewUrl(file) : null };
             }
             return item;
         });
@@ -207,26 +244,38 @@ export default function EditCard({ card }: { card: CardType }) {
     };
 
     const handleServiceFileChange = (id: string, file: File | null) => {
+        const itemIndex = data.services.findIndex((item: Service) => item.id === id);
+        const errorKey = `services.${itemIndex}.file`;
+
+        if (itemIndex !== -1 && isImageTooLarge(file)) {
+            setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+            return;
+        }
+
+        if (itemIndex !== -1) {
+            clearErrors(errorKey, `services.${itemIndex}.path`);
+        }
+
         const newService = data.services.map((item: Service) => {
             if (item.id === id) {
-                return { 
-                    ...item, 
-                    file, 
-                    path: file ? URL.createObjectURL(file) : null
+                revokePreviewUrl(item.path);
+                return {
+                    ...item,
+                    file,
+                    path: file ? createPreviewUrl(file) : null,
                 };
             }
             return item;
         });
-        console.log(newService);
         setData('services', newService);
     };
 
     const handleServiceDescriptionChange = (id: string, description: string) => {
         const newService = data.services.map((item: Service) => {
             if (item.id === id) {
-                return { 
-                    ...item, 
-                    description
+                return {
+                    ...item,
+                    description,
                 };
             }
             return item;
@@ -237,9 +286,9 @@ export default function EditCard({ card }: { card: CardType }) {
     const handleServiceNameChange = (id: string, name: string) => {
         const newService = data.services.map((item: Service) => {
             if (item.id === id) {
-                return { 
-                    ...item, 
-                    name
+                return {
+                    ...item,
+                    name,
                 };
             }
             return item;
@@ -262,31 +311,32 @@ export default function EditCard({ card }: { card: CardType }) {
     };
 
     const addMoreServiceItem = () => {
-        setData('services', [...data.services, { 
-            id: crypto.randomUUID(), 
-            file: null, 
-            path: null, 
-            name: '', 
-            description: ''
-        }]);
+        setData('services', [
+            ...data.services,
+            {
+                id: crypto.randomUUID(),
+                file: null,
+                path: null,
+                name: '',
+                description: '',
+            },
+        ]);
     };
 
     const removeGalleryItem = (id: string) => {
-        // if (data.galleries.length > 1) {
-            setData(
-                'galleries',
-                data.galleries.filter((item: Gallery) => item.id !== id),
-            );
-        // }
+        data.galleries.filter((item: Gallery) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
+        setData(
+            'galleries',
+            data.galleries.filter((item: Gallery) => item.id !== id),
+        );
     };
 
     const removeServiceItem = (id: string) => {
-        // if (data.services.length > 1) {
-            setData(
-                'services',
-                data.services.filter((item: Service) => item.id !== id),
-            );
-        // }
+        data.services.filter((item: Service) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
+        setData(
+            'services',
+            data.services.filter((item: Service) => item.id !== id),
+        );
     };
 
     const removeGalleryFile = (id: string) => {
@@ -294,6 +344,7 @@ export default function EditCard({ card }: { card: CardType }) {
             'galleries',
             data.galleries.map((item: Gallery) => {
                 if (item.id === id) {
+                    revokePreviewUrl(item.path);
                     return { ...item, file: null, path: null };
                 }
                 return item;
@@ -306,6 +357,7 @@ export default function EditCard({ card }: { card: CardType }) {
             'services',
             data.services.map((item: Service) => {
                 if (item.id === id) {
+                    revokePreviewUrl(item.path);
                     return { ...item, file: null, path: null };
                 }
                 return item;
@@ -313,10 +365,19 @@ export default function EditCard({ card }: { card: CardType }) {
         );
     };
 
-    const handleFileChange = (field: 'avatar' | 'logo' | 'banner') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (field: 'avatar' | 'logo' | 'banner') => (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setData(field, { file, path: URL.createObjectURL(file) });
+            const errorKey = `${field}.file`;
+
+            if (isImageTooLarge(file)) {
+                setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+                return;
+            }
+
+            clearErrors(errorKey, `${field}.path`);
+            revokePreviewUrl(data[field].path);
+            setData(field, { file, path: createPreviewUrl(file) });
         }
     };
 
@@ -327,15 +388,18 @@ export default function EditCard({ card }: { card: CardType }) {
             setData('business_hours', []);
         } else {
             // When enabled, restore the previous business hours or use default
-            setData('business_hours', card.business_hours || [
-                { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '09:00', close: '17:00' },
-                { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '09:00', close: '17:00' },
-                { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '09:00', close: '17:00' },
-                { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '09:00', close: '17:00' },
-                { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '09:00', close: '17:00' },
-                { id: crypto.randomUUID(), day: 'Saturday', isOpen: false, open: '09:00', close: '17:00' },
-                { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '09:00', close: '17:00' }
-            ]);
+            setData(
+                'business_hours',
+                card.business_hours || [
+                    { id: crypto.randomUUID(), day: 'Monday', isOpen: true, open: '09:00', close: '17:00' },
+                    { id: crypto.randomUUID(), day: 'Tuesday', isOpen: true, open: '09:00', close: '17:00' },
+                    { id: crypto.randomUUID(), day: 'Wednesday', isOpen: true, open: '09:00', close: '17:00' },
+                    { id: crypto.randomUUID(), day: 'Thursday', isOpen: true, open: '09:00', close: '17:00' },
+                    { id: crypto.randomUUID(), day: 'Friday', isOpen: true, open: '09:00', close: '17:00' },
+                    { id: crypto.randomUUID(), day: 'Saturday', isOpen: false, open: '09:00', close: '17:00' },
+                    { id: crypto.randomUUID(), day: 'Sunday', isOpen: false, open: '09:00', close: '17:00' },
+                ],
+            );
         }
     };
 
@@ -347,7 +411,6 @@ export default function EditCard({ card }: { card: CardType }) {
             },
             onError: (errors) => {
                 toast.error('Failed to update card. Please check the form for errors.');
-                console.log('Update errors:', errors);
             },
             preserveState: true,
             preserveScroll: true,
@@ -355,6 +418,7 @@ export default function EditCard({ card }: { card: CardType }) {
     };
 
     const removeFile = (field: 'avatar' | 'logo' | 'banner') => {
+        revokePreviewUrl(data[field].path);
         setData(field, { file: null, path: null });
     };
 
@@ -362,9 +426,11 @@ export default function EditCard({ card }: { card: CardType }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Card" />
             <form onSubmit={submit} className="min-h-screen">
-
                 <div className="m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none">
-                    <Link className="cursor-pointer bg-red-500 hover:bg-red-600 rounded-lg px-4 py-1 text-white font-bold" href={route('card.show', card.id)}>
+                    <Link
+                        className="cursor-pointer rounded-lg bg-red-500 px-4 py-1 font-bold text-white hover:bg-red-600"
+                        href={route('card.show', card.id)}
+                    >
                         Cancel
                     </Link>
 
@@ -412,88 +478,33 @@ export default function EditCard({ card }: { card: CardType }) {
                         <Tabs defaultValue="display">
                             <TabsList className="flex h-auto w-full flex-row flex-wrap justify-start">
                                 <TabsTrigger value="display">
-                                    {
-                                        DisplayError ? (
-                                            <span className="text-red-500">
-                                                Display
-                                                </span>
-                                        ) : (
-                                            <span className="">Display</span>
-                                        )
-                                    }
-
+                                    {DisplayError ? <span className="text-red-500">Display</span> : <span className="">Display</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="personal_information">
-                                    
-                                    {
-                                        personalInformationError ? (
-                                            <span className="text-red-500">
-                                                Information
-                                                </span>
-                                        ) : (
-                                            <span className=""> Information</span>
-                                        )
-                                    }
+                                    {personalInformationError ? (
+                                        <span className="text-red-500">Information</span>
+                                    ) : (
+                                        <span className=""> Information</span>
+                                    )}
                                 </TabsTrigger>
                                 <TabsTrigger value="links">
-                                    
-                                    {
-                                        linksError ? (
-                                            <span className="text-red-500">
-                                                Social Links
-                                                </span>
-                                        ) : (
-                                            <span className=""> Social Links</span>
-                                        )
-                                    }
+                                    {linksError ? <span className="text-red-500">Social Links</span> : <span className=""> Social Links</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="location">
-                                    
-                                    {
-                                        locationError ? (
-                                            <span className="text-red-500">
-                                                Location
-                                                </span>
-                                        ) : (
-                                            <span className=""> Location</span>
-                                        )
-                                    }
+                                    {locationError ? <span className="text-red-500">Location</span> : <span className=""> Location</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="business_hours">
-                                    
-                                    {
-                                        businessHoursError ? (
-                                            <span className="text-red-500">
-                                                Business Hours
-                                                </span>
-                                        ) : (
-                                            <span className=""> Business Hours</span>
-                                        )
-                                    }
+                                    {businessHoursError ? (
+                                        <span className="text-red-500">Business Hours</span>
+                                    ) : (
+                                        <span className=""> Business Hours</span>
+                                    )}
                                 </TabsTrigger>
                                 <TabsTrigger value="service">
-                                    
-                                    {
-                                        serviceError ? (
-                                            <span className="text-red-500">
-                                                Services
-                                                </span>
-                                        ) : (
-                                            <span className=""> Services</span>
-                                        )
-                                    }
+                                    {serviceError ? <span className="text-red-500">Services</span> : <span className=""> Services</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="gallery">
-                                    
-                                    {
-                                        galleryError ? (
-                                            <span className="text-red-500">
-                                                Galleries
-                                                </span>
-                                        ) : (
-                                            <span className=""> Galleries</span>
-                                        )
-                                    }
+                                    {galleryError ? <span className="text-red-500">Galleries</span> : <span className=""> Galleries</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="template" className="md:hidden">
                                     {templateTabError ? <span className="text-red-500">Template</span> : <span>Template</span>}
@@ -543,7 +554,7 @@ export default function EditCard({ card }: { card: CardType }) {
 
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
                                             <Label htmlFor="avatar-upload" className="text-sm font-medium">
-                                                Upload Your Avatar <span className="text-red-500 text-lg">*</span>
+                                                Upload Your Avatar <span className="text-lg text-red-500">*</span>
                                             </Label>
                                             {data.avatar.path ? (
                                                 <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800">
@@ -648,21 +659,27 @@ export default function EditCard({ card }: { card: CardType }) {
                                         </div> */}
                                         <div className="grid grid-cols-1 gap-4 rounded-lg border-2 border-dashed p-2 md:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label htmlFor="fname">First Name <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="fname">
+                                                    First Name <span className="text-lg text-red-500">*</span>
+                                                </Label>
                                                 <Input
                                                     id="fname"
                                                     value={data.first_name}
                                                     onChange={(e) => setData('first_name', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.first_name} className="mt-2" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label htmlFor="lname">Last Name <span className="text-red-500 text-lg">*</span></Label>
+                                                <Label htmlFor="lname">
+                                                    Last Name <span className="text-lg text-red-500">*</span>
+                                                </Label>
                                                 <Input
                                                     id="lname"
                                                     value={data.last_name}
                                                     onChange={(e) => setData('last_name', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.last_name} className="mt-2" />
@@ -676,6 +693,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                     id="organization"
                                                     value={data.organization}
                                                     onChange={(e) => setData('organization', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.organization} className="mt-2" />
@@ -686,6 +704,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                     id="jobtitle"
                                                     value={data.job_title}
                                                     onChange={(e) => setData('job_title', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.job_title} className="mt-2" />
@@ -700,6 +719,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                     type="tel"
                                                     value={data.phone}
                                                     onChange={(e) => setData('phone', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.phone} className="mt-2" />
@@ -711,6 +731,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                     type="email"
                                                     value={data.email}
                                                     onChange={(e) => setData('email', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.email} className="mt-2" />
@@ -725,6 +746,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 placeholder="Enter your headline text"
                                                 value={data.headline}
                                                 onChange={(e) => setData('headline', e.target.value)}
+                                                maxLength={255}
                                             />
                                             <InputError message={errors.headline} className="mt-2" />
                                         </div>
@@ -773,7 +795,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                             variant="ghost"
                                                             size="icon"
                                                             onClick={() => removeLinkItem(link.name)}
-                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
                                                         >
                                                             <X className="h-5 w-5" />
                                                             <span className="sr-only">Remove</span>
@@ -791,11 +813,11 @@ export default function EditCard({ card }: { card: CardType }) {
                                                         }}
                                                         disabled={processing}
                                                     />
+                                                    <InputError message={errors[`links.${index}.name`]} className="mt-2" />
                                                     <InputError message={errors[`links.${index}.url`]} className="mt-2" />
                                                 </div>
                                             );
                                         })}
-
                                     </CardContent>
                                 </Card>
                             </TabsContent>
@@ -812,6 +834,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 id="address"
                                                 value={data.address}
                                                 onChange={(e) => setData('address', e.target.value)}
+                                                maxLength={255}
                                                 disabled={processing}
                                             />
                                             <InputError message={errors.address} className="mt-2" />
@@ -822,6 +845,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 id="location"
                                                 value={data.location}
                                                 onChange={(e) => setData('location', e.target.value)}
+                                                maxLength={255}
                                                 disabled={processing}
                                             />
                                             <InputError message={errors.location} className="mt-2" />
@@ -841,14 +865,13 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 <Switch
                                                     id="business-hours-toggle"
                                                     checked={data.business_hours_enabled}
-                                                    // onCheckedChange={handleBusinessHoursToggle}
-                                                    onCheckedChange={(checked) => setData('business_hours_enabled', checked)}
-
+                                                    onCheckedChange={handleBusinessHoursToggle}
                                                 />
                                             </div>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
+                                        <InputError message={errors.business_hours_enabled || errors.business_hours} className="mt-2" />
                                         {data.business_hours_enabled ? (
                                             data.business_hours?.map((day: DaySchedule, index) => (
                                                 <div key={day.id} className="rounded-lg border p-4">
@@ -878,6 +901,10 @@ export default function EditCard({ card }: { card: CardType }) {
                                                             </div>
                                                         )}
                                                     </div>
+                                                    <InputError
+                                                        message={errors[`business_hours.${index}.day`] || errors[`business_hours.${index}.isOpen`]}
+                                                        className="mt-2"
+                                                    />
                                                     {day.isOpen ? (
                                                         <div className="space-y-3">
                                                             <div className="flex flex-row items-center gap-2 md:flex-row">
@@ -926,10 +953,16 @@ export default function EditCard({ card }: { card: CardType }) {
                                                             ) : (
                                                                 <>
                                                                     {errors[`business_hours.${index}.open`] && (
-                                                                        <InputError message={errors[`business_hours.${index}.open`]} className="mt-2" />
+                                                                        <InputError
+                                                                            message={errors[`business_hours.${index}.open`]}
+                                                                            className="mt-2"
+                                                                        />
                                                                     )}
                                                                     {errors[`business_hours.${index}.close`] && (
-                                                                        <InputError message={errors[`business_hours.${index}.close`]} className="mt-2" />
+                                                                        <InputError
+                                                                            message={errors[`business_hours.${index}.close`]}
+                                                                            className="mt-2"
+                                                                        />
                                                                     )}
                                                                 </>
                                                             )}
@@ -940,7 +973,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center text-muted-foreground">
+                                            <div className="text-muted-foreground text-center">
                                                 Business hours are disabled. Enable the toggle above to set your business hours.
                                             </div>
                                         )}
@@ -954,21 +987,22 @@ export default function EditCard({ card }: { card: CardType }) {
                                         <CardDescription>Update your services.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
+                                        <InputError message={errors.services} className="mt-2" />
                                         <div className="space-y-6">
                                             {data.services.map((item, index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
                                                         {/* {data.services.length > 1 && ( */}
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="absolute top-2 right-2"
-                                                                onClick={() => removeServiceItem(item.id)}
-                                                            >
-                                                                <X className="h-5 w-5" />
-                                                                <span className="sr-only">Remove</span>
-                                                            </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="absolute top-2 right-2"
+                                                            onClick={() => removeServiceItem(item.id)}
+                                                        >
+                                                            <X className="h-5 w-5" />
+                                                            <span className="sr-only">Remove</span>
+                                                        </Button>
                                                         {/* )} */}
                                                         <div className="space-y-4">
                                                             <div>
@@ -989,7 +1023,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                     ) : (
                                                                         <div className="flex items-center">
                                                                             <Input
-                                                                                id={`image-${item.id}`}
+                                                                                id={`service-image-${item.id}`}
                                                                                 type="file"
                                                                                 accept="image/*"
                                                                                 className="hidden"
@@ -1001,7 +1035,9 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                             <Button
                                                                                 type="button"
                                                                                 variant="outline"
-                                                                                onClick={() => document.getElementById(`image-${item.id}`)?.click()}
+                                                                                onClick={() =>
+                                                                                    document.getElementById(`service-image-${item.id}`)?.click()
+                                                                                }
                                                                                 className="flex items-center gap-2"
                                                                             >
                                                                                 <Upload className="h-4 w-4" />
@@ -1009,7 +1045,10 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                             </Button>
                                                                         </div>
                                                                     )}
-                                                                    <InputError message={errors[`services.${index}.file`] || errors[`services.${index}.path`]} className="mt-2" />
+                                                                    <InputError
+                                                                        message={errors[`services.${index}.file`] || errors[`services.${index}.path`]}
+                                                                        className="mt-2"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                             <div>
@@ -1034,6 +1073,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                     value={item.description}
                                                                     onChange={(e) => handleServiceDescriptionChange(item.id, e.target.value)}
                                                                     className="min-h-24"
+                                                                    maxLength={500}
                                                                 />
                                                                 <InputError message={errors[`services.${index}.description`]} className="mt-2" />
                                                             </div>
@@ -1070,25 +1110,26 @@ export default function EditCard({ card }: { card: CardType }) {
                                         <CardDescription>Update your gallery images and descriptions.</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
+                                        <InputError message={errors.galleries} className="mt-2" />
                                         <div className="space-y-6">
                                             {data.galleries.map((item, index) => (
                                                 <Card key={item.id} className="relative">
                                                     <CardContent className="p-6">
                                                         {/* {data.galleries.length > 1 && ( */}
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="absolute top-2 right-2"
-                                                                onClick={() => removeGalleryItem(item.id)}
-                                                            >
-                                                                <X className="h-5 w-5" />
-                                                                <span className="sr-only">Remove</span>
-                                                            </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="absolute top-2 right-2"
+                                                            onClick={() => removeGalleryItem(item.id)}
+                                                        >
+                                                            <X className="h-5 w-5" />
+                                                            <span className="sr-only">Remove</span>
+                                                        </Button>
                                                         {/* )} */}
                                                         <div className="space-y-4">
                                                             <div>
-                                                                <Label htmlFor={`image-${item.id}`} className="mb-2 block">
+                                                                <Label htmlFor={`gallery-image-${item.id}`} className="mb-2 block">
                                                                     Image {index + 1}
                                                                 </Label>
                                                                 <div className="flex flex-col gap-2">
@@ -1110,7 +1151,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                     ) : (
                                                                         <div className="flex items-center">
                                                                             <Input
-                                                                                id={`image-${item.id}`}
+                                                                                id={`gallery-image-${item.id}`}
                                                                                 type="file"
                                                                                 accept="image/*"
                                                                                 className="hidden"
@@ -1122,7 +1163,9 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                             <Button
                                                                                 type="button"
                                                                                 variant="outline"
-                                                                                onClick={() => document.getElementById(`image-${item.id}`)?.click()}
+                                                                                onClick={() =>
+                                                                                    document.getElementById(`gallery-image-${item.id}`)?.click()
+                                                                                }
                                                                                 className="flex items-center gap-2"
                                                                             >
                                                                                 <Upload className="h-4 w-4" />
@@ -1131,7 +1174,10 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                         </div>
                                                                     )}
                                                                 </div>
-                                                                <InputError message={errors[`galleries.${index}.file`] || errors[`galleries.${index}.path`]} className="mt-2" />
+                                                                <InputError
+                                                                    message={errors[`galleries.${index}.file`] || errors[`galleries.${index}.path`]}
+                                                                    className="mt-2"
+                                                                />
                                                             </div>
                                                             <div>
                                                                 <Label htmlFor={`description-${item.id}`} className="mb-2 block">
@@ -1143,6 +1189,7 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                     value={item.description}
                                                                     onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
                                                                     className="min-h-24"
+                                                                    maxLength={500}
                                                                 />
                                                                 <InputError message={errors[`galleries.${index}.description`]} className="mt-2" />
                                                             </div>
@@ -1176,7 +1223,9 @@ export default function EditCard({ card }: { card: CardType }) {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Template</CardTitle>
-                                        <CardDescription>See how your card looks with the selected template. Adjust images and colors on Display.</CardDescription>
+                                        <CardDescription>
+                                            See how your card looks with the selected template. Adjust images and colors on Display.
+                                        </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <CardTemplateSelector

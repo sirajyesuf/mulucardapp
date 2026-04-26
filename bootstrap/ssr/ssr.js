@@ -2808,6 +2808,8 @@ const breadcrumbs$8 = [
   },
   { title: "Create Card", href: "" }
 ];
+const MAX_IMAGE_SIZE_BYTES$1 = 2 * 1024 * 1024;
+const MAX_IMAGE_SIZE_MESSAGE$1 = "The image file size must not exceed 2MB.";
 function CreateCard() {
   var _a, _b;
   const auth = usePage().props.auth;
@@ -2820,6 +2822,18 @@ function CreateCard() {
     url: "",
     placeholder: `https://${name.toLowerCase()}.com/your-profile`
   });
+  const objectUrls = useRef(/* @__PURE__ */ new Set());
+  const createPreviewUrl = (file) => {
+    const url = URL.createObjectURL(file);
+    objectUrls.current.add(url);
+    return url;
+  };
+  const revokePreviewUrl = (path) => {
+    if (path == null ? void 0 : path.startsWith("blob:")) {
+      URL.revokeObjectURL(path);
+      objectUrls.current.delete(path);
+    }
+  };
   const [removedLinks, setRemovedLinks] = useState(() => [...cardSocialLinks]);
   const removeLinkItem = (name) => {
     setData(
@@ -2857,7 +2871,6 @@ function CreateCard() {
     setData("business_hours", updatedSchedule);
   };
   const updateTimeSlot = (day, field, value) => {
-    console.log(day, field, value);
     const updatedSchedule = data.business_hours.map((item) => {
       if (item.id === day.id) {
         if (field === "open") {
@@ -2888,7 +2901,7 @@ function CreateCard() {
     });
     setData("business_hours", updatedSchedule);
   };
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
     banner: {
       file: null,
       path: null
@@ -2926,24 +2939,41 @@ function CreateCard() {
       { id: crypto.randomUUID(), day: "Sunday", isOpen: false, open: "03:00", close: "11:00" }
     ]
   });
+  useEffect(() => {
+    return () => {
+      objectUrls.current.forEach((url) => URL.revokeObjectURL(url));
+      objectUrls.current.clear();
+    };
+  }, []);
   const hasTabError = (prefixes, errors2) => {
     return Object.keys(errors2).some((key) => prefixes.some((prefix) => key.startsWith(prefix)));
   };
   const DisplayError = hasTabError(["avatar.file", "banner.file", "logo.file"], errors);
   const personalInformationError = hasTabError(["first_name", "last_name", "organization", "job_title", "email", "phone", "headline"], errors);
-  const linksError = hasTabError(["links.0", "links.1", "links.2", "links.3", "links.4", "links.5"], errors);
+  const linksError = hasTabError(["links"], errors);
   const locationError = hasTabError(["address", "location"], errors);
-  const galleryError = hasTabError(["galleries.0", "galleries.1", "galleries.2"], errors);
-  const serviceError = hasTabError(["services.0", "services.1", "services.2"], errors);
-  const businessHoursError = hasTabError(["business_hours.0", "business_hours.1", "business_hours.2"], errors);
+  const galleryError = hasTabError(["galleries"], errors);
+  const serviceError = hasTabError(["services"], errors);
+  const businessHoursError = hasTabError(["business_hours"], errors);
   const templateTabError = hasTabError(["template"], errors);
+  const isImageTooLarge = (file) => file !== null && file.size > MAX_IMAGE_SIZE_BYTES$1;
   const handleGalleryFileChange = (id, file) => {
+    const itemIndex = data.galleries.findIndex((item) => item.id === id);
+    const errorKey = `galleries.${itemIndex}.file`;
+    if (itemIndex !== -1 && isImageTooLarge(file)) {
+      setError(errorKey, MAX_IMAGE_SIZE_MESSAGE$1);
+      return;
+    }
+    if (itemIndex !== -1) {
+      clearErrors(errorKey);
+    }
     const newGallery = data.galleries.map((item) => {
       if (item.id === id) {
+        revokePreviewUrl(item.path);
         return {
           ...item,
           file,
-          path: file ? URL.createObjectURL(file) : null
+          path: file ? createPreviewUrl(file) : null
         };
       }
       return item;
@@ -2951,12 +2981,22 @@ function CreateCard() {
     setData("galleries", newGallery);
   };
   const handleServiceFileChange = (id, file) => {
+    const itemIndex = data.services.findIndex((item) => item.id === id);
+    const errorKey = `services.${itemIndex}.file`;
+    if (itemIndex !== -1 && isImageTooLarge(file)) {
+      setError(errorKey, MAX_IMAGE_SIZE_MESSAGE$1);
+      return;
+    }
+    if (itemIndex !== -1) {
+      clearErrors(errorKey);
+    }
     const newService = data.services.map((item) => {
       if (item.id === id) {
+        revokePreviewUrl(item.path);
         return {
           ...item,
           file,
-          path: file ? URL.createObjectURL(file) : null
+          path: file ? createPreviewUrl(file) : null
         };
       }
       return item;
@@ -3006,12 +3046,14 @@ function CreateCard() {
     setData("services", [...data.services, { id: crypto.randomUUID(), file: null, name: "", path: null, description: "" }]);
   };
   const removeGalleryItem = (id) => {
+    data.galleries.filter((item) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
     setData(
       "galleries",
       data.galleries.filter((item) => item.id !== id)
     );
   };
   const removeServiceItem = (id) => {
+    data.services.filter((item) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
     setData(
       "services",
       data.services.filter((item) => item.id !== id)
@@ -3022,6 +3064,7 @@ function CreateCard() {
       "galleries",
       data.galleries.map((item) => {
         if (item.id === id) {
+          revokePreviewUrl(item.path);
           return { ...item, file: null, path: null };
         }
         return item;
@@ -3033,6 +3076,7 @@ function CreateCard() {
       "services",
       data.services.map((item) => {
         if (item.id === id) {
+          revokePreviewUrl(item.path);
           return { ...item, file: null, path: null };
         }
         return item;
@@ -3045,53 +3089,58 @@ function CreateCard() {
   const handleFileChange = (field) => (e) => {
     var _a2;
     const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) ?? null;
+    const errorKey = `${field}.file`;
+    if (isImageTooLarge(file)) {
+      setError(errorKey, MAX_IMAGE_SIZE_MESSAGE$1);
+      return;
+    }
+    clearErrors(errorKey);
     if (field === "banner") {
+      revokePreviewUrl(data.banner.path);
       const newBanner = {
         file,
-        path: file ? URL.createObjectURL(file) : null
+        path: file ? createPreviewUrl(file) : null
       };
       setData("banner", newBanner);
     }
     if (field === "avatar") {
+      revokePreviewUrl(data.avatar.path);
       const newAvatar = {
         file,
-        path: file ? URL.createObjectURL(file) : null
+        path: file ? createPreviewUrl(file) : null
       };
       setData("avatar", newAvatar);
     }
     if (field === "logo") {
+      revokePreviewUrl(data.logo.path);
       const newLogo = {
         file,
-        path: file ? URL.createObjectURL(file) : null
+        path: file ? createPreviewUrl(file) : null
       };
       setData("logo", newLogo);
     }
   };
   const submit = (event) => {
     event.preventDefault();
-    console.log(data);
     post(route("card.store"), {
-      onSuccess: () => {
-        console.log("Upload successful!");
-      },
-      onError: (errors2) => {
-        console.log("Upload errors:", errors2);
-      },
       preserveState: true,
       preserveScroll: true
     });
   };
   const removeFile = (field) => {
     if (field === "avatar") {
+      revokePreviewUrl(data.avatar.path);
       setData("avatar", { file: null, path: null });
     } else if (field === "logo") {
+      revokePreviewUrl(data.logo.path);
       setData("logo", { file: null, path: null });
     } else if (field === "banner") {
+      revokePreviewUrl(data.banner.path);
       setData("banner", { file: null, path: null });
     }
   };
   return /* @__PURE__ */ jsxs(AppLayout, { breadcrumbs: breadcrumbs$8, children: [
-    /* @__PURE__ */ jsx(Head, { title: "Dashboard" }),
+    /* @__PURE__ */ jsx(Head, { title: "Create Card" }),
     /* @__PURE__ */ jsxs("form", { onSubmit: submit, className: "min-h-screen", children: [
       /* @__PURE__ */ jsx("div", { className: "m-2 flex flex-row justify-end rounded-lg border-2 p-2 shadow-none", children: /* @__PURE__ */ jsxs(Button, { variant: "outline", type: "submit", className: "cursor-pointer bg-green-600 text-white", tabIndex: 5, disabled: processing, children: [
         processing && /* @__PURE__ */ jsx(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
@@ -3132,7 +3181,7 @@ function CreateCard() {
             ] }),
             /* @__PURE__ */ jsxs(CardContent, { className: "space-y-4", children: [
               /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 rounded-xl border-2 px-2 py-4", children: [
-                /* @__PURE__ */ jsx(Label, { htmlFor: "avatar-upload", className: "text-sm font-medium text", children: "Upload Your Banner" }),
+                /* @__PURE__ */ jsx(Label, { htmlFor: "banner-upload", className: "text text-sm font-medium", children: "Upload Your Banner" }),
                 data.banner.file ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
                   /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: data.banner.file.name }),
                   /* @__PURE__ */ jsxs(Button, { type: "button", variant: "ghost", size: "icon", onClick: () => removeFile("banner"), children: [
@@ -3170,7 +3219,7 @@ function CreateCard() {
                 /* @__PURE__ */ jsx(InputError, { message: errors["banner.file"], className: "mt-2" })
               ] }),
               /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 rounded-xl border-2 px-2 py-4", children: [
-                /* @__PURE__ */ jsxs(Label, { htmlFor: "avatar-upload", className: "text-sm font-medium", children: [
+                /* @__PURE__ */ jsxs(Label, { htmlFor: "logo-upload", className: "text-sm font-medium", children: [
                   "Upload Your Avatar ",
                   /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
                 ] }),
@@ -3278,6 +3327,7 @@ function CreateCard() {
                       id: "fname",
                       value: data.first_name,
                       onChange: (e) => setData("first_name", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -3295,6 +3345,7 @@ function CreateCard() {
                       id: "lname",
                       value: data.last_name,
                       onChange: (e) => setData("last_name", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -3310,6 +3361,7 @@ function CreateCard() {
                       id: "organization",
                       value: data.organization,
                       onChange: (e) => setData("organization", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -3323,6 +3375,7 @@ function CreateCard() {
                       id: "jobtitle",
                       value: data.job_title,
                       onChange: (e) => setData("job_title", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -3339,6 +3392,7 @@ function CreateCard() {
                       type: "tel",
                       value: data.phone,
                       onChange: (e) => setData("phone", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -3353,6 +3407,7 @@ function CreateCard() {
                       type: "email",
                       value: data.email,
                       onChange: (e) => setData("email", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -3367,7 +3422,8 @@ function CreateCard() {
                     className: "h-30 w-full",
                     placeholder: "enter your headline text",
                     value: data.headline,
-                    onChange: (e) => setData("headline", e.target.value)
+                    onChange: (e) => setData("headline", e.target.value),
+                    maxLength: 255
                   }
                 ),
                 /* @__PURE__ */ jsx(InputError, { message: errors.headline, className: "mt-2" })
@@ -3434,6 +3490,7 @@ function CreateCard() {
                     disabled: processing
                   }
                 ),
+                /* @__PURE__ */ jsx(InputError, { message: errors[`links.${index}.name`], className: "mt-2" }),
                 /* @__PURE__ */ jsx(InputError, { message: errors[`links.${index}.url`], className: "mt-2" })
               ] }, index);
             }) })
@@ -3452,19 +3509,21 @@ function CreateCard() {
                     id: "address",
                     value: data.address,
                     onChange: (e) => setData("address", e.target.value),
+                    maxLength: 255,
                     disabled: processing
                   }
                 ),
                 /* @__PURE__ */ jsx(InputError, { message: errors.address, className: "mt-2" })
               ] }),
               /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
-                /* @__PURE__ */ jsx(Label, { htmlFor: "lname", children: "Location" }),
+                /* @__PURE__ */ jsx(Label, { htmlFor: "location", children: "Location" }),
                 /* @__PURE__ */ jsx(
                   Input,
                   {
                     id: "location",
                     value: data.location,
                     onChange: (e) => setData("location", e.target.value),
+                    maxLength: 255,
                     disabled: processing
                   }
                 ),
@@ -3487,260 +3546,114 @@ function CreateCard() {
                 }
               ) })
             ] }) }),
-            /* @__PURE__ */ jsx(CardContent, { className: "space-y-6", children: data.business_hours_enabled ? data.business_hours.map((day, index) => /* @__PURE__ */ jsxs("div", { className: "rounded-lg border p-4", children: [
-              /* @__PURE__ */ jsxs("div", { className: "mb-4 flex items-center justify-between", children: [
-                /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
-                  /* @__PURE__ */ jsx(
-                    Switch,
-                    {
-                      id: `${day.id}-toggle`,
-                      checked: day.isOpen,
-                      onCheckedChange: () => toggleDayOpen(day)
-                    }
-                  ),
-                  /* @__PURE__ */ jsx(Label, { htmlFor: `${day.id}-toggle`, className: "text-lg font-medium", children: day.day })
-                ] }),
-                day.isOpen && /* @__PURE__ */ jsx("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "outline",
-                    size: "sm",
-                    onClick: () => copyToAllDays(day),
-                    className: "flex items-center gap-2",
-                    children: [
-                      /* @__PURE__ */ jsx(Copy, { className: "h-4 w-4 md:hidden" }),
-                      /* @__PURE__ */ jsx("span", { className: "hidden md:inline", children: "Apply to all days" })
-                    ]
-                  }
-                ) })
-              ] }),
-              day.isOpen ? /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
-                /* @__PURE__ */ jsxs("div", { className: "flex flex-row items-center gap-2 md:flex-row", children: [
-                  /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
-                    /* @__PURE__ */ jsx(Clock, { className: "text-muted-foreground mr-2 hidden h-4 w-4 md:block" }),
-                    /* @__PURE__ */ jsxs(
-                      Select,
+            /* @__PURE__ */ jsxs(CardContent, { className: "space-y-6", children: [
+              /* @__PURE__ */ jsx(InputError, { message: errors.business_hours_enabled || errors.business_hours, className: "mt-2" }),
+              data.business_hours_enabled ? data.business_hours.map((day, index) => /* @__PURE__ */ jsxs("div", { className: "rounded-lg border p-4", children: [
+                /* @__PURE__ */ jsxs("div", { className: "mb-4 flex items-center justify-between", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
+                    /* @__PURE__ */ jsx(
+                      Switch,
                       {
-                        value: day.open,
-                        onValueChange: (value) => updateTimeSlot(day, "open", value),
-                        children: [
-                          /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Opening time" }) }),
-                          /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `open-${time}`)) })
-                        ]
+                        id: `${day.id}-toggle`,
+                        checked: day.isOpen,
+                        onCheckedChange: () => toggleDayOpen(day)
                       }
-                    )
+                    ),
+                    /* @__PURE__ */ jsx(Label, { htmlFor: `${day.id}-toggle`, className: "text-lg font-medium", children: day.day })
                   ] }),
-                  /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: "to" }),
-                  /* @__PURE__ */ jsx("div", { className: "flex items-center", children: /* @__PURE__ */ jsxs(
-                    Select,
+                  day.isOpen && /* @__PURE__ */ jsx("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxs(
+                    Button,
                     {
-                      value: day.close,
-                      onValueChange: (value) => updateTimeSlot(day, "close", value),
+                      type: "button",
+                      variant: "outline",
+                      size: "sm",
+                      onClick: () => copyToAllDays(day),
+                      className: "flex items-center gap-2",
                       children: [
-                        /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Closing time" }) }),
-                        /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `open-${time}`)) })
+                        /* @__PURE__ */ jsx(Copy, { className: "h-4 w-4 md:hidden" }),
+                        /* @__PURE__ */ jsx("span", { className: "hidden md:inline", children: "Apply to all days" })
                       ]
                     }
                   ) })
                 ] }),
-                errors[`business_hours.${index}.open`] && errors[`business_hours.${index}.close`] ? /* @__PURE__ */ jsx(
+                /* @__PURE__ */ jsx(
                   InputError,
                   {
-                    message: `please select both opening and closing time for ${day.day}`,
+                    message: errors[`business_hours.${index}.day`] || errors[`business_hours.${index}.isOpen`],
                     className: "mt-2"
                   }
-                ) : /* @__PURE__ */ jsxs(Fragment, { children: [
-                  errors[`business_hours.${index}.open`] && /* @__PURE__ */ jsx(
+                ),
+                day.isOpen ? /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex flex-row items-center gap-2 md:flex-row", children: [
+                    /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                      /* @__PURE__ */ jsx(Clock, { className: "text-muted-foreground mr-2 hidden h-4 w-4 md:block" }),
+                      /* @__PURE__ */ jsxs(
+                        Select,
+                        {
+                          value: day.open,
+                          onValueChange: (value) => updateTimeSlot(day, "open", value),
+                          children: [
+                            /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Opening time" }) }),
+                            /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `open-${time}`)) })
+                          ]
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: "to" }),
+                    /* @__PURE__ */ jsx("div", { className: "flex items-center", children: /* @__PURE__ */ jsxs(
+                      Select,
+                      {
+                        value: day.close,
+                        onValueChange: (value) => updateTimeSlot(day, "close", value),
+                        children: [
+                          /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Closing time" }) }),
+                          /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `open-${time}`)) })
+                        ]
+                      }
+                    ) })
+                  ] }),
+                  errors[`business_hours.${index}.open`] && errors[`business_hours.${index}.close`] ? /* @__PURE__ */ jsx(
                     InputError,
                     {
-                      message: errors[`business_hours.${index}.open`],
+                      message: `please select both opening and closing time for ${day.day}`,
                       className: "mt-2"
                     }
-                  ),
-                  errors[`business_hours.${index}.close`] && /* @__PURE__ */ jsx(
-                    InputError,
-                    {
-                      message: errors[`business_hours.${index}.close`],
-                      className: "mt-2"
-                    }
-                  )
-                ] })
-              ] }) : /* @__PURE__ */ jsx("div", { className: "text-muted-foreground italic", children: "Closed" })
-            ] }, day.id)) : /* @__PURE__ */ jsx("div", { className: "text-muted-foreground text-center", children: "Business hours are disabled. Enable the toggle above to set your business hours." }) })
+                  ) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                    errors[`business_hours.${index}.open`] && /* @__PURE__ */ jsx(
+                      InputError,
+                      {
+                        message: errors[`business_hours.${index}.open`],
+                        className: "mt-2"
+                      }
+                    ),
+                    errors[`business_hours.${index}.close`] && /* @__PURE__ */ jsx(
+                      InputError,
+                      {
+                        message: errors[`business_hours.${index}.close`],
+                        className: "mt-2"
+                      }
+                    )
+                  ] })
+                ] }) : /* @__PURE__ */ jsx("div", { className: "text-muted-foreground italic", children: "Closed" })
+              ] }, day.id)) : /* @__PURE__ */ jsx("div", { className: "text-muted-foreground text-center", children: "Business hours are disabled. Enable the toggle above to set your business hours." })
+            ] })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "service", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
               /* @__PURE__ */ jsx(CardTitle, { children: "Service" }),
               /* @__PURE__ */ jsx(CardDescription, { children: "add all your services" })
             ] }),
-            /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsx("div", { className: "space-y-6", children: data.services.length === 0 ? /* @__PURE__ */ jsxs("div", { className: "py-8 text-center", children: [
-              /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mb-4", children: "No services added yet" }),
-              /* @__PURE__ */ jsxs(
-                Button,
-                {
-                  type: "button",
-                  variant: "outline",
-                  onClick: addMoreServiceItem,
-                  className: "mx-auto flex items-center gap-2",
-                  disabled: data.services.length >= serviceLimit,
-                  children: [
-                    /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                    "Add Service"
-                  ]
-                }
-              ),
-              data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
-                /* @__PURE__ */ jsx(ShieldAlert, { className: "h-8 w-8" }),
-                /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
-              ] })
-            ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-              data.services.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "ghost",
-                    size: "icon",
-                    className: "absolute top-2 right-2 text-red-500 hover:bg-red-50 hover:text-red-700",
-                    onClick: () => removeServiceItem(item.id),
-                    children: [
-                      /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
-                      /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsxs(
-                      Label,
-                      {
-                        htmlFor: `image-${item.id}`,
-                        className: "flex items-center gap-1 text-sm font-medium text-black",
-                        children: [
-                          /* @__PURE__ */ jsx("span", { children: "Upload Your Image" }),
-                          /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
-                        ]
-                      }
-                    ),
-                    /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2", children: item.file ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: typeof item.file === "string" ? item.file : item.file.name }),
-                      /* @__PURE__ */ jsxs(
-                        Button,
-                        {
-                          type: "button",
-                          variant: "ghost",
-                          size: "icon",
-                          onClick: () => removeServiceFile(item.id),
-                          children: [
-                            /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
-                            /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
-                          ]
-                        }
-                      )
-                    ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
-                      /* @__PURE__ */ jsx(
-                        Input,
-                        {
-                          id: `image-${item.id}`,
-                          type: "file",
-                          accept: "image/*",
-                          className: "hidden",
-                          onChange: (e) => {
-                            var _a2;
-                            const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
-                            handleServiceFileChange(item.id, file);
-                          }
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs(
-                        Button,
-                        {
-                          type: "button",
-                          variant: "outline",
-                          onClick: () => {
-                            var _a2;
-                            return (_a2 = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a2.click();
-                          },
-                          className: "flex items-center gap-2",
-                          children: [
-                            /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
-                            "Select Image"
-                          ]
-                        }
-                      )
-                    ] }) }),
-                    /* @__PURE__ */ jsx(
-                      InputError,
-                      {
-                        message: errors[`services.${index}.file`],
-                        className: "mt-2"
-                      }
-                    )
-                  ] }),
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsxs(Label, { htmlFor: "name", className: "mb-2 block flex items-center gap-1", children: [
-                      /* @__PURE__ */ jsx("span", { children: "Name" }),
-                      /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ jsx(
-                      Input,
-                      {
-                        id: "name",
-                        placeholder: "name",
-                        value: item.name,
-                        onChange: (e) => handleServiceNameChange(item.id, e.target.value)
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(
-                      InputError,
-                      {
-                        message: errors[`services.${index}.name`],
-                        className: "mt-2"
-                      }
-                    )
-                  ] }),
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsxs(
-                      Label,
-                      {
-                        htmlFor: `description-${item.id}`,
-                        className: "mb-2 block flex items-center gap-1",
-                        children: [
-                          /* @__PURE__ */ jsx("span", { children: "Description" }),
-                          /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
-                        ]
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(
-                      Textarea,
-                      {
-                        id: `description-${item.id}`,
-                        placeholder: "Enter a description for this image",
-                        value: item.description,
-                        onChange: (e) => handleServiceDescriptionChange(item.id, e.target.value),
-                        className: "min-h-24"
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(
-                      InputError,
-                      {
-                        message: errors[`services.${index}.description`],
-                        className: "mt-2"
-                      }
-                    )
-                  ] })
-                ] })
-              ] }) }, item.id)),
-              data.services.length >= serviceLimit && /* @__PURE__ */ jsx(InputError, { message: errors.services, className: "mt-2" }),
-              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+            /* @__PURE__ */ jsxs(CardContent, { className: "space-y-2", children: [
+              /* @__PURE__ */ jsx(InputError, { message: errors.services, className: "mt-2" }),
+              /* @__PURE__ */ jsx("div", { className: "space-y-6", children: data.services.length === 0 ? /* @__PURE__ */ jsxs("div", { className: "py-8 text-center", children: [
+                /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mb-4", children: "No services added yet" }),
                 /* @__PURE__ */ jsxs(
                   Button,
                   {
                     type: "button",
                     variant: "outline",
                     onClick: addMoreServiceItem,
-                    className: "flex items-center gap-2",
+                    className: "mx-auto flex items-center gap-2",
                     disabled: data.services.length >= serviceLimit,
                     children: [
                       /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
@@ -3748,163 +3661,195 @@ function CreateCard() {
                     ]
                   }
                 ),
-                data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
                   /* @__PURE__ */ jsx(ShieldAlert, { className: "h-8 w-8" }),
                   /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
                 ] })
-              ] })
-            ] }) }) })
+              ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                data.services.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "ghost",
+                      size: "icon",
+                      className: "absolute top-2 right-2 text-red-500 hover:bg-red-50 hover:text-red-700",
+                      onClick: () => removeServiceItem(item.id),
+                      children: [
+                        /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
+                        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsxs(
+                        Label,
+                        {
+                          htmlFor: `service-image-${item.id}`,
+                          className: "flex items-center gap-1 text-sm font-medium text-black",
+                          children: [
+                            /* @__PURE__ */ jsx("span", { children: "Upload Your Image" }),
+                            /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2", children: item.file ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
+                        /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: typeof item.file === "string" ? item.file : item.file.name }),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "ghost",
+                            size: "icon",
+                            onClick: () => removeServiceFile(item.id),
+                            children: [
+                              /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
+                              /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
+                            ]
+                          }
+                        )
+                      ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                        /* @__PURE__ */ jsx(
+                          Input,
+                          {
+                            id: `service-image-${item.id}`,
+                            type: "file",
+                            accept: "image/*",
+                            className: "hidden",
+                            onChange: (e) => {
+                              var _a2;
+                              const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
+                              handleServiceFileChange(item.id, file);
+                            }
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "outline",
+                            onClick: () => {
+                              var _a2;
+                              return (_a2 = document.getElementById(`service-image-${item.id}`)) == null ? void 0 : _a2.click();
+                            },
+                            className: "flex items-center gap-2",
+                            children: [
+                              /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
+                              "Select Image"
+                            ]
+                          }
+                        )
+                      ] }) }),
+                      /* @__PURE__ */ jsx(
+                        InputError,
+                        {
+                          message: errors[`services.${index}.file`] || errors[`services.${index}.path`],
+                          className: "mt-2"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsxs(
+                        Label,
+                        {
+                          htmlFor: `service-name-${item.id}`,
+                          className: "mb-2 block flex items-center gap-1",
+                          children: [
+                            /* @__PURE__ */ jsx("span", { children: "Name" }),
+                            /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(
+                        Input,
+                        {
+                          id: `service-name-${item.id}`,
+                          placeholder: "name",
+                          value: item.name,
+                          onChange: (e) => handleServiceNameChange(item.id, e.target.value)
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(
+                        InputError,
+                        {
+                          message: errors[`services.${index}.name`],
+                          className: "mt-2"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsxs(
+                        Label,
+                        {
+                          htmlFor: `description-${item.id}`,
+                          className: "mb-2 block flex items-center gap-1",
+                          children: [
+                            /* @__PURE__ */ jsx("span", { children: "Description" }),
+                            /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(
+                        Textarea,
+                        {
+                          id: `description-${item.id}`,
+                          placeholder: "Enter a description for this image",
+                          value: item.description,
+                          onChange: (e) => handleServiceDescriptionChange(item.id, e.target.value),
+                          className: "min-h-24",
+                          maxLength: 500
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(
+                        InputError,
+                        {
+                          message: errors[`services.${index}.description`],
+                          className: "mt-2"
+                        }
+                      )
+                    ] })
+                  ] })
+                ] }) }, item.id)),
+                /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "outline",
+                      onClick: addMoreServiceItem,
+                      className: "flex items-center gap-2",
+                      disabled: data.services.length >= serviceLimit,
+                      children: [
+                        /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                        "Add Service"
+                      ]
+                    }
+                  ),
+                  data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                    /* @__PURE__ */ jsx(ShieldAlert, { className: "h-8 w-8" }),
+                    /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
+                  ] })
+                ] })
+              ] }) })
+            ] })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "gallery", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
               /* @__PURE__ */ jsx(CardTitle, { children: "Gallery" }),
               /* @__PURE__ */ jsx(CardDescription, { children: "add all your images" })
             ] }),
-            /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsx("div", { className: "space-y-6", children: data.galleries.length === 0 ? /* @__PURE__ */ jsxs("div", { className: "py-8 text-center", children: [
-              /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mb-4", children: "No images added yet" }),
-              /* @__PURE__ */ jsxs(
-                Button,
-                {
-                  type: "button",
-                  variant: "outline",
-                  onClick: addMoreItem,
-                  className: "mx-auto flex items-center gap-2",
-                  disabled: data.galleries.length >= galleryLimit,
-                  children: [
-                    /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                    "Add Image"
-                  ]
-                }
-              ),
-              data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
-                /* @__PURE__ */ jsx(ShieldAlert, { className: "h-6 w-6" }),
-                /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
-              ] })
-            ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-              data.galleries.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "ghost",
-                    size: "icon",
-                    className: "absolute top-2 right-2 text-red-500 hover:bg-red-50 hover:text-red-700",
-                    onClick: () => removeGalleryItem(item.id),
-                    children: [
-                      /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
-                      /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsxs(
-                      Label,
-                      {
-                        htmlFor: `image-${item.id}`,
-                        className: "flex items-center gap-1 text-sm font-medium text-black",
-                        children: [
-                          /* @__PURE__ */ jsx("span", { children: "Upload Your Image" }),
-                          /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
-                        ]
-                      }
-                    ),
-                    /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2", children: item.file ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.file.name }),
-                      /* @__PURE__ */ jsxs(
-                        Button,
-                        {
-                          type: "button",
-                          variant: "ghost",
-                          size: "icon",
-                          onClick: () => removeGalleryFile(item.id),
-                          children: [
-                            /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
-                            /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
-                          ]
-                        }
-                      )
-                    ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
-                      /* @__PURE__ */ jsx(
-                        Input,
-                        {
-                          id: `image-${item.id}`,
-                          type: "file",
-                          accept: "image/*",
-                          className: "hidden",
-                          onChange: (e) => {
-                            var _a2;
-                            const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
-                            handleGalleryFileChange(item.id, file);
-                          }
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs(
-                        Button,
-                        {
-                          type: "button",
-                          variant: "outline",
-                          onClick: () => {
-                            var _a2;
-                            return (_a2 = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a2.click();
-                          },
-                          className: "flex items-center gap-2",
-                          children: [
-                            /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
-                            "Select Image"
-                          ]
-                        }
-                      )
-                    ] }) }),
-                    /* @__PURE__ */ jsx(
-                      InputError,
-                      {
-                        message: errors[`galleries.${index}.file`],
-                        className: "mt-2"
-                      }
-                    )
-                  ] }),
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsxs(
-                      Label,
-                      {
-                        htmlFor: `description-${item.id}`,
-                        className: "mb-2 block flex items-center gap-1",
-                        children: [
-                          /* @__PURE__ */ jsx("span", { children: "Description" }),
-                          /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
-                        ]
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(
-                      Textarea,
-                      {
-                        id: `description-${item.id}`,
-                        placeholder: "Enter a description for this image",
-                        value: item.description,
-                        onChange: (e) => handleDescriptionChange(item.id, e.target.value),
-                        className: "min-h-24"
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(
-                      InputError,
-                      {
-                        message: errors[`galleries.${index}.description`],
-                        className: "mt-2"
-                      }
-                    )
-                  ] })
-                ] })
-              ] }) }, item.id)),
-              data.galleries.length >= galleryLimit && /* @__PURE__ */ jsx(InputError, { message: errors.galleries, className: "mt-2" }),
-              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+            /* @__PURE__ */ jsxs(CardContent, { className: "space-y-2", children: [
+              /* @__PURE__ */ jsx(InputError, { message: errors.galleries, className: "mt-2" }),
+              /* @__PURE__ */ jsx("div", { className: "space-y-6", children: data.galleries.length === 0 ? /* @__PURE__ */ jsxs("div", { className: "py-8 text-center", children: [
+                /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mb-4", children: "No images added yet" }),
                 /* @__PURE__ */ jsxs(
                   Button,
                   {
                     type: "button",
                     variant: "outline",
                     onClick: addMoreItem,
-                    className: "flex items-center gap-2",
+                    className: "mx-auto flex items-center gap-2",
                     disabled: data.galleries.length >= galleryLimit,
                     children: [
                       /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
@@ -3912,12 +3857,149 @@ function CreateCard() {
                     ]
                   }
                 ),
-                data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
                   /* @__PURE__ */ jsx(ShieldAlert, { className: "h-6 w-6" }),
                   /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
                 ] })
-              ] })
-            ] }) }) })
+              ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                data.galleries.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "ghost",
+                      size: "icon",
+                      className: "absolute top-2 right-2 text-red-500 hover:bg-red-50 hover:text-red-700",
+                      onClick: () => removeGalleryItem(item.id),
+                      children: [
+                        /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
+                        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsxs(
+                        Label,
+                        {
+                          htmlFor: `gallery-image-${item.id}`,
+                          className: "flex items-center gap-1 text-sm font-medium text-black",
+                          children: [
+                            /* @__PURE__ */ jsx("span", { children: "Upload Your Image" }),
+                            /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2", children: item.file ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
+                        /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.file.name }),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "ghost",
+                            size: "icon",
+                            onClick: () => removeGalleryFile(item.id),
+                            children: [
+                              /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
+                              /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
+                            ]
+                          }
+                        )
+                      ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                        /* @__PURE__ */ jsx(
+                          Input,
+                          {
+                            id: `gallery-image-${item.id}`,
+                            type: "file",
+                            accept: "image/*",
+                            className: "hidden",
+                            onChange: (e) => {
+                              var _a2;
+                              const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
+                              handleGalleryFileChange(item.id, file);
+                            }
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "outline",
+                            onClick: () => {
+                              var _a2;
+                              return (_a2 = document.getElementById(`gallery-image-${item.id}`)) == null ? void 0 : _a2.click();
+                            },
+                            className: "flex items-center gap-2",
+                            children: [
+                              /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
+                              "Select Image"
+                            ]
+                          }
+                        )
+                      ] }) }),
+                      /* @__PURE__ */ jsx(
+                        InputError,
+                        {
+                          message: errors[`galleries.${index}.file`] || errors[`galleries.${index}.path`],
+                          className: "mt-2"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsxs(
+                        Label,
+                        {
+                          htmlFor: `description-${item.id}`,
+                          className: "mb-2 block flex items-center gap-1",
+                          children: [
+                            /* @__PURE__ */ jsx("span", { children: "Description" }),
+                            /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(
+                        Textarea,
+                        {
+                          id: `description-${item.id}`,
+                          placeholder: "Enter a description for this image",
+                          value: item.description,
+                          onChange: (e) => handleDescriptionChange(item.id, e.target.value),
+                          className: "min-h-24",
+                          maxLength: 500
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(
+                        InputError,
+                        {
+                          message: errors[`galleries.${index}.description`],
+                          className: "mt-2"
+                        }
+                      )
+                    ] })
+                  ] })
+                ] }) }, item.id)),
+                /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "outline",
+                      onClick: addMoreItem,
+                      className: "flex items-center gap-2",
+                      disabled: data.galleries.length >= galleryLimit,
+                      children: [
+                        /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                        "Add Image"
+                      ]
+                    }
+                  ),
+                  data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                    /* @__PURE__ */ jsx(ShieldAlert, { className: "h-6 w-6" }),
+                    /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
+                  ] })
+                ] })
+              ] }) })
+            ] })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "template", className: "md:hidden", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
@@ -3948,6 +4030,8 @@ const __vite_glob_0_9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   __proto__: null,
   default: CreateCard
 }, Symbol.toStringTag, { value: "Module" }));
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_IMAGE_SIZE_MESSAGE = "The image file size must not exceed 2MB.";
 const breadcrumbs$7 = [
   { title: "Dashboard", href: "/dashboard" },
   { title: "Edit Card", href: "" }
@@ -3960,9 +4044,7 @@ function EditCard({ card }) {
   const serviceLimit = ((_a = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _a.number_of_service) ?? 0;
   const galleryLimit = ((_b = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _b.number_of_gallery) ?? 0;
   const cardSocialLinks = props.cardSocialLinks;
-  const existingLinksMap = new Map(
-    (card.links || []).map((link) => [link.name, link.url])
-  );
+  const existingLinksMap = new Map((card.links || []).map((link) => [link.name, link.url]));
   const existingLinks = cardSocialLinks.filter((linkName) => existingLinksMap.has(linkName));
   const initialRemovedLinks = cardSocialLinks.filter((linkName) => !existingLinksMap.has(linkName));
   const [removedLinks, setRemovedLinks] = useState(initialRemovedLinks);
@@ -3971,25 +4053,39 @@ function EditCard({ card }) {
       "links",
       data.links.filter((link) => link.name !== name)
     );
-    setRemovedLinks([...removedLinks, name]);
+    setRemovedLinks((prev) => prev.includes(name) ? prev : [...prev, name]);
   };
   const addBackLink = (name) => {
+    if (data.links.some((link) => link.name === name)) {
+      setRemovedLinks((prev) => prev.filter((link) => link !== name));
+      return;
+    }
     const newLink = {
       name,
       url: "",
       placeholder: `https://${name.toLowerCase()}.com/your-profile`
     };
     setData("links", [...data.links, newLink]);
-    setRemovedLinks(removedLinks.filter((link) => link !== name));
+    setRemovedLinks((prev) => prev.filter((link) => link !== name));
   };
   const links = existingLinks.map((linkName) => ({
     name: linkName,
     url: existingLinksMap.get(linkName) || "",
     placeholder: `https://${linkName.toLowerCase()}.com/your-profile`
   }));
-  useState(initialRemovedLinks);
   const colors = ["#3a59ae", "#a580e5", "#6dd3c7", "#3bb55d", "#ffc631", "#ff8c39", "#ea3a2e", "#ee85dd", "#4a4a4a"];
-  console.log(card);
+  const objectUrls = useRef(/* @__PURE__ */ new Set());
+  const createPreviewUrl = (file) => {
+    const url = URL.createObjectURL(file);
+    objectUrls.current.add(url);
+    return url;
+  };
+  const revokePreviewUrl = (path) => {
+    if (path == null ? void 0 : path.startsWith("blob:")) {
+      URL.revokeObjectURL(path);
+      objectUrls.current.delete(path);
+    }
+  };
   const timeOptions = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
@@ -3998,7 +4094,7 @@ function EditCard({ card }) {
       timeOptions.push(`${formattedHour}:${formattedMinute}`);
     }
   }
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
     banner: card.banner,
     avatar: card.avatar,
     logo: card.logo,
@@ -4017,6 +4113,7 @@ function EditCard({ card }) {
     services: ((_d = card.services) == null ? void 0 : _d.length) > 0 ? card.services : [],
     business_hours_enabled: card.business_hours_enabled,
     template: card.template ?? "classic",
+    url: card.url,
     business_hours: card.business_hours || [
       { id: crypto.randomUUID(), day: "Monday", isOpen: true, open: "09:00", close: "17:00" },
       { id: crypto.randomUUID(), day: "Tuesday", isOpen: true, open: "09:00", close: "17:00" },
@@ -4027,25 +4124,24 @@ function EditCard({ card }) {
       { id: crypto.randomUUID(), day: "Sunday", isOpen: false, open: "09:00", close: "17:00" }
     ]
   });
+  useEffect(() => {
+    return () => {
+      objectUrls.current.forEach((url) => URL.revokeObjectURL(url));
+      objectUrls.current.clear();
+    };
+  }, []);
   const hasTabError = (prefixes, errors2) => {
-    return Object.keys(errors2).some(
-      (key) => prefixes.some((prefix) => key.startsWith(prefix))
-    );
+    return Object.keys(errors2).some((key) => prefixes.some((prefix) => key.startsWith(prefix)));
   };
   const DisplayError = hasTabError(["avatar.file", "banner.file", "banner.path", "logo.file"], errors);
-  const personalInformationError = hasTabError(
-    ["first_name", "last_name", "organization", "job_title", "email", "phone", "headline"],
-    errors
-  );
-  const linksError = hasTabError(
-    ["links.0", "links.1", "links.2", "links.3", "links.4", "links.5"],
-    errors
-  );
+  const personalInformationError = hasTabError(["first_name", "last_name", "organization", "job_title", "email", "phone", "headline"], errors);
+  const linksError = hasTabError(["links"], errors);
   const locationError = hasTabError(["address", "location"], errors);
-  const galleryError = hasTabError(["galleries.0", "galleries.1", "galleries.2"], errors);
-  const serviceError = hasTabError(["services.0", "services.1", "services.2"], errors);
-  const businessHoursError = hasTabError(["business_hours.0", "business_hours.1", "business_hours.2"], errors);
+  const galleryError = hasTabError(["galleries"], errors);
+  const serviceError = hasTabError(["services"], errors);
+  const businessHoursError = hasTabError(["business_hours"], errors);
   const templateTabError = hasTabError(["template"], errors);
+  const isImageTooLarge = (file) => file !== null && file.size > MAX_IMAGE_SIZE_BYTES;
   const copyToAllDays = (day) => {
     const updatedSchedule = data.business_hours.map((item) => ({
       ...item,
@@ -4073,26 +4169,45 @@ function EditCard({ card }) {
     setData("business_hours", updatedSchedule);
   };
   const handleGalleryFileChange = (id, file) => {
+    const itemIndex = data.galleries.findIndex((item) => item.id === id);
+    const errorKey = `galleries.${itemIndex}.file`;
+    if (itemIndex !== -1 && isImageTooLarge(file)) {
+      setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+      return;
+    }
+    if (itemIndex !== -1) {
+      clearErrors(errorKey, `galleries.${itemIndex}.path`);
+    }
     const newGallery = data.galleries.map((item) => {
       if (item.id === id) {
-        return { ...item, file, path: file ? URL.createObjectURL(file) : null };
+        revokePreviewUrl(item.path);
+        return { ...item, file, path: file ? createPreviewUrl(file) : null };
       }
       return item;
     });
     setData("galleries", newGallery);
   };
   const handleServiceFileChange = (id, file) => {
+    const itemIndex = data.services.findIndex((item) => item.id === id);
+    const errorKey = `services.${itemIndex}.file`;
+    if (itemIndex !== -1 && isImageTooLarge(file)) {
+      setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+      return;
+    }
+    if (itemIndex !== -1) {
+      clearErrors(errorKey, `services.${itemIndex}.path`);
+    }
     const newService = data.services.map((item) => {
       if (item.id === id) {
+        revokePreviewUrl(item.path);
         return {
           ...item,
           file,
-          path: file ? URL.createObjectURL(file) : null
+          path: file ? createPreviewUrl(file) : null
         };
       }
       return item;
     });
-    console.log(newService);
     setData("services", newService);
   };
   const handleServiceDescriptionChange = (id, description) => {
@@ -4132,21 +4247,26 @@ function EditCard({ card }) {
     setData("galleries", [...data.galleries, { id: crypto.randomUUID(), file: null, path: null, description: "" }]);
   };
   const addMoreServiceItem = () => {
-    setData("services", [...data.services, {
-      id: crypto.randomUUID(),
-      file: null,
-      path: null,
-      name: "",
-      description: ""
-    }]);
+    setData("services", [
+      ...data.services,
+      {
+        id: crypto.randomUUID(),
+        file: null,
+        path: null,
+        name: "",
+        description: ""
+      }
+    ]);
   };
   const removeGalleryItem = (id) => {
+    data.galleries.filter((item) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
     setData(
       "galleries",
       data.galleries.filter((item) => item.id !== id)
     );
   };
   const removeServiceItem = (id) => {
+    data.services.filter((item) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
     setData(
       "services",
       data.services.filter((item) => item.id !== id)
@@ -4157,6 +4277,7 @@ function EditCard({ card }) {
       "galleries",
       data.galleries.map((item) => {
         if (item.id === id) {
+          revokePreviewUrl(item.path);
           return { ...item, file: null, path: null };
         }
         return item;
@@ -4168,6 +4289,7 @@ function EditCard({ card }) {
       "services",
       data.services.map((item) => {
         if (item.id === id) {
+          revokePreviewUrl(item.path);
           return { ...item, file: null, path: null };
         }
         return item;
@@ -4178,7 +4300,33 @@ function EditCard({ card }) {
     var _a2;
     const file = (_a2 = e.target.files) == null ? void 0 : _a2[0];
     if (file) {
-      setData(field, { file, path: URL.createObjectURL(file) });
+      const errorKey = `${field}.file`;
+      if (isImageTooLarge(file)) {
+        setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+        return;
+      }
+      clearErrors(errorKey, `${field}.path`);
+      revokePreviewUrl(data[field].path);
+      setData(field, { file, path: createPreviewUrl(file) });
+    }
+  };
+  const handleBusinessHoursToggle = (checked) => {
+    setData("business_hours_enabled", checked);
+    if (!checked) {
+      setData("business_hours", []);
+    } else {
+      setData(
+        "business_hours",
+        card.business_hours || [
+          { id: crypto.randomUUID(), day: "Monday", isOpen: true, open: "09:00", close: "17:00" },
+          { id: crypto.randomUUID(), day: "Tuesday", isOpen: true, open: "09:00", close: "17:00" },
+          { id: crypto.randomUUID(), day: "Wednesday", isOpen: true, open: "09:00", close: "17:00" },
+          { id: crypto.randomUUID(), day: "Thursday", isOpen: true, open: "09:00", close: "17:00" },
+          { id: crypto.randomUUID(), day: "Friday", isOpen: true, open: "09:00", close: "17:00" },
+          { id: crypto.randomUUID(), day: "Saturday", isOpen: false, open: "09:00", close: "17:00" },
+          { id: crypto.randomUUID(), day: "Sunday", isOpen: false, open: "09:00", close: "17:00" }
+        ]
+      );
     }
   };
   const submit = (event) => {
@@ -4189,20 +4337,27 @@ function EditCard({ card }) {
       },
       onError: (errors2) => {
         toast.error("Failed to update card. Please check the form for errors.");
-        console.log("Update errors:", errors2);
       },
       preserveState: true,
       preserveScroll: true
     });
   };
   const removeFile = (field) => {
+    revokePreviewUrl(data[field].path);
     setData(field, { file: null, path: null });
   };
   return /* @__PURE__ */ jsxs(AppLayout, { breadcrumbs: breadcrumbs$7, children: [
     /* @__PURE__ */ jsx(Head, { title: "Edit Card" }),
     /* @__PURE__ */ jsxs("form", { onSubmit: submit, className: "min-h-screen", children: [
       /* @__PURE__ */ jsxs("div", { className: "m-2 flex flex-row justify-between rounded-lg border-2 p-2 shadow-none", children: [
-        /* @__PURE__ */ jsx(Link, { className: "cursor-pointer bg-red-500 hover:bg-red-600 rounded-lg px-4 py-1 text-white font-bold", href: route("card.show", card.id), children: "Cancel" }),
+        /* @__PURE__ */ jsx(
+          Link,
+          {
+            className: "cursor-pointer rounded-lg bg-red-500 px-4 py-1 font-bold text-white hover:bg-red-600",
+            href: route("card.show", card.id),
+            children: "Cancel"
+          }
+        ),
         /* @__PURE__ */ jsxs(Button, { variant: "outline", type: "submit", className: "cursor-pointer bg-green-600 text-white", disabled: processing, children: [
           processing && /* @__PURE__ */ jsx(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
           "Update Card"
@@ -4304,7 +4459,7 @@ function EditCard({ card }) {
               /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 rounded-xl border-2 px-2 py-4", children: [
                 /* @__PURE__ */ jsxs(Label, { htmlFor: "avatar-upload", className: "text-sm font-medium", children: [
                   "Upload Your Avatar ",
-                  /* @__PURE__ */ jsx("span", { className: "text-red-500 text-lg", children: "*" })
+                  /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
                 ] }),
                 data.avatar.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
                   /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: data.avatar.path.split("/").pop() || "Existing Avatar" }),
@@ -4401,7 +4556,7 @@ function EditCard({ card }) {
                 /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
                   /* @__PURE__ */ jsxs(Label, { htmlFor: "fname", children: [
                     "First Name ",
-                    /* @__PURE__ */ jsx("span", { className: "text-red-500 text-lg", children: "*" })
+                    /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
                   ] }),
                   /* @__PURE__ */ jsx(
                     Input,
@@ -4409,6 +4564,7 @@ function EditCard({ card }) {
                       id: "fname",
                       value: data.first_name,
                       onChange: (e) => setData("first_name", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -4417,7 +4573,7 @@ function EditCard({ card }) {
                 /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
                   /* @__PURE__ */ jsxs(Label, { htmlFor: "lname", children: [
                     "Last Name ",
-                    /* @__PURE__ */ jsx("span", { className: "text-red-500 text-lg", children: "*" })
+                    /* @__PURE__ */ jsx("span", { className: "text-lg text-red-500", children: "*" })
                   ] }),
                   /* @__PURE__ */ jsx(
                     Input,
@@ -4425,6 +4581,7 @@ function EditCard({ card }) {
                       id: "lname",
                       value: data.last_name,
                       onChange: (e) => setData("last_name", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -4440,6 +4597,7 @@ function EditCard({ card }) {
                       id: "organization",
                       value: data.organization,
                       onChange: (e) => setData("organization", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -4453,6 +4611,7 @@ function EditCard({ card }) {
                       id: "jobtitle",
                       value: data.job_title,
                       onChange: (e) => setData("job_title", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -4469,6 +4628,7 @@ function EditCard({ card }) {
                       type: "tel",
                       value: data.phone,
                       onChange: (e) => setData("phone", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -4483,6 +4643,7 @@ function EditCard({ card }) {
                       type: "email",
                       value: data.email,
                       onChange: (e) => setData("email", e.target.value),
+                      maxLength: 255,
                       disabled: processing
                     }
                   ),
@@ -4498,7 +4659,8 @@ function EditCard({ card }) {
                     className: "h-30 w-full",
                     placeholder: "Enter your headline text",
                     value: data.headline,
-                    onChange: (e) => setData("headline", e.target.value)
+                    onChange: (e) => setData("headline", e.target.value),
+                    maxLength: 255
                   }
                 ),
                 /* @__PURE__ */ jsx(InputError, { message: errors.headline, className: "mt-2" })
@@ -4543,7 +4705,7 @@ function EditCard({ card }) {
                       variant: "ghost",
                       size: "icon",
                       onClick: () => removeLinkItem(link.name),
-                      className: "text-red-500 hover:text-red-700 hover:bg-red-50",
+                      className: "text-red-500 hover:bg-red-50 hover:text-red-700",
                       children: [
                         /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
                         /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
@@ -4566,6 +4728,7 @@ function EditCard({ card }) {
                     disabled: processing
                   }
                 ),
+                /* @__PURE__ */ jsx(InputError, { message: errors[`links.${index}.name`], className: "mt-2" }),
                 /* @__PURE__ */ jsx(InputError, { message: errors[`links.${index}.url`], className: "mt-2" })
               ] }, index);
             }) })
@@ -4584,6 +4747,7 @@ function EditCard({ card }) {
                     id: "address",
                     value: data.address,
                     onChange: (e) => setData("address", e.target.value),
+                    maxLength: 255,
                     disabled: processing
                   }
                 ),
@@ -4597,6 +4761,7 @@ function EditCard({ card }) {
                     id: "location",
                     value: data.location,
                     onChange: (e) => setData("location", e.target.value),
+                    maxLength: 255,
                     disabled: processing
                   }
                 ),
@@ -4615,316 +4780,358 @@ function EditCard({ card }) {
                 {
                   id: "business-hours-toggle",
                   checked: data.business_hours_enabled,
-                  onCheckedChange: (checked) => setData("business_hours_enabled", checked)
+                  onCheckedChange: handleBusinessHoursToggle
                 }
               ) })
             ] }) }),
-            /* @__PURE__ */ jsx(CardContent, { className: "space-y-6", children: data.business_hours_enabled ? (_e = data.business_hours) == null ? void 0 : _e.map((day, index) => /* @__PURE__ */ jsxs("div", { className: "rounded-lg border p-4", children: [
-              /* @__PURE__ */ jsxs("div", { className: "mb-4 flex items-center justify-between", children: [
-                /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
-                  /* @__PURE__ */ jsx(
-                    Switch,
-                    {
-                      id: `${day.id}-toggle`,
-                      checked: day.isOpen,
-                      onCheckedChange: () => toggleDayOpen(day)
-                    }
-                  ),
-                  /* @__PURE__ */ jsx(Label, { htmlFor: `${day.id}-toggle`, className: "text-lg font-medium", children: day.day })
-                ] }),
-                day.isOpen && /* @__PURE__ */ jsx("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "outline",
-                    size: "sm",
-                    onClick: () => copyToAllDays(day),
-                    className: "flex items-center gap-2",
-                    children: [
-                      /* @__PURE__ */ jsx(Copy, { className: "h-4 w-4 md:hidden" }),
-                      /* @__PURE__ */ jsx("span", { className: "hidden md:inline", children: "Apply to all days" })
-                    ]
-                  }
-                ) })
-              ] }),
-              day.isOpen ? /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
-                /* @__PURE__ */ jsxs("div", { className: "flex flex-row items-center gap-2 md:flex-row", children: [
-                  /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
-                    /* @__PURE__ */ jsx(Clock, { className: "text-muted-foreground mr-2 hidden h-4 w-4 md:block" }),
-                    /* @__PURE__ */ jsxs(
-                      Select,
+            /* @__PURE__ */ jsxs(CardContent, { className: "space-y-6", children: [
+              /* @__PURE__ */ jsx(InputError, { message: errors.business_hours_enabled || errors.business_hours, className: "mt-2" }),
+              data.business_hours_enabled ? (_e = data.business_hours) == null ? void 0 : _e.map((day, index) => /* @__PURE__ */ jsxs("div", { className: "rounded-lg border p-4", children: [
+                /* @__PURE__ */ jsxs("div", { className: "mb-4 flex items-center justify-between", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
+                    /* @__PURE__ */ jsx(
+                      Switch,
                       {
-                        value: day.open,
-                        onValueChange: (value) => updateTimeSlot(day, "open", value),
-                        children: [
-                          /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Opening time" }) }),
-                          /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `open-${time}`)) })
-                        ]
+                        id: `${day.id}-toggle`,
+                        checked: day.isOpen,
+                        onCheckedChange: () => toggleDayOpen(day)
                       }
-                    )
+                    ),
+                    /* @__PURE__ */ jsx(Label, { htmlFor: `${day.id}-toggle`, className: "text-lg font-medium", children: day.day })
                   ] }),
-                  /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: "to" }),
-                  /* @__PURE__ */ jsx("div", { className: "flex items-center", children: /* @__PURE__ */ jsxs(
-                    Select,
+                  day.isOpen && /* @__PURE__ */ jsx("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxs(
+                    Button,
                     {
-                      value: day.close,
-                      onValueChange: (value) => updateTimeSlot(day, "close", value),
+                      type: "button",
+                      variant: "outline",
+                      size: "sm",
+                      onClick: () => copyToAllDays(day),
+                      className: "flex items-center gap-2",
                       children: [
-                        /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Closing time" }) }),
-                        /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `close-${time}`)) })
+                        /* @__PURE__ */ jsx(Copy, { className: "h-4 w-4 md:hidden" }),
+                        /* @__PURE__ */ jsx("span", { className: "hidden md:inline", children: "Apply to all days" })
                       ]
                     }
                   ) })
                 ] }),
-                errors[`business_hours.${index}.open`] && errors[`business_hours.${index}.close`] ? /* @__PURE__ */ jsx(
+                /* @__PURE__ */ jsx(
                   InputError,
                   {
-                    message: `Please select both opening and closing time for ${day.day}`,
+                    message: errors[`business_hours.${index}.day`] || errors[`business_hours.${index}.isOpen`],
                     className: "mt-2"
                   }
-                ) : /* @__PURE__ */ jsxs(Fragment, { children: [
-                  errors[`business_hours.${index}.open`] && /* @__PURE__ */ jsx(InputError, { message: errors[`business_hours.${index}.open`], className: "mt-2" }),
-                  errors[`business_hours.${index}.close`] && /* @__PURE__ */ jsx(InputError, { message: errors[`business_hours.${index}.close`], className: "mt-2" })
-                ] })
-              ] }) : /* @__PURE__ */ jsx("div", { className: "text-muted-foreground italic", children: "Closed" })
-            ] }, day.id)) : /* @__PURE__ */ jsx("div", { className: "text-center text-muted-foreground", children: "Business hours are disabled. Enable the toggle above to set your business hours." }) })
+                ),
+                day.isOpen ? /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex flex-row items-center gap-2 md:flex-row", children: [
+                    /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                      /* @__PURE__ */ jsx(Clock, { className: "text-muted-foreground mr-2 hidden h-4 w-4 md:block" }),
+                      /* @__PURE__ */ jsxs(
+                        Select,
+                        {
+                          value: day.open,
+                          onValueChange: (value) => updateTimeSlot(day, "open", value),
+                          children: [
+                            /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Opening time" }) }),
+                            /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `open-${time}`)) })
+                          ]
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: "to" }),
+                    /* @__PURE__ */ jsx("div", { className: "flex items-center", children: /* @__PURE__ */ jsxs(
+                      Select,
+                      {
+                        value: day.close,
+                        onValueChange: (value) => updateTimeSlot(day, "close", value),
+                        children: [
+                          /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[100px] md:w-[150px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "Closing time" }) }),
+                          /* @__PURE__ */ jsx(SelectContent, { children: timeOptions.map((time) => /* @__PURE__ */ jsx(SelectItem, { value: time, children: time }, `close-${time}`)) })
+                        ]
+                      }
+                    ) })
+                  ] }),
+                  errors[`business_hours.${index}.open`] && errors[`business_hours.${index}.close`] ? /* @__PURE__ */ jsx(
+                    InputError,
+                    {
+                      message: `Please select both opening and closing time for ${day.day}`,
+                      className: "mt-2"
+                    }
+                  ) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                    errors[`business_hours.${index}.open`] && /* @__PURE__ */ jsx(
+                      InputError,
+                      {
+                        message: errors[`business_hours.${index}.open`],
+                        className: "mt-2"
+                      }
+                    ),
+                    errors[`business_hours.${index}.close`] && /* @__PURE__ */ jsx(
+                      InputError,
+                      {
+                        message: errors[`business_hours.${index}.close`],
+                        className: "mt-2"
+                      }
+                    )
+                  ] })
+                ] }) : /* @__PURE__ */ jsx("div", { className: "text-muted-foreground italic", children: "Closed" })
+              ] }, day.id)) : /* @__PURE__ */ jsx("div", { className: "text-muted-foreground text-center", children: "Business hours are disabled. Enable the toggle above to set your business hours." })
+            ] })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "service", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
               /* @__PURE__ */ jsx(CardTitle, { children: "Services" }),
               /* @__PURE__ */ jsx(CardDescription, { children: "Update your services." })
             ] }),
-            /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
-              data.services.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "ghost",
-                    size: "icon",
-                    className: "absolute top-2 right-2",
-                    onClick: () => removeServiceItem(item.id),
-                    children: [
-                      /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
-                      /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-                  /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2", children: [
-                    item.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.path.split("/").pop() }),
-                      /* @__PURE__ */ jsxs(
-                        Button,
+            /* @__PURE__ */ jsxs(CardContent, { className: "space-y-2", children: [
+              /* @__PURE__ */ jsx(InputError, { message: errors.services, className: "mt-2" }),
+              /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
+                data.services.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "ghost",
+                      size: "icon",
+                      className: "absolute top-2 right-2",
+                      onClick: () => removeServiceItem(item.id),
+                      children: [
+                        /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
+                        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+                    /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2", children: [
+                      item.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
+                        /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.path.split("/").pop() }),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "ghost",
+                            size: "icon",
+                            onClick: () => removeServiceFile(item.id),
+                            children: [
+                              /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
+                              /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
+                            ]
+                          }
+                        )
+                      ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                        /* @__PURE__ */ jsx(
+                          Input,
+                          {
+                            id: `service-image-${item.id}`,
+                            type: "file",
+                            accept: "image/*",
+                            className: "hidden",
+                            onChange: (e) => {
+                              var _a2;
+                              const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
+                              handleServiceFileChange(item.id, file);
+                            }
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "outline",
+                            onClick: () => {
+                              var _a2;
+                              return (_a2 = document.getElementById(`service-image-${item.id}`)) == null ? void 0 : _a2.click();
+                            },
+                            className: "flex items-center gap-2",
+                            children: [
+                              /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
+                              "Select Image"
+                            ]
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsx(
+                        InputError,
                         {
-                          type: "button",
-                          variant: "ghost",
-                          size: "icon",
-                          onClick: () => removeServiceFile(item.id),
-                          children: [
-                            /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
-                            /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
-                          ]
+                          message: errors[`services.${index}.file`] || errors[`services.${index}.path`],
+                          className: "mt-2"
                         }
                       )
-                    ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                    ] }) }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsx(Label, { htmlFor: `name-${item.id}`, className: "mb-2 block", children: "Name" }),
                       /* @__PURE__ */ jsx(
                         Input,
                         {
-                          id: `image-${item.id}`,
-                          type: "file",
-                          accept: "image/*",
-                          className: "hidden",
-                          onChange: (e) => {
-                            var _a2;
-                            const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
-                            handleServiceFileChange(item.id, file);
-                          }
+                          id: `name-${item.id}`,
+                          placeholder: "Name",
+                          value: item.name,
+                          onChange: (e) => handleServiceNameChange(item.id, e.target.value)
                         }
                       ),
-                      /* @__PURE__ */ jsxs(
-                        Button,
-                        {
-                          type: "button",
-                          variant: "outline",
-                          onClick: () => {
-                            var _a2;
-                            return (_a2 = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a2.click();
-                          },
-                          className: "flex items-center gap-2",
-                          children: [
-                            /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
-                            "Select Image"
-                          ]
-                        }
-                      )
+                      /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.name`], className: "mt-2" })
                     ] }),
-                    /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.file`] || errors[`services.${index}.path`], className: "mt-2" })
-                  ] }) }),
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsx(Label, { htmlFor: `name-${item.id}`, className: "mb-2 block", children: "Name" }),
-                    /* @__PURE__ */ jsx(
-                      Input,
-                      {
-                        id: `name-${item.id}`,
-                        placeholder: "Name",
-                        value: item.name,
-                        onChange: (e) => handleServiceNameChange(item.id, e.target.value)
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.name`], className: "mt-2" })
-                  ] }),
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsx(Label, { htmlFor: `description-${item.id}`, className: "mb-2 block", children: "Description" }),
-                    /* @__PURE__ */ jsx(
-                      Textarea,
-                      {
-                        id: `description-${item.id}`,
-                        placeholder: "Enter a description for this service",
-                        value: item.description,
-                        onChange: (e) => handleServiceDescriptionChange(item.id, e.target.value),
-                        className: "min-h-24"
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.description`], className: "mt-2" })
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsx(Label, { htmlFor: `description-${item.id}`, className: "mb-2 block", children: "Description" }),
+                      /* @__PURE__ */ jsx(
+                        Textarea,
+                        {
+                          id: `description-${item.id}`,
+                          placeholder: "Enter a description for this service",
+                          value: item.description,
+                          onChange: (e) => handleServiceDescriptionChange(item.id, e.target.value),
+                          className: "min-h-24",
+                          maxLength: 500
+                        }
+                      ),
+                      /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.description`], className: "mt-2" })
+                    ] })
+                  ] })
+                ] }) }, item.id)),
+                /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "outline",
+                      onClick: addMoreServiceItem,
+                      className: "flex items-center gap-2",
+                      disabled: data.services.length >= serviceLimit,
+                      children: [
+                        /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                        "Add More"
+                      ]
+                    }
+                  ),
+                  data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                    /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
                   ] })
                 ] })
-              ] }) }, item.id)),
-              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
-                /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "outline",
-                    onClick: addMoreServiceItem,
-                    className: "flex items-center gap-2",
-                    disabled: data.services.length >= serviceLimit,
-                    children: [
-                      /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                      "Add More"
-                    ]
-                  }
-                ),
-                data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
-                  /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
-                  /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
-                ] })
               ] })
-            ] }) })
+            ] })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "gallery", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [
               /* @__PURE__ */ jsx(CardTitle, { children: "Galleries" }),
               /* @__PURE__ */ jsx(CardDescription, { children: "Update your gallery images and descriptions." })
             ] }),
-            /* @__PURE__ */ jsx(CardContent, { className: "space-y-2", children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
-              data.galleries.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
-                /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "ghost",
-                    size: "icon",
-                    className: "absolute top-2 right-2",
-                    onClick: () => removeGalleryItem(item.id),
-                    children: [
-                      /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
-                      /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsxs(Label, { htmlFor: `image-${item.id}`, className: "mb-2 block", children: [
-                      "Image ",
-                      index + 1
-                    ] }),
-                    /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2", children: item.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
-                      /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.file instanceof File ? item.file.name : "Existing Image" }),
-                      /* @__PURE__ */ jsxs(
-                        Button,
+            /* @__PURE__ */ jsxs(CardContent, { className: "space-y-2", children: [
+              /* @__PURE__ */ jsx(InputError, { message: errors.galleries, className: "mt-2" }),
+              /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
+                data.galleries.map((item, index) => /* @__PURE__ */ jsx(Card, { className: "relative", children: /* @__PURE__ */ jsxs(CardContent, { className: "p-6", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "ghost",
+                      size: "icon",
+                      className: "absolute top-2 right-2",
+                      onClick: () => removeGalleryItem(item.id),
+                      children: [
+                        /* @__PURE__ */ jsx(X, { className: "h-5 w-5" }),
+                        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsxs(Label, { htmlFor: `gallery-image-${item.id}`, className: "mb-2 block", children: [
+                        "Image ",
+                        index + 1
+                      ] }),
+                      /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2", children: item.path ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-md border bg-gray-50 p-2 dark:bg-gray-800", children: [
+                        /* @__PURE__ */ jsx("span", { className: "flex-1 truncate", children: item.file instanceof File ? item.file.name : "Existing Image" }),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "ghost",
+                            size: "icon",
+                            onClick: () => removeGalleryFile(item.id),
+                            children: [
+                              /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
+                              /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
+                            ]
+                          }
+                        )
+                      ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                        /* @__PURE__ */ jsx(
+                          Input,
+                          {
+                            id: `gallery-image-${item.id}`,
+                            type: "file",
+                            accept: "image/*",
+                            className: "hidden",
+                            onChange: (e) => {
+                              var _a2;
+                              const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
+                              handleGalleryFileChange(item.id, file);
+                            }
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "outline",
+                            onClick: () => {
+                              var _a2;
+                              return (_a2 = document.getElementById(`gallery-image-${item.id}`)) == null ? void 0 : _a2.click();
+                            },
+                            className: "flex items-center gap-2",
+                            children: [
+                              /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
+                              "Select Image"
+                            ]
+                          }
+                        )
+                      ] }) }),
+                      /* @__PURE__ */ jsx(
+                        InputError,
                         {
-                          type: "button",
-                          variant: "ghost",
-                          size: "icon",
-                          onClick: () => removeGalleryFile(item.id),
-                          children: [
-                            /* @__PURE__ */ jsx(X, { className: "h-4 w-4" }),
-                            /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Remove file" })
-                          ]
+                          message: errors[`galleries.${index}.file`] || errors[`galleries.${index}.path`],
+                          className: "mt-2"
                         }
                       )
-                    ] }) : /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsx(Label, { htmlFor: `description-${item.id}`, className: "mb-2 block", children: "Description" }),
                       /* @__PURE__ */ jsx(
-                        Input,
+                        Textarea,
                         {
-                          id: `image-${item.id}`,
-                          type: "file",
-                          accept: "image/*",
-                          className: "hidden",
-                          onChange: (e) => {
-                            var _a2;
-                            const file = ((_a2 = e.target.files) == null ? void 0 : _a2[0]) || null;
-                            handleGalleryFileChange(item.id, file);
-                          }
+                          id: `description-${item.id}`,
+                          placeholder: "Enter a description for this image",
+                          value: item.description,
+                          onChange: (e) => handleDescriptionChange(item.id, e.target.value),
+                          className: "min-h-24",
+                          maxLength: 500
                         }
                       ),
-                      /* @__PURE__ */ jsxs(
-                        Button,
-                        {
-                          type: "button",
-                          variant: "outline",
-                          onClick: () => {
-                            var _a2;
-                            return (_a2 = document.getElementById(`image-${item.id}`)) == null ? void 0 : _a2.click();
-                          },
-                          className: "flex items-center gap-2",
-                          children: [
-                            /* @__PURE__ */ jsx(Upload, { className: "h-4 w-4" }),
-                            "Select Image"
-                          ]
-                        }
-                      )
-                    ] }) }),
-                    /* @__PURE__ */ jsx(InputError, { message: errors[`galleries.${index}.file`] || errors[`galleries.${index}.path`], className: "mt-2" })
-                  ] }),
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsx(Label, { htmlFor: `description-${item.id}`, className: "mb-2 block", children: "Description" }),
-                    /* @__PURE__ */ jsx(
-                      Textarea,
-                      {
-                        id: `description-${item.id}`,
-                        placeholder: "Enter a description for this image",
-                        value: item.description,
-                        onChange: (e) => handleDescriptionChange(item.id, e.target.value),
-                        className: "min-h-24"
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(InputError, { message: errors[`galleries.${index}.description`], className: "mt-2" })
+                      /* @__PURE__ */ jsx(InputError, { message: errors[`galleries.${index}.description`], className: "mt-2" })
+                    ] })
+                  ] })
+                ] }) }, item.id)),
+                /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
+                  /* @__PURE__ */ jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "outline",
+                      onClick: addMoreItem,
+                      className: "flex items-center gap-2",
+                      disabled: data.galleries.length >= galleryLimit,
+                      children: [
+                        /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
+                        "Add More"
+                      ]
+                    }
+                  ),
+                  data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                    /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
                   ] })
                 ] })
-              ] }) }, item.id)),
-              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row", children: [
-                /* @__PURE__ */ jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "outline",
-                    onClick: addMoreItem,
-                    className: "flex items-center gap-2",
-                    disabled: data.galleries.length >= galleryLimit,
-                    children: [
-                      /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
-                      "Add More"
-                    ]
-                  }
-                ),
-                data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
-                  /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
-                  /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
-                ] })
               ] })
-            ] }) })
+            ] })
           ] }) }),
           /* @__PURE__ */ jsx(TabsContent, { value: "template", className: "md:hidden", children: /* @__PURE__ */ jsxs(Card, { children: [
             /* @__PURE__ */ jsxs(CardHeader, { children: [

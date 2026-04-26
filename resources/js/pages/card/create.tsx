@@ -10,14 +10,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
-import { CardTemplateSelector } from '@/pages/card/card-template-selector';
 import { buildCreatePreviewProps } from '@/pages/card/build-create-preview-props';
 import MuluCard from '@/pages/card/card';
+import { CardTemplateSelector } from '@/pages/card/card-template-selector';
 import type { CardTemplateId } from '@/pages/card/mulu-card-props';
 import { type BreadcrumbItem, type DaySchedule, type Gallery, type Image, type Link, type Service, type SharedData } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Check, Clock, Copy, Globe, LoaderCircle, PlusCircle, ShieldAlert, Upload, X } from 'lucide-react';
-import { ChangeEvent, FormEventHandler, useState } from 'react';
+import { ChangeEvent, FormEventHandler, useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,6 +26,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     { title: 'Create Card', href: '' },
 ];
+
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_IMAGE_SIZE_MESSAGE = 'The image file size must not exceed 2MB.';
 
 interface CardForm {
     banner: Image;
@@ -61,6 +64,20 @@ export default function CreateCard() {
         url: '',
         placeholder: `https://${name.toLowerCase()}.com/your-profile`,
     });
+    const objectUrls = useRef<Set<string>>(new Set());
+
+    const createPreviewUrl = (file: File) => {
+        const url = URL.createObjectURL(file);
+        objectUrls.current.add(url);
+        return url;
+    };
+
+    const revokePreviewUrl = (path: string | null) => {
+        if (path?.startsWith('blob:')) {
+            URL.revokeObjectURL(path);
+            objectUrls.current.delete(path);
+        }
+    };
 
     const [removedLinks, setRemovedLinks] = useState<string[]>(() => [...cardSocialLinks]);
 
@@ -106,7 +123,6 @@ export default function CreateCard() {
         setData('business_hours', updatedSchedule);
     };
     const updateTimeSlot = (day: DaySchedule, field: 'open' | 'close', value: string) => {
-        console.log(day, field, value);
         const updatedSchedule = data.business_hours.map((item) => {
             if (item.id === day.id) {
                 if (field === 'open') {
@@ -142,7 +158,7 @@ export default function CreateCard() {
         setData('business_hours', updatedSchedule);
     };
 
-    const { data, setData, post, processing, errors } = useForm<CardForm>({
+    const { data, setData, post, processing, errors, setError, clearErrors } = useForm<CardForm>({
         banner: {
             file: null,
             path: null,
@@ -181,6 +197,13 @@ export default function CreateCard() {
         ],
     });
 
+    useEffect(() => {
+        return () => {
+            objectUrls.current.forEach((url) => URL.revokeObjectURL(url));
+            objectUrls.current.clear();
+        };
+    }, []);
+
     const hasTabError = (prefixes: string[], errors: Partial<Record<string, string>>) => {
         return Object.keys(errors).some((key) => prefixes.some((prefix) => key.startsWith(prefix)));
     };
@@ -189,25 +212,40 @@ export default function CreateCard() {
 
     const personalInformationError = hasTabError(['first_name', 'last_name', 'organization', 'job_title', 'email', 'phone', 'headline'], errors);
 
-    const linksError = hasTabError(['links.0', 'links.1', 'links.2', 'links.3', 'links.4', 'links.5'], errors);
+    const linksError = hasTabError(['links'], errors);
 
     const locationError = hasTabError(['address', 'location'], errors);
 
-    const galleryError = hasTabError(['galleries.0', 'galleries.1', 'galleries.2'], errors);
+    const galleryError = hasTabError(['galleries'], errors);
 
-    const serviceError = hasTabError(['services.0', 'services.1', 'services.2'], errors);
+    const serviceError = hasTabError(['services'], errors);
 
-    const businessHoursError = hasTabError(['business_hours.0', 'business_hours.1', 'business_hours.2'], errors);
+    const businessHoursError = hasTabError(['business_hours'], errors);
 
     const templateTabError = hasTabError(['template'], errors);
 
+    const isImageTooLarge = (file: File | null) => file !== null && file.size > MAX_IMAGE_SIZE_BYTES;
+
     const handleGalleryFileChange = (id: string, file: File | null) => {
+        const itemIndex = data.galleries.findIndex((item: Gallery) => item.id === id);
+        const errorKey = `galleries.${itemIndex}.file`;
+
+        if (itemIndex !== -1 && isImageTooLarge(file)) {
+            setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+            return;
+        }
+
+        if (itemIndex !== -1) {
+            clearErrors(errorKey);
+        }
+
         const newGallery = data.galleries.map((item: Gallery) => {
             if (item.id === id) {
+                revokePreviewUrl(item.path);
                 return {
                     ...item,
                     file,
-                    path: file ? URL.createObjectURL(file) : null,
+                    path: file ? createPreviewUrl(file) : null,
                 };
             }
             return item;
@@ -217,12 +255,25 @@ export default function CreateCard() {
     };
 
     const handleServiceFileChange = (id: string, file: File | null) => {
+        const itemIndex = data.services.findIndex((item: Service) => item.id === id);
+        const errorKey = `services.${itemIndex}.file`;
+
+        if (itemIndex !== -1 && isImageTooLarge(file)) {
+            setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+            return;
+        }
+
+        if (itemIndex !== -1) {
+            clearErrors(errorKey);
+        }
+
         const newService = data.services.map((item: Service) => {
             if (item.id === id) {
+                revokePreviewUrl(item.path);
                 return {
                     ...item,
                     file,
-                    path: file ? URL.createObjectURL(file) : null,
+                    path: file ? createPreviewUrl(file) : null,
                 };
             }
             return item;
@@ -283,21 +334,19 @@ export default function CreateCard() {
     };
 
     const removeGalleryItem = (id: string) => {
-        // if (data.galleries.length > 1) {
+        data.galleries.filter((item: Gallery) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
         setData(
             'galleries',
             data.galleries.filter((item: Gallery) => item.id !== id),
         );
-        // }
     };
 
     const removeServiceItem = (id: string) => {
-        // if (data.services.length > 1) {
+        data.services.filter((item: Service) => item.id === id).forEach((item) => revokePreviewUrl(item.path));
         setData(
             'services',
             data.services.filter((item: Service) => item.id !== id),
         );
-        // }
     };
 
     const removeGalleryFile = (id: string) => {
@@ -305,6 +354,7 @@ export default function CreateCard() {
             'galleries',
             data.galleries.map((item: Gallery) => {
                 if (item.id === id) {
+                    revokePreviewUrl(item.path);
                     return { ...item, file: null, path: null };
                 }
                 return item;
@@ -317,6 +367,7 @@ export default function CreateCard() {
             'services',
             data.services.map((item: Service) => {
                 if (item.id === id) {
+                    revokePreviewUrl(item.path);
                     return { ...item, file: null, path: null };
                 }
                 return item;
@@ -330,29 +381,40 @@ export default function CreateCard() {
 
     const handleFileChange = (field: 'avatar' | 'logo' | 'banner') => (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] ?? null;
+        const errorKey = `${field}.file`;
+
+        if (isImageTooLarge(file)) {
+            setError(errorKey, MAX_IMAGE_SIZE_MESSAGE);
+            return;
+        }
+
+        clearErrors(errorKey);
 
         if (field === 'banner') {
+            revokePreviewUrl(data.banner.path);
             const newBanner = {
                 file: file,
-                path: file ? URL.createObjectURL(file) : null,
+                path: file ? createPreviewUrl(file) : null,
             };
 
             setData('banner', newBanner);
         }
 
         if (field === 'avatar') {
+            revokePreviewUrl(data.avatar.path);
             const newAvatar = {
                 file: file,
-                path: file ? URL.createObjectURL(file) : null,
+                path: file ? createPreviewUrl(file) : null,
             };
 
             setData('avatar', newAvatar);
         }
 
         if (field === 'logo') {
+            revokePreviewUrl(data.logo.path);
             const newLogo = {
                 file: file,
-                path: file ? URL.createObjectURL(file) : null,
+                path: file ? createPreviewUrl(file) : null,
             };
 
             setData('logo', newLogo);
@@ -361,15 +423,8 @@ export default function CreateCard() {
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
-        console.log(data);
 
         post(route('card.store'), {
-            onSuccess: () => {
-                console.log('Upload successful!');
-            },
-            onError: (errors) => {
-                console.log('Upload errors:', errors);
-            },
             preserveState: true,
             preserveScroll: true,
         });
@@ -377,17 +432,20 @@ export default function CreateCard() {
 
     const removeFile = (field: 'avatar' | 'logo' | 'banner') => {
         if (field === 'avatar') {
+            revokePreviewUrl(data.avatar.path);
             setData('avatar', { file: null, path: null });
         } else if (field === 'logo') {
+            revokePreviewUrl(data.logo.path);
             setData('logo', { file: null, path: null });
         } else if (field === 'banner') {
+            revokePreviewUrl(data.banner.path);
             setData('banner', { file: null, path: null });
         }
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Create Card" />
             <form onSubmit={submit} className="min-h-screen">
                 <div className="m-2 flex flex-row justify-end rounded-lg border-2 p-2 shadow-none">
                     <Button variant="outline" type="submit" className="cursor-pointer bg-green-600 text-white" tabIndex={5} disabled={processing}>
@@ -458,7 +516,7 @@ export default function CreateCard() {
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="avatar-upload" className="text-sm font-medium text">
+                                            <Label htmlFor="banner-upload" className="text text-sm font-medium">
                                                 Upload Your Banner
                                             </Label>
                                             {data.banner.file ? (
@@ -494,7 +552,7 @@ export default function CreateCard() {
                                         </div>
                                         {/* banner end */}
                                         <div className="flex flex-col gap-2 rounded-xl border-2 px-2 py-4">
-                                            <Label htmlFor="avatar-upload" className="text-sm font-medium">
+                                            <Label htmlFor="logo-upload" className="text-sm font-medium">
                                                 Upload Your Avatar <span className="text-lg text-red-500">*</span>
                                             </Label>
                                             {data.avatar.file ? (
@@ -598,6 +656,7 @@ export default function CreateCard() {
                                                     id="fname"
                                                     value={data.first_name}
                                                     onChange={(e) => setData('first_name', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.first_name} className="mt-2" />
@@ -610,6 +669,7 @@ export default function CreateCard() {
                                                     id="lname"
                                                     value={data.last_name}
                                                     onChange={(e) => setData('last_name', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.last_name} className="mt-2" />
@@ -625,6 +685,7 @@ export default function CreateCard() {
                                                     id="organization"
                                                     value={data.organization}
                                                     onChange={(e) => setData('organization', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
                                                 <InputError message={errors.organization} className="mt-2" />
@@ -637,6 +698,7 @@ export default function CreateCard() {
                                                     id="jobtitle"
                                                     value={data.job_title}
                                                     onChange={(e) => setData('job_title', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
 
@@ -654,6 +716,7 @@ export default function CreateCard() {
                                                     type="tel"
                                                     value={data.phone}
                                                     onChange={(e) => setData('phone', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
 
@@ -669,6 +732,7 @@ export default function CreateCard() {
                                                     type="email"
                                                     value={data.email}
                                                     onChange={(e) => setData('email', e.target.value)}
+                                                    maxLength={255}
                                                     disabled={processing}
                                                 />
 
@@ -685,6 +749,7 @@ export default function CreateCard() {
                                                 placeholder="enter your headline text"
                                                 value={data.headline}
                                                 onChange={(e) => setData('headline', e.target.value)}
+                                                maxLength={255}
                                             />
                                             <InputError message={errors.headline} className="mt-2" />
                                         </div>
@@ -749,6 +814,7 @@ export default function CreateCard() {
                                                         }}
                                                         disabled={processing}
                                                     />
+                                                    <InputError message={errors[`links.${index}.name` as keyof typeof errors]} className="mt-2" />
                                                     <InputError message={errors[`links.${index}.url` as keyof typeof errors]} className="mt-2" />
                                                 </div>
                                             );
@@ -770,16 +836,18 @@ export default function CreateCard() {
                                                 id="address"
                                                 value={data.address}
                                                 onChange={(e) => setData('address', e.target.value)}
+                                                maxLength={255}
                                                 disabled={processing}
                                             />
                                             <InputError message={errors.address} className="mt-2" />
                                         </div>
                                         <div className="space-y-1">
-                                            <Label htmlFor="lname">Location</Label>
+                                            <Label htmlFor="location">Location</Label>
                                             <Input
                                                 id="location"
                                                 value={data.location}
                                                 onChange={(e) => setData('location', e.target.value)}
+                                                maxLength={255}
                                                 disabled={processing}
                                             />
                                             <InputError message={errors.location} className="mt-2" />
@@ -807,6 +875,7 @@ export default function CreateCard() {
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
+                                        <InputError message={errors.business_hours_enabled || errors.business_hours} className="mt-2" />
                                         {data.business_hours_enabled ? (
                                             data.business_hours.map((day: DaySchedule, index) => (
                                                 <div key={day.id} className="rounded-lg border p-4">
@@ -836,6 +905,13 @@ export default function CreateCard() {
                                                             </div>
                                                         )}
                                                     </div>
+                                                    <InputError
+                                                        message={
+                                                            errors[`business_hours.${index}.day` as keyof typeof errors] ||
+                                                            errors[`business_hours.${index}.isOpen` as keyof typeof errors]
+                                                        }
+                                                        className="mt-2"
+                                                    />
                                                     {day.isOpen ? (
                                                         <div className="space-y-3">
                                                             <div className="flex flex-row items-center gap-2 md:flex-row">
@@ -922,6 +998,7 @@ export default function CreateCard() {
                                         <CardDescription>add all your services</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
+                                        <InputError message={errors.services} className="mt-2" />
                                         <div className="space-y-6">
                                             {data.services.length === 0 ? (
                                                 <div className="py-8 text-center">
@@ -962,7 +1039,7 @@ export default function CreateCard() {
                                                                 <div className="space-y-4">
                                                                     <div>
                                                                         <Label
-                                                                            htmlFor={`image-${item.id}`}
+                                                                            htmlFor={`service-image-${item.id}`}
                                                                             className="flex items-center gap-1 text-sm font-medium text-black"
                                                                         >
                                                                             <span>Upload Your Image</span>
@@ -987,7 +1064,7 @@ export default function CreateCard() {
                                                                             ) : (
                                                                                 <div className="flex items-center">
                                                                                     <Input
-                                                                                        id={`image-${item.id}`}
+                                                                                        id={`service-image-${item.id}`}
                                                                                         type="file"
                                                                                         accept="image/*"
                                                                                         className="hidden"
@@ -1000,7 +1077,9 @@ export default function CreateCard() {
                                                                                         type="button"
                                                                                         variant="outline"
                                                                                         onClick={() =>
-                                                                                            document.getElementById(`image-${item.id}`)?.click()
+                                                                                            document
+                                                                                                .getElementById(`service-image-${item.id}`)
+                                                                                                ?.click()
                                                                                         }
                                                                                         className="flex items-center gap-2"
                                                                                     >
@@ -1011,18 +1090,24 @@ export default function CreateCard() {
                                                                             )}
                                                                         </div>
                                                                         <InputError
-                                                                            message={errors[`services.${index}.file` as keyof typeof errors]}
+                                                                            message={
+                                                                                errors[`services.${index}.file` as keyof typeof errors] ||
+                                                                                errors[`services.${index}.path` as keyof typeof errors]
+                                                                            }
                                                                             className="mt-2"
                                                                         />
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="name" className="mb-2 block flex items-center gap-1">
+                                                                        <Label
+                                                                            htmlFor={`service-name-${item.id}`}
+                                                                            className="mb-2 block flex items-center gap-1"
+                                                                        >
                                                                             <span>Name</span>
                                                                             <span className="text-lg text-red-500">*</span>
                                                                         </Label>
                                                                         <Input
-                                                                            id="name"
+                                                                            id={`service-name-${item.id}`}
                                                                             placeholder="name"
                                                                             value={item.name}
                                                                             onChange={(e) => handleServiceNameChange(item.id, e.target.value)}
@@ -1048,6 +1133,7 @@ export default function CreateCard() {
                                                                             value={item.description}
                                                                             onChange={(e) => handleServiceDescriptionChange(item.id, e.target.value)}
                                                                             className="min-h-24"
+                                                                            maxLength={500}
                                                                         />
                                                                         <InputError
                                                                             message={errors[`services.${index}.description` as keyof typeof errors]}
@@ -1058,10 +1144,6 @@ export default function CreateCard() {
                                                             </CardContent>
                                                         </Card>
                                                     ))}
-
-                                                    {data.services.length >= serviceLimit && (
-                                                        <InputError message={errors.services} className="mt-2" />
-                                                    )}
 
                                                     <div className="flex flex-col gap-4 sm:flex-row">
                                                         <Button
@@ -1098,6 +1180,7 @@ export default function CreateCard() {
                                         <CardDescription>add all your images</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
+                                        <InputError message={errors.galleries} className="mt-2" />
                                         <div className="space-y-6">
                                             {data.galleries.length === 0 ? (
                                                 <div className="py-8 text-center">
@@ -1138,7 +1221,7 @@ export default function CreateCard() {
                                                                 <div className="space-y-4">
                                                                     <div>
                                                                         <Label
-                                                                            htmlFor={`image-${item.id}`}
+                                                                            htmlFor={`gallery-image-${item.id}`}
                                                                             className="flex items-center gap-1 text-sm font-medium text-black"
                                                                         >
                                                                             <span>Upload Your Image</span>
@@ -1161,7 +1244,7 @@ export default function CreateCard() {
                                                                             ) : (
                                                                                 <div className="flex items-center">
                                                                                     <Input
-                                                                                        id={`image-${item.id}`}
+                                                                                        id={`gallery-image-${item.id}`}
                                                                                         type="file"
                                                                                         accept="image/*"
                                                                                         className="hidden"
@@ -1174,7 +1257,9 @@ export default function CreateCard() {
                                                                                         type="button"
                                                                                         variant="outline"
                                                                                         onClick={() =>
-                                                                                            document.getElementById(`image-${item.id}`)?.click()
+                                                                                            document
+                                                                                                .getElementById(`gallery-image-${item.id}`)
+                                                                                                ?.click()
                                                                                         }
                                                                                         className="flex items-center gap-2"
                                                                                     >
@@ -1185,7 +1270,10 @@ export default function CreateCard() {
                                                                             )}
                                                                         </div>
                                                                         <InputError
-                                                                            message={errors[`galleries.${index}.file` as keyof typeof errors]}
+                                                                            message={
+                                                                                errors[`galleries.${index}.file` as keyof typeof errors] ||
+                                                                                errors[`galleries.${index}.path` as keyof typeof errors]
+                                                                            }
                                                                             className="mt-2"
                                                                         />
                                                                     </div>
@@ -1204,6 +1292,7 @@ export default function CreateCard() {
                                                                             value={item.description}
                                                                             onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
                                                                             className="min-h-24"
+                                                                            maxLength={500}
                                                                         />
                                                                         <InputError
                                                                             message={errors[`galleries.${index}.description` as keyof typeof errors]}
@@ -1214,10 +1303,6 @@ export default function CreateCard() {
                                                             </CardContent>
                                                         </Card>
                                                     ))}
-
-                                                    {data.galleries.length >= galleryLimit && (
-                                                        <InputError message={errors.galleries} className="mt-2" />
-                                                    )}
 
                                                     <div className="flex flex-col gap-4 sm:flex-row">
                                                         <Button
@@ -1249,7 +1334,9 @@ export default function CreateCard() {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Template</CardTitle>
-                                        <CardDescription>See how your card looks with the selected template. Adjust images and colors on Display.</CardDescription>
+                                        <CardDescription>
+                                            See how your card looks with the selected template. Adjust images and colors on Display.
+                                        </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <CardTemplateSelector
