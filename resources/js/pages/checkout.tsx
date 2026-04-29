@@ -9,67 +9,6 @@ import { toast, Toaster } from 'sonner';
 import InputError from '@/components/input-error';
 import { Link } from '@inertiajs/react'
 
-const AccountDetails = ({ name, account_number, account_holder }: Bank) => {
-    const [hasCopied, setHasCopied] = useState(false);
-
-    const handleCopy = (text: string, label: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            setHasCopied(true);
-            toast.success(`${label} copied to clipboard`);
-
-            setTimeout(() => {
-                setHasCopied(false);
-            }, 2000);
-        });
-    };
-
-    return (
-        <div className="bg-secondary/50 space-y-4 rounded-xl p-4">
-            
-            <h3 className="text-muted-foreground text-sm font-medium">Transfer to this account</h3>
-
-            <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-muted-foreground text-xs">Bank</p>
-                        <p className="font-medium">{name}</p>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-muted-foreground text-xs">Account Number</p>
-                        <p className="font-medium">{account_number}</p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => handleCopy(account_number, 'Account number')}
-                        className="hover:bg-muted rounded-md p-1.5 transition-colors"
-                        aria-label="Copy account number"
-                    >
-                        {hasCopied ? <Check className="h-4 w-4 text-green-500" /> : <ClipboardCopy className="text-muted-foreground h-4 w-4" />}
-                    </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-muted-foreground text-xs">Account Holder</p>
-                        <p className="font-medium">{account_holder}</p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => handleCopy(account_holder, 'Account holder')}
-                        className="hover:bg-muted rounded-md p-1.5 transition-colors"
-                        aria-label="Copy account holder name"
-                    >
-                        {hasCopied ? <Check className="h-4 w-4 text-green-500" /> : <ClipboardCopy className="text-muted-foreground h-4 w-4" />}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 interface PaymentMethodLogoProps {
     bankName: string;
     logoUrl: string | null;
@@ -176,90 +115,8 @@ export const BankSelector: React.FC<BankSelectorProps> = ({ banks, selectedBank,
     );
 };
 
-interface PaymentLayoutProps {
-    children: React.ReactNode;
-    className?: string;
-}
-
-export const PaymentLayout: React.FC<PaymentLayoutProps> = ({ children, className }) => {
-    return (
-        <div className="from-background to-secondary/50 flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br p-4 md:p-8">
-            <div className={cn('glass-card animate-scale-in w-full max-w-lg rounded-2xl p-6 md:p-8', className)}>{children}</div>
-        </div>
-    );
-};
-
-// import { BanknoteIcon, Building, Building2, CreditCard, Landmark, Wallet, WalletCards } from 'lucide-react';
-
-// const SupportedBanks = () => {
-//     const supportedBanks = [
-//         { name: 'Chase', icon: <Building className="h-6 w-6" /> },
-//         { name: 'Bank of America', icon: <Landmark className="h-6 w-6" /> },
-//         { name: 'Wells Fargo', icon: <CreditCard className="h-6 w-6" /> },
-//         { name: 'Citibank', icon: <Wallet className="h-6 w-6" /> },
-//         { name: 'Capital One', icon: <Building2 className="h-6 w-6" /> },
-//         { name: 'Discover', icon: <BanknoteIcon className="h-6 w-6" /> },
-//         { name: 'TD Bank', icon: <WalletCards className="h-6 w-6" /> },
-//     ];
-
-//     return (
-//         <div className="space-y-2">
-//             <p className="text-sm text-gray-500">Supported banks</p>
-//             <div className="flex flex-wrap items-center gap-4">
-//                 {supportedBanks.map((bank) => (
-//                     <div key={bank.name} className="flex flex-col items-center">
-//                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">{bank.icon}</div>
-//                         <span className="mt-1 text-xs">{bank.name}</span>
-//                     </div>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// };
-
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-interface TransactionCodeInputProps {
-    value: string;
-    onChange: (value: string) => void;
-    onComplete?: () => void;
-    className?: string;
-}
-
-export const TransactionCodeInput: React.FC<TransactionCodeInputProps> = ({ value, onChange, onComplete, className }) => {
-    const [isFocused, setIsFocused] = useState(false);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Allow only alphanumeric characters
-        const newValue = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-        onChange(newValue);
-
-        // Call onComplete if the transaction code has enough characters (e.g., 8-12)
-        if (newValue.length >= 8 && onComplete) {
-            onComplete();
-        }
-    };
-
-    return (
-        <div className={cn('space-y-2', className)}>
-            <Label htmlFor="transaction-code" className="text-foreground/90 text-sm font-medium">
-                Transaction Reference Code
-            </Label>
-            <Input
-                id="transaction-code"
-                value={value}
-                onChange={handleChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder="Enter reference code (e.g., TXN12345678)"
-                className={cn('input-highlight py-6 text-base font-medium tracking-wide transition-all', isFocused ? 'scale-[1.01]' : '', className)}
-                maxLength={16}
-            />
-            <p className="text-muted-foreground text-xs">Enter the transaction reference code from your bank transfer</p>
-        </div>
-    );
-};
 
 const Index = () => {
     const { props } = usePage();
@@ -272,44 +129,33 @@ const Index = () => {
         transactionCode: string;
         email: string;
     };
-    const { data, setData, post, errors } = useForm<PaymentForm>({
+    const { data, setData, post, errors, processing } = useForm<PaymentForm>({
         payment_method_id: banks[0]?.id ?? null,
         transactionCode: '',
         email: auth.user.email,
     });
+    const [copiedKey, setCopiedKey] = useState<'identifier' | 'holder' | null>(null);
 
     const selectedPaymentMethod = banks.find((method) => method.id === data.payment_method_id) ?? null;
+    const canSubmit = Boolean(data.payment_method_id && data.transactionCode.trim()) && !processing;
+    const identifierLabel = selectedPaymentMethod?.type === 'wallet' ? 'Phone Number' : 'Account Number';
+    const identifierValue = selectedPaymentMethod?.type === 'wallet' ? selectedPaymentMethod.phone_number : selectedPaymentMethod?.account_number;
 
     function onSelectBank(bank: Bank) {
         setData('payment_method_id', bank.id);
     }
 
-    // const [selectedBank, setSelectedBank] = useState(banks[0]);
-    // const [transactionCode, setTransactionCode] = useState('');
-    // const [email, setEmail] = useState(User.email);
-    // const [isProcessing, setIsProcessing] = useState(false);
-    // const [showPromoCodeInput, setShowPromoCodeInput] = useState(false);
-    // const [promoCode, setPromoCode] = useState('');
-    // const [discount, setDiscount] = useState(0);
-
     const baseAmount = plan.price;
     const paymentAmount = baseAmount;
 
-    // const handlePromoCodeApply = () => {
-    //     if (!promoCode) {
-    //         toast.error('Please enter a promotion code');
-    //         return;
-    //     }
-
-    //     // Simulate promotion code validation
-    //     if (promoCode.toLowerCase() === 'stripe25') {
-    //         const newDiscount = baseAmount * 0.25;
-    //         setDiscount(newDiscount);
-    //         toast.success('Promotion code applied successfully!');
-    //     } else {
-    //         toast.error('Invalid promotion code');
-    //     }
-    // };
+    const copyValue = (value: string | null | undefined, label: string, key: 'identifier' | 'holder') => {
+        if (!value) return;
+        navigator.clipboard.writeText(value).then(() => {
+            setCopiedKey(key);
+            toast.success(`${label} copied`);
+            setTimeout(() => setCopiedKey(null), 1500);
+        });
+    };
 
     const handlePayment = () => {
         if (!data.payment_method_id) {
@@ -317,12 +163,18 @@ const Index = () => {
             return;
         }
 
+        if (!data.transactionCode.trim()) {
+            toast.error('Please enter your transaction reference code.');
+            return;
+        }
+
         post(route('checkout.order', { plan: plan }), {
             onSuccess: () => {
                 toast.success('Your order has been placed successfully! Your subscription will be activated shortly after approval. Thank you for choosing MuluCard!');
             },
-            onError: (error) => {
-                toast.error(error.message);
+            onError: (formErrors) => {
+                const firstError = Object.values(formErrors)[0];
+                toast.error(firstError ?? 'Please review the form and try again.');
             },
         });
     };
@@ -330,7 +182,7 @@ const Index = () => {
     return (
         <div className="container mx-auto flex min-h-screen flex-col bg-white md:flex-row">
             <Toaster richColors  />
-            {/* Left column - Company and subscription info */}         
+            {/* Left column - Company and subscription info */}
             <div className="flex flex-col bg-white p-6 md:w-1/2 md:p-12">
                 <div className="mb-8">
                     <Link className="flex items-center text-sm text-gray-500 hover:text-gray-700" href="/dashboard">
@@ -345,7 +197,6 @@ const Index = () => {
                         <span className="text-3xl font-bold">Birr {paymentAmount}</span>
                         <span className="ml-2 text-sm text-gray-500">per year</span>
                     </div>
-                    {/* <p className="mt-1 text-sm text-gray-500">${(paymentAmount / 12).toFixed(2)} / month billed annually</p> */}
                 </div>
 
                 <div className="mt-8 rounded-md border bg-gray-50 p-4">
@@ -358,44 +209,6 @@ const Index = () => {
                     </div>
                 </div>
 
-                {/* <Separator className="my-6" /> */}
-
-                {/* <div className="flex items-center justify-between">
-                    <span className="font-medium">Subtotal</span>
-                    <span className="font-medium">Birr {baseAmount}</span>
-                </div> */}
-                {/*
-                {discount > 0 && (
-                    <div className="mt-2 flex items-center justify-between text-green-600">
-                        <span className="font-medium">Discount</span>
-                        <span className="font-medium">-${discount}</span>
-                    </div>
-                )} */}
-                {/*
-                {showPromoCodeInput ? (
-                    <div className="mt-4 space-y-2">
-                        <div className="flex items-center">
-                            <Input
-                                value={promoCode}
-                                onChange={(e) => setPromoCode(e.target.value)}
-                                placeholder="Enter promotion code"
-                                className="flex-1"
-                            />
-                            <Button onClick={handlePromoCodeApply} variant="outline" className="ml-2" size="sm">
-                                Apply
-                            </Button>
-                            <Button onClick={() => setShowPromoCodeInput(false)} variant="ghost" size="sm" className="ml-1 p-1">
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        <p className="text-xs text-gray-500">Try "STRIPE25" for 25% off</p>
-                    </div>
-                ) : (
-                    <button onClick={() => setShowPromoCodeInput(true)} className="mt-4 self-start text-sm text-blue-600 hover:text-blue-800">
-                        Add promotion code
-                    </button>
-                )} */}
-
                 <Separator className="my-6" />
 
                 <div className="flex items-center justify-between font-medium">
@@ -405,18 +218,24 @@ const Index = () => {
             </div>
 
             {/* Right column - Payment form */}
-            <div className="flex flex-col bg-gray-50 p-6 md:w-1/2 md:p-12 border-none">
-                <h1 className="mb-6 text-xl font-semibold">Pay with Bank Transfer</h1>
+            <div className="flex flex-col border-none bg-gray-50 p-6 md:w-1/2 md:p-12">
+                <h1 className="mb-3 text-xl font-semibold">Pay by Transfer</h1>
+                <div className="mb-6 grid gap-2 rounded-md border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900">
+                    <p><span className="font-medium">1.</span> Choose a payment method</p>
+                    <p><span className="font-medium">2.</span> Send the transfer</p>
+                    <p><span className="font-medium">3.</span> Enter your transaction reference code</p>
+                </div>
 
                 <div className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
+                    <div className="space-y-2 rounded-md border border-gray-200 bg-white p-3">
+                        <Label htmlFor="email" className="text-xs uppercase tracking-wide text-gray-500">Account Email</Label>
                         <Input
                             id="email"
                             type="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             disabled
+                            className="bg-gray-100 text-gray-600"
                         />
                     </div>
 
@@ -427,25 +246,34 @@ const Index = () => {
                     </div>
 
                     {selectedPaymentMethod && (
-                        <div className="space-y-2 rounded-md border bg-white p-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm text-gray-500">Type</span>
-                                <span className="text-sm font-medium capitalize">{selectedPaymentMethod.type}</span>
+                        <div className="space-y-3 rounded-md border bg-white p-4">
+                            <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-3">
+                                <div className="mb-1 flex items-center justify-between">
+                                    <span className="text-xs text-gray-500">{identifierLabel}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => copyValue(identifierValue, identifierLabel, 'identifier')}
+                                        className="rounded p-1 hover:bg-gray-200"
+                                        aria-label={`Copy ${identifierLabel}`}
+                                    >
+                                        {copiedKey === 'identifier' ? <Check className="h-4 w-4 text-green-600" /> : <ClipboardCopy className="h-4 w-4 text-gray-500" />}
+                                    </button>
+                                </div>
+                                <p className="text-lg font-semibold tracking-wide">{identifierValue ?? '-'}</p>
                             </div>
-                            {selectedPaymentMethod.type === 'bank' ? (
-                                <div className="flex justify-between">
-                                    <span className="text-sm text-gray-500">Account Number</span>
-                                    <span className="text-sm font-medium">{selectedPaymentMethod.account_number}</span>
-                                </div>
-                            ) : (
-                                <div className="flex justify-between">
-                                    <span className="text-sm text-gray-500">Phone Number</span>
-                                    <span className="text-sm font-medium">{selectedPaymentMethod.phone_number}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between">
+                            <div className="flex items-center justify-between">
                                 <span className="text-sm text-gray-500">{selectedPaymentMethod.type === 'wallet' ? 'Recipient Name' : 'Account Holder'}</span>
-                                <span className="text-sm font-medium">{selectedPaymentMethod.account_holder}</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">{selectedPaymentMethod.account_holder}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => copyValue(selectedPaymentMethod.account_holder, 'Recipient name', 'holder')}
+                                        className="rounded p-1 hover:bg-gray-100"
+                                        aria-label="Copy recipient name"
+                                    >
+                                        {copiedKey === 'holder' ? <Check className="h-4 w-4 text-green-600" /> : <ClipboardCopy className="h-4 w-4 text-gray-500" />}
+                                    </button>
+                                </div>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm text-gray-500">Payment Method</span>
@@ -460,20 +288,29 @@ const Index = () => {
                             id="transactionCode"
                             value={data.transactionCode}
                             onChange={(e) => setData('transactionCode', e.target.value)}
-                            placeholder="Enter your transaction reference code"
+                            placeholder="Use the exact transfer reference from your bank or wallet receipt"
                         />
-                        <p className="text-xs text-gray-500">Enter the transaction reference code from your bank transfer.</p>
+                        <p className="text-xs text-gray-500">Use the exact transfer reference from your receipt or wallet app.</p>
                         <InputError className="mt-2" message={errors.transactionCode} />
                     </div>
 
-                    <Button onClick={handlePayment} className="mt-4 w-full rounded-md bg-blue-400 py-4 text-white hover:bg-blue-500">
-                        Subscribe
-                    </Button>
-
-                    {/* <p className="mt-4 text-center text-xs text-gray-500">
-                        By confirming your subscription, you allow Your Company to charge you for future payments in accordance with their terms. You
-                        can always cancel your subscription.
-                    </p> */}
+                    <div className="space-y-3 rounded-md bg-white/80 p-3 md:p-0 md:bg-transparent md:sticky md:bottom-0">
+                        <div className="flex items-center justify-between border-b border-gray-200 pb-2 text-sm font-medium md:hidden">
+                            <span>Total due today</span>
+                            <span>Birr {paymentAmount}</span>
+                        </div>
+                        <Button
+                            onClick={handlePayment}
+                            disabled={!canSubmit}
+                            className={cn(
+                                'mt-1 w-full rounded-md py-4 text-white',
+                                canSubmit ? 'bg-blue-500 hover:bg-blue-600' : 'cursor-not-allowed bg-blue-300',
+                            )}
+                        >
+                            {processing ? 'Submitting...' : 'Subscribe'}
+                        </Button>
+                        <p className="text-center text-xs text-gray-500">Your order will be reviewed after payment confirmation.</p>
+                    </div>
 
                     <div className="mt-4 flex items-center justify-center space-x-2 text-xs text-gray-400">
                         <span>Powered by Mulucard</span>
@@ -481,6 +318,8 @@ const Index = () => {
                         <button className="hover:text-gray-600">Terms</button>
                         <span>•</span>
                         <button className="hover:text-gray-600">Privacy</button>
+                        <span>•</span>
+                        <button className="hover:text-gray-600">Support</button>
                     </div>
                 </div>
             </div>
