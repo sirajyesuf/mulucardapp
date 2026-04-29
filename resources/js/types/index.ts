@@ -140,9 +140,12 @@ export interface Order {
 export type Bank = {
     id: number;
     name: string;
+    type: 'bank' | 'wallet';
     account_holder: string;
-    account_number: string;
-    logo: string;
+    account_number: string | null;
+    phone_number: string | null;
+    logo: string | null;
+    logo_url: string | null;
 };
 
 export interface Subscription {

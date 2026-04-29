@@ -70,11 +70,12 @@ const AccountDetails = ({ name, account_number, account_holder }: Bank) => {
     );
 };
 
-interface BankLogoProps {
+interface PaymentMethodLogoProps {
     bankName: string;
+    logoUrl: string | null;
 }
 
-const BankLogo: React.FC<BankLogoProps> = ({ bankName }) => {
+const PaymentMethodLogo: React.FC<PaymentMethodLogoProps> = ({ bankName, logoUrl }) => {
     // Define bank logo colors
     const getBankColor = (name: string) => {
         const banks: Record<string, string> = {
@@ -100,11 +101,11 @@ const BankLogo: React.FC<BankLogoProps> = ({ bankName }) => {
             .slice(0, 2);
     };
 
-    return (
-        <div className={`${getBankColor(bankName)} flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium text-white`}>
-            {getInitials(bankName)}
-        </div>
-    );
+    if (logoUrl) {
+        return <img src={logoUrl} alt={bankName} className="h-10 w-10 rounded-md object-cover" />;
+    }
+
+    return <div className={`${getBankColor(bankName)} flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium text-white`}>{getInitials(bankName)}</div>;
 };
 
 interface BankSelectorProps {
@@ -127,14 +128,18 @@ export const BankSelector: React.FC<BankSelectorProps> = ({ banks, selectedBank,
             >
                 {selectedBank ? (
                     <div className="flex items-center space-x-3">
-                        <BankLogo bankName={selectedBank.name} />
+                        <PaymentMethodLogo bankName={selectedBank.name} logoUrl={selectedBank.logo_url} />
                         <div>
                             <p className="font-medium">{selectedBank.name}</p>
-                            <p className="text-muted-foreground text-sm">Account ending in {selectedBank.account_number.slice(-4)}</p>
+                            <p className="text-muted-foreground text-sm">
+                                {selectedBank.type === 'bank'
+                                    ? `Bank • Account ending in ${selectedBank.account_number?.slice(-4) ?? 'N/A'}`
+                                    : `Wallet • Phone ending in ${selectedBank.phone_number?.slice(-4) ?? 'N/A'}`}
+                            </p>
                         </div>
                     </div>
                 ) : (
-                    <span className="text-muted-foreground">Select your bank</span>
+                    <span className="text-muted-foreground">Select payment method</span>
                 )}
                 {isOpen ? <ChevronUp className="text-muted-foreground h-5 w-5" /> : <ChevronDown className="text-muted-foreground h-5 w-5" />}
             </button>
@@ -147,19 +152,21 @@ export const BankSelector: React.FC<BankSelectorProps> = ({ banks, selectedBank,
                                 key={bank.id}
                                 className={cn(
                                     'hover:bg-muted flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors',
-                                    selectedBank?.account_number === bank.account_number ? 'bg-primary/5' : '',
+                                    selectedBank?.id === bank.id ? 'bg-primary/5' : '',
                                 )}
                                 onClick={() => {
                                     onSelectBank(bank);
                                     setIsOpen(false);
                                 }}
                             >
-                                <BankLogo bankName={bank.name} />
+                                <PaymentMethodLogo bankName={bank.name} logoUrl={bank.logo_url} />
                                 <div className="flex-1">
                                     <p className="font-medium">{bank.name}</p>
-                                    <p className="text-muted-foreground text-sm">Account ending in {bank.account_number.slice(-4)}</p>
+                                    <p className="text-muted-foreground text-sm">
+                                        {bank.type === 'bank' ? `Bank • Account ending in ${bank.account_number?.slice(-4) ?? 'N/A'}` : `Wallet • Phone ending in ${bank.phone_number?.slice(-4) ?? 'N/A'}`}
+                                    </p>
                                 </div>
-                                {selectedBank?.account_number === bank.account_number && <Check className="text-primary h-5 w-5" />}
+                                {selectedBank?.id === bank.id && <Check className="text-primary h-5 w-5" />}
                             </button>
                         ))}
                     </div>
@@ -261,18 +268,20 @@ const Index = () => {
     const plan = props.plan as Plan;
 
     type PaymentForm = {
-        bank: Bank;
+        payment_method_id: number | null;
         transactionCode: string;
         email: string;
     };
     const { data, setData, post, errors } = useForm<PaymentForm>({
-        bank: banks[0],
+        payment_method_id: banks[0]?.id ?? null,
         transactionCode: '',
         email: auth.user.email,
     });
 
+    const selectedPaymentMethod = banks.find((method) => method.id === data.payment_method_id) ?? null;
+
     function onSelectBank(bank: Bank) {
-        setData('bank', bank);
+        setData('payment_method_id', bank.id);
     }
 
     // const [selectedBank, setSelectedBank] = useState(banks[0]);
@@ -303,6 +312,11 @@ const Index = () => {
     // };
 
     const handlePayment = () => {
+        if (!data.payment_method_id) {
+            toast.error('Please select a payment method.');
+            return;
+        }
+
         post(route('checkout.order', { plan: plan }), {
             onSuccess: () => {
                 toast.success('Your order has been placed successfully! Your subscription will be activated shortly after approval. Thank you for choosing MuluCard!');
@@ -407,24 +421,38 @@ const Index = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Bank Information</Label>
-                        <BankSelector banks={banks} selectedBank={data.bank} onSelectBank={onSelectBank} />
+                        <Label>Payment Method</Label>
+                        <BankSelector banks={banks} selectedBank={selectedPaymentMethod} onSelectBank={onSelectBank} />
+                        <InputError className="mt-2" message={errors.payment_method_id} />
                     </div>
 
-                    <div className="space-y-2 rounded-md border bg-white p-4">
-                        <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Account Number</span>
-                            <span className="text-sm font-medium">{data.bank.account_number}</span>
+                    {selectedPaymentMethod && (
+                        <div className="space-y-2 rounded-md border bg-white p-4">
+                            <div className="flex justify-between">
+                                <span className="text-sm text-gray-500">Type</span>
+                                <span className="text-sm font-medium capitalize">{selectedPaymentMethod.type}</span>
+                            </div>
+                            {selectedPaymentMethod.type === 'bank' ? (
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-500">Account Number</span>
+                                    <span className="text-sm font-medium">{selectedPaymentMethod.account_number}</span>
+                                </div>
+                            ) : (
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-500">Phone Number</span>
+                                    <span className="text-sm font-medium">{selectedPaymentMethod.phone_number}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between">
+                                <span className="text-sm text-gray-500">{selectedPaymentMethod.type === 'wallet' ? 'Recipient Name' : 'Account Holder'}</span>
+                                <span className="text-sm font-medium">{selectedPaymentMethod.account_holder}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-gray-500">Payment Method</span>
+                                <span className="text-sm font-medium">{selectedPaymentMethod.name}</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Account Holder</span>
-                            <span className="text-sm font-medium">{data.bank.account_holder}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Bank Name</span>
-                            <span className="text-sm font-medium">{data.bank.name}</span>
-                        </div>
-                    </div>
+                    )}
 
                     <div className="space-y-2">
                         <Label htmlFor="transactionCode">Transaction Reference Code</Label>

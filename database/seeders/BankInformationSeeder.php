@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class BankInformationSeeder extends Seeder
 {
@@ -32,8 +31,11 @@ class BankInformationSeeder extends Seeder
       
             DB::table('bank_information')->insert([
                 'name' => $bank['name'],
+                'type' => 'bank',
                 'account_number' => $bank['account_number'],
                 'account_holder' => $bank['account_holder'],
+                'logo' => 'payment-method-logos/default-bank-logo.png',
+                'is_active' => true,
             ]);
         }
     }

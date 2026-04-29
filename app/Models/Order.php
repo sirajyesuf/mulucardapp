@@ -12,6 +12,7 @@ class Order extends Model
 
     protected $casts = [
         'status' => OrderStatus::class,
+        'payment_snapshot' => 'array',
     ];
 
     public function user(){
@@ -20,5 +21,10 @@ class Order extends Model
 
     public function plan(){
         return $this->belongsTo(Plan::class);
+    }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(BankInformation::class, 'payment_method_id');
     }
 }
