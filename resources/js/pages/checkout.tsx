@@ -170,7 +170,7 @@ const Index = () => {
 
         post(route('checkout.order', { plan: plan }), {
             onSuccess: () => {
-                toast.success('Your order has been placed successfully! Your subscription will be activated shortly after approval. Thank you for choosing MuluCard!');
+                toast.success('Order submitted. Your subscription will be activated after approval.');
             },
             onError: (formErrors) => {
                 const firstError = Object.values(formErrors)[0];
