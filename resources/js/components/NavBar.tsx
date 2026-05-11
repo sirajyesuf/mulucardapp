@@ -33,9 +33,8 @@ export default function Navbar() {
         >
             <div className="container mx-auto max-w-7xl">
                 <div className="flex items-center justify-between">
-                    <a href="/" className="flex items-center gap-[1px] text-xl font-semibold">
-                        <span className="text-primary">Mulu</span>
-                        <span className="text-foreground">Card</span>
+                    <a href="/" className="flex items-center">
+                        <img src="/MULU CARD-01.png" alt="MuluCard" className="h-10 w-auto md:h-12" />
                     </a>
 
                     {/* Desktop Navigation */}
