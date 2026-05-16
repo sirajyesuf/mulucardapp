@@ -30,6 +30,7 @@ export interface NavItem {
 
 export interface SharedData {
     name: string;
+    logoUrl: string;
     quote: { message: string; author: string };
     auth: Auth;
     [key: string]: unknown;

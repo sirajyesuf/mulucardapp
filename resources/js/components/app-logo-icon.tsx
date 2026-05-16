@@ -1,5 +1,15 @@
+import { usePage } from '@inertiajs/react';
 import { ImgHTMLAttributes } from 'react';
 
-export default function AppLogoIcon({ className, alt = 'MuluCard', ...props }: ImgHTMLAttributes<HTMLImageElement>) {
-    return <img src="/MULU CARD-01.png" alt={alt} className={className} {...props} />;
+import { type SharedData } from '@/types';
+
+export default function AppLogoIcon({
+    className,
+    alt = 'MuluCard',
+    src,
+    ...props
+}: ImgHTMLAttributes<HTMLImageElement>) {
+    const { logoUrl } = usePage<SharedData>().props;
+
+    return <img src={src ?? logoUrl} alt={alt} className={className} {...props} />;
 }
