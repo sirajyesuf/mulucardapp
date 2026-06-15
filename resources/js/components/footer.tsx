@@ -27,15 +27,19 @@ export default function Footer() {
                                 </Button>
                             </a>
 
-                            <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full">
-                                <Twitter className="h-4 w-4" />
-                                <span className="sr-only">Twitter</span>
-                            </Button>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                                <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full">
+                                    <Twitter className="h-4 w-4" />
+                                    <span className="sr-only">Twitter</span>
+                                </Button>
+                            </a>
 
-                            <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full">
-                                <Instagram className="h-4 w-4" />
-                                <span className="sr-only">Instagram</span>
-                            </Button>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                                <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full">
+                                    <Instagram className="h-4 w-4" />
+                                    <span className="sr-only">Instagram</span>
+                                </Button>
+                            </a>
                         </div>
                     </div>
 
