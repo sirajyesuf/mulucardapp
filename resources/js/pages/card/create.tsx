@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RichTextEditor } from '@/components/rich-text-editor';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { socialIconMap } from '@/lib/socialIcons';
 import { buildCreatePreviewProps } from '@/pages/card/build-create-preview-props';
@@ -744,11 +745,10 @@ export default function CreateCard() {
                                             <Label htmlFor="headline" className="flex items-center gap-1">
                                                 <span>Headline</span>
                                             </Label>
-                                            <Textarea
-                                                className="h-30 w-full"
-                                                placeholder="enter your headline text"
+                                            <RichTextEditor
                                                 value={data.headline}
-                                                onChange={(e) => setData('headline', e.target.value)}
+                                                onChange={(html) => setData('headline', html)}
+                                                placeholder="Enter your headline text"
                                             />
                                             <InputError message={errors.headline} className="mt-2" />
                                         </div>

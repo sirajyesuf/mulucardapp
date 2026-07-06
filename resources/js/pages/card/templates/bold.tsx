@@ -81,9 +81,10 @@ export function BoldCardTemplate(props: MuluCardProps) {
                         className="mt-5 py-0 pl-3.5"
                         style={{ borderLeft: `3px solid ${banner_color}` }}
                     >
-                        <p className="text-muted-foreground text-left text-xs leading-relaxed sm:text-[0.8125rem]">
-                            {headline}
-                        </p>
+                        <div
+                            className="text-muted-foreground text-left text-xs leading-relaxed sm:text-[0.8125rem] [&_p]:m-0"
+                            dangerouslySetInnerHTML={{ __html: headline }}
+                        />
                     </blockquote>
                 ) : null}
 

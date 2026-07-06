@@ -51,8 +51,11 @@ export default function Hello() {
         //    if (link.url) lines.push(`URL:${link.url}`);
         // });
 
-        // Headline as Note
-        if (cardData.headline) lines.push(`NOTE:${cardData.headline.replace(/\n/g, '\\n')}`); // Escape newlines
+        // Headline as Note (strip HTML tags)
+        if (cardData.headline) {
+            const plainText = cardData.headline.replace(/<[^>]*>/g, '');
+            lines.push(`NOTE:${plainText.replace(/\n/g, '\\n')}`);
+        }
 
         // Avatar URL (using the path property)
         // vCard standard: PHOTO;VALUE=URI:<url>

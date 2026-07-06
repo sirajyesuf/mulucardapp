@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 @plugin 'tailwindcss-animate';
+@plugin '@tailwindcss/typography';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
@@ -177,6 +178,28 @@
   
   body {
     letter-spacing: var(--tracking-normal);
+  }
+
+  .tiptap p.is-editor-empty:first-child::before {
+    color: var(--muted-foreground);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .tiptap ul {
+    padding-left: 1.25rem;
+    list-style-type: disc;
+  }
+
+  .tiptap ol {
+    padding-left: 1.25rem;
+    list-style-type: decimal;
+  }
+
+  .tiptap:focus {
+    outline: none;
   }
 
   /**
