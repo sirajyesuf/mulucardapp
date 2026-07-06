@@ -251,7 +251,6 @@ test('card update validates each update request rule', function (array $case) {
     'job title must be text' => [updateValidationCase(['job_title' => ['Engineer']], 'job_title')],
     'job title may not exceed 255 characters' => [updateValidationCase(['job_title' => updateValidationLongText()], 'job_title')],
     'headline must be text' => [updateValidationCase(['headline' => ['headline']], 'headline')],
-    'headline may not exceed 255 characters' => [updateValidationCase(['headline' => updateValidationLongText()], 'headline')],
     'address must be text' => [updateValidationCase(['address' => ['address']], 'address')],
     'address may not exceed 255 characters' => [updateValidationCase(['address' => updateValidationLongText()], 'address')],
     'location must be text' => [updateValidationCase(['location' => ['location']], 'location')],

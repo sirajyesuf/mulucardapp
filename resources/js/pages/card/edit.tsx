@@ -746,7 +746,6 @@ export default function EditCard({ card }: { card: CardType }) {
                                                 placeholder="Enter your headline text"
                                                 value={data.headline}
                                                 onChange={(e) => setData('headline', e.target.value)}
-                                                maxLength={255}
                                             />
                                             <InputError message={errors.headline} className="mt-2" />
                                         </div>

@@ -749,7 +749,6 @@ export default function CreateCard() {
                                                 placeholder="enter your headline text"
                                                 value={data.headline}
                                                 onChange={(e) => setData('headline', e.target.value)}
-                                                maxLength={255}
                                             />
                                             <InputError message={errors.headline} className="mt-2" />
                                         </div>

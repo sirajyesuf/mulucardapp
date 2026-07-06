@@ -46,7 +46,7 @@ class UpdateCardRequest extends FormRequest
             'phone' => 'nullable|string|max:255',
             'organization' => 'nullable|string|max:255',
             'job_title' => 'nullable|string|max:255',
-            'headline' => 'nullable|string|max:255',
+            'headline' => 'nullable|string',
             'address' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
 

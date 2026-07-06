@@ -218,7 +218,6 @@ test('card creation validates each create request rule', function (array $case) 
     'email must be valid' => [createValidationCase(['email' => 'not-an-email'], 'email')],
     'email may not exceed 255 characters' => [createValidationCase(['email' => cardValidationLongText().'@example.com'], 'email')],
     'headline must be text' => [createValidationCase(['headline' => ['headline']], 'headline')],
-    'headline may not exceed 255 characters' => [createValidationCase(['headline' => cardValidationLongText()], 'headline')],
     'address must be text' => [createValidationCase(['address' => ['address']], 'address')],
     'address may not exceed 255 characters' => [createValidationCase(['address' => cardValidationLongText()], 'address')],
     'location must be text' => [createValidationCase(['location' => ['location']], 'location')],

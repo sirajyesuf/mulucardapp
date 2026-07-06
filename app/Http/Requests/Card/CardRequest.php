@@ -43,7 +43,7 @@ class CardRequest extends FormRequest
             'links.*.url' => 'required|url:https',
             'phone' => 'nullable|string|max:255',
             'email' => 'nullable|string|email|max:255',
-            'headline' => 'nullable|string|max:255',
+            'headline' => 'nullable|string',
             'address' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
             'business_hours_enabled' => 'required|boolean',
