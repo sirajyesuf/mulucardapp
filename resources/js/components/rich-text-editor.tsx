@@ -2,7 +2,8 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
-import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered } from 'lucide-react'
+import TextAlign from '@tiptap/extension-text-align'
+import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react'
 import { Toggle } from '@/components/ui/toggle'
 import { cn } from '@/lib/utils'
 import { useCallback, useEffect, useRef } from 'react'
@@ -28,6 +29,9 @@ export function RichTextEditor({ value, onChange, placeholder, disabled, classNa
                 code: false,
             }),
             Underline,
+            TextAlign.configure({
+                types: ['paragraph', 'listItem'],
+            }),
             Placeholder.configure({
                 placeholder: placeholder ?? 'Type something…',
                 emptyEditorClass: 'is-editor-empty',
@@ -72,12 +76,16 @@ export function RichTextEditor({ value, onChange, placeholder, disabled, classNa
     const toggleUnderline = useCallback(() => editor?.chain().focus().toggleUnderline().run(), [editor])
     const toggleBulletList = useCallback(() => editor?.chain().focus().toggleBulletList().run(), [editor])
     const toggleOrderedList = useCallback(() => editor?.chain().focus().toggleOrderedList().run(), [editor])
+    const setAlignLeft = useCallback(() => editor?.chain().focus().setTextAlign('left').run(), [editor])
+    const setAlignCenter = useCallback(() => editor?.chain().focus().setTextAlign('center').run(), [editor])
+    const setAlignRight = useCallback(() => editor?.chain().focus().setTextAlign('right').run(), [editor])
+    const setAlignJustify = useCallback(() => editor?.chain().focus().setTextAlign('justify').run(), [editor])
 
     if (!editor) return null
 
     return (
         <div className={cn('border-input focus-within:border-ring focus-within:ring-ring/50 flex w-full flex-col rounded-md border shadow-xs transition-[color,box-shadow] focus-within:ring-[3px]', className)}>
-            <div className="flex items-center gap-0.5 border-b px-1 py-1">
+            <div className="flex flex-wrap items-center gap-0.5 border-b px-1 py-1">
                 <Toggle size="sm" pressed={editor.isActive('bold')} onPressedChange={toggleBold} disabled={disabled}>
                     <Bold className="h-3.5 w-3.5" />
                 </Toggle>
@@ -93,6 +101,19 @@ export function RichTextEditor({ value, onChange, placeholder, disabled, classNa
                 </Toggle>
                 <Toggle size="sm" pressed={editor.isActive('orderedList')} onPressedChange={toggleOrderedList} disabled={disabled}>
                     <ListOrdered className="h-3.5 w-3.5" />
+                </Toggle>
+                <div className="bg-border mx-0.5 h-5 w-px" />
+                <Toggle size="sm" pressed={editor.isActive({ textAlign: 'left' })} onPressedChange={setAlignLeft} disabled={disabled}>
+                    <AlignLeft className="h-3.5 w-3.5" />
+                </Toggle>
+                <Toggle size="sm" pressed={editor.isActive({ textAlign: 'center' })} onPressedChange={setAlignCenter} disabled={disabled}>
+                    <AlignCenter className="h-3.5 w-3.5" />
+                </Toggle>
+                <Toggle size="sm" pressed={editor.isActive({ textAlign: 'right' })} onPressedChange={setAlignRight} disabled={disabled}>
+                    <AlignRight className="h-3.5 w-3.5" />
+                </Toggle>
+                <Toggle size="sm" pressed={editor.isActive({ textAlign: 'justify' })} onPressedChange={setAlignJustify} disabled={disabled}>
+                    <AlignJustify className="h-3.5 w-3.5" />
                 </Toggle>
             </div>
             <EditorContent editor={editor} />
