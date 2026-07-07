@@ -25,8 +25,8 @@ class CardRequest extends FormRequest
     public function rules(): array
     {
         $plan = $this->user()?->activeSubscription()->with('plan')->first()?->plan;
-        $serviceLimit = $plan?->number_of_service ?? 0;
-        $galleryLimit = $plan?->number_of_gallery ?? 0;
+        $serviceLimit = $plan?->number_of_service;
+        $galleryLimit = $plan?->number_of_gallery;
 
         return [
             'template' => ['required', Rule::in(['classic', 'modern', 'bold'])],
@@ -62,7 +62,7 @@ class CardRequest extends FormRequest
                         return;
                     }
 
-                    if ($galleryLimit >= 0 && count($value) > $galleryLimit) {
+                    if ($galleryLimit !== null && count($value) > $galleryLimit) {
                         $fail("Your plan allows up to {$galleryLimit} galleries.");
                     }
                 },
@@ -80,7 +80,7 @@ class CardRequest extends FormRequest
                         return;
                     }
 
-                    if ($serviceLimit >= 0 && count($value) > $serviceLimit) {
+                    if ($serviceLimit !== null && count($value) > $serviceLimit) {
                         $fail("Your plan allows up to {$serviceLimit} services.");
                     }
                 },
