@@ -65,8 +65,8 @@ export default function EditCard({ card }: { card: CardType }) {
     const props = usePage<SharedData>().props;
     const auth = props.auth;
     const activePlan = auth.activePlan;
-    const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
-    const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
+    const serviceLimit = activePlan?.plan?.number_of_service;
+    const galleryLimit = activePlan?.plan?.number_of_gallery;
     const cardSocialLinks = props.cardSocialLinks;
     const existingLinksMap = new Map((card.links || []).map((link) => [link.name, link.url]));
 
@@ -1082,12 +1082,12 @@ export default function EditCard({ card }: { card: CardType }) {
                                                     variant="outline"
                                                     onClick={addMoreServiceItem}
                                                     className="flex items-center gap-2"
-                                                    disabled={data.services.length >= serviceLimit}
+                                                    disabled={serviceLimit !== null && data.services.length >= serviceLimit}
                                                 >
                                                     <PlusCircle className="h-5 w-5" />
                                                     Add More
                                                 </Button>
-                                                {data.services.length >= serviceLimit && (
+                                                {serviceLimit !== null && data.services.length >= serviceLimit && (
                                                     <div className="flex items-center gap-2 text-yellow-600">
                                                         <ShieldAlert className="h-4 w-4" />
                                                         <span>Service limit reached. Upgrade your plan to add more services.</span>
@@ -1195,12 +1195,12 @@ export default function EditCard({ card }: { card: CardType }) {
                                                     variant="outline"
                                                     onClick={addMoreItem}
                                                     className="flex items-center gap-2"
-                                                    disabled={data.galleries.length >= galleryLimit}
+                                                    disabled={galleryLimit !== null && data.galleries.length >= galleryLimit}
                                                 >
                                                     <PlusCircle className="h-5 w-5" />
                                                     Add More
                                                 </Button>
-                                                {data.galleries.length >= galleryLimit && (
+                                                {galleryLimit !== null && data.galleries.length >= galleryLimit && (
                                                     <div className="flex items-center gap-2 text-yellow-600">
                                                         <ShieldAlert className="h-4 w-4" />
                                                         <span>Gallery limit reached. Upgrade your plan to add more images.</span>

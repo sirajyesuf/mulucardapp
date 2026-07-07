@@ -57,8 +57,8 @@ interface CardForm {
 export default function CreateCard() {
     const auth = usePage<SharedData>().props.auth;
     const activePlan = auth.activePlan;
-    const serviceLimit = activePlan?.plan?.number_of_service ?? 0;
-    const galleryLimit = activePlan?.plan?.number_of_gallery ?? 0;
+    const serviceLimit = activePlan?.plan?.number_of_service;
+    const galleryLimit = activePlan?.plan?.number_of_gallery;
     const cardSocialLinks = usePage<SharedData>().props.cardSocialLinks;
     const createLink = (name: string) => ({
         name,
@@ -1007,12 +1007,12 @@ export default function CreateCard() {
                                                         variant="outline"
                                                         onClick={addMoreServiceItem}
                                                         className="mx-auto flex items-center gap-2"
-                                                        disabled={data.services.length >= serviceLimit}
+                                                        disabled={serviceLimit !== null && data.services.length >= serviceLimit}
                                                     >
                                                         <PlusCircle className="h-5 w-5" />
                                                         Add Service
                                                     </Button>
-                                                    {data.services.length >= serviceLimit && (
+                                                    {serviceLimit !== null && data.services.length >= serviceLimit && (
                                                         <div className="mt-4 flex items-center gap-2 text-yellow-600">
                                                             <ShieldAlert className="h-8 w-8" />
                                                             <span>Service limit reached. Upgrade your plan to add more services.</span>
@@ -1147,12 +1147,12 @@ export default function CreateCard() {
                                                             variant="outline"
                                                             onClick={addMoreServiceItem}
                                                             className="flex items-center gap-2"
-                                                            disabled={data.services.length >= serviceLimit}
+                                                            disabled={serviceLimit !== null && data.services.length >= serviceLimit}
                                                         >
                                                             <PlusCircle className="h-5 w-5" />
                                                             Add Service
                                                         </Button>
-                                                        {data.services.length >= serviceLimit && (
+                                                        {serviceLimit !== null && data.services.length >= serviceLimit && (
                                                             <div className="flex items-center gap-2 text-yellow-600">
                                                                 <ShieldAlert className="h-8 w-8" />
                                                                 <span>Service limit reached. Upgrade your plan to add more services.</span>
@@ -1186,12 +1186,12 @@ export default function CreateCard() {
                                                         variant="outline"
                                                         onClick={addMoreItem}
                                                         className="mx-auto flex items-center gap-2"
-                                                        disabled={data.galleries.length >= galleryLimit}
+                                                        disabled={galleryLimit !== null && data.galleries.length >= galleryLimit}
                                                     >
                                                         <PlusCircle className="h-5 w-5" />
                                                         Add Image
                                                     </Button>
-                                                    {data.galleries.length >= galleryLimit && (
+                                                    {galleryLimit !== null && data.galleries.length >= galleryLimit && (
                                                         <div className="mt-4 flex items-center gap-2 text-yellow-600">
                                                             <ShieldAlert className="h-6 w-6" />
                                                             <span>Gallery limit reached. Upgrade your plan to add more images.</span>
@@ -1303,12 +1303,12 @@ export default function CreateCard() {
                                                             variant="outline"
                                                             onClick={addMoreItem}
                                                             className="flex items-center gap-2"
-                                                            disabled={data.galleries.length >= galleryLimit}
+                                                            disabled={galleryLimit !== null && data.galleries.length >= galleryLimit}
                                                         >
                                                             <PlusCircle className="h-5 w-5" />
                                                             Add Image
                                                         </Button>
-                                                        {data.galleries.length >= galleryLimit && (
+                                                        {galleryLimit !== null && data.galleries.length >= galleryLimit && (
                                                             <div className="flex items-center gap-2 text-yellow-600">
                                                                 <ShieldAlert className="h-6 w-6" />
                                                                 <span>Gallery limit reached. Upgrade your plan to add more images.</span>
