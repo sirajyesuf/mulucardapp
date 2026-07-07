@@ -69,7 +69,7 @@ class CardRequest extends FormRequest
             ],
             'galleries.*.file' => 'required|image|max:2048',
             'galleries.*.path' => 'nullable|string',
-            'galleries.*.description' => 'required|string|max:500',
+            'galleries.*.description' => 'required|string',
 
             // //validation for services
             'services' => [
@@ -88,7 +88,7 @@ class CardRequest extends FormRequest
             'services.*.file' => 'required|image|max:2048',
             'services.*.path' => 'nullable|string',
             'services.*.name' => 'required|string',
-            'services.*.description' => 'required|string|max:500',
+            'services.*.description' => 'required|string',
 
         ];
 

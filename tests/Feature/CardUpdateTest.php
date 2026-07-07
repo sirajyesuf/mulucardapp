@@ -281,7 +281,7 @@ test('card update validates each update request rule', function (array $case) {
     'gallery file may not exceed 2MB' => [updateValidationCase(['galleries' => [['id' => 'gallery-one', 'file' => UploadedFile::fake()->image('gallery.jpg')->size(2049), 'description' => 'Gallery']]], 'galleries.0.file')],
     'gallery path must be text when present' => [updateValidationCase(['galleries' => [['id' => 'gallery-one', 'file' => UploadedFile::fake()->image('gallery.jpg'), 'path' => ['blob'], 'description' => 'Gallery']]], 'galleries.0.path')],
     'gallery description is required' => [updateValidationCase(['galleries' => [['id' => 'gallery-one', 'file' => UploadedFile::fake()->image('gallery.jpg'), 'description' => null]]], 'galleries.0.description')],
-    'gallery description may not exceed 500 characters' => [updateValidationCase(['galleries' => [['id' => 'gallery-one', 'file' => UploadedFile::fake()->image('gallery.jpg'), 'description' => updateValidationLongText(501)]]], 'galleries.0.description')],
+
     'services must be an array' => [updateValidationCase(['services' => 'service'], 'services')],
     'services may not exceed plan limit' => [updateValidationCase(['services' => [
         ['id' => 'service-one', 'file' => UploadedFile::fake()->image('service-1.jpg'), 'name' => 'One', 'description' => 'One'],
@@ -295,5 +295,5 @@ test('card update validates each update request rule', function (array $case) {
     'service name is required' => [updateValidationCase(['services' => [['id' => 'service-one', 'file' => UploadedFile::fake()->image('service.jpg'), 'name' => null, 'description' => 'Service']]], 'services.0.name')],
     'service name must be text' => [updateValidationCase(['services' => [['id' => 'service-one', 'file' => UploadedFile::fake()->image('service.jpg'), 'name' => ['Service'], 'description' => 'Service']]], 'services.0.name')],
     'service description is required' => [updateValidationCase(['services' => [['id' => 'service-one', 'file' => UploadedFile::fake()->image('service.jpg'), 'name' => 'Service', 'description' => null]]], 'services.0.description')],
-    'service description may not exceed 500 characters' => [updateValidationCase(['services' => [['id' => 'service-one', 'file' => UploadedFile::fake()->image('service.jpg'), 'name' => 'Service', 'description' => updateValidationLongText(501)]]], 'services.0.description')],
+    'service description must be text' => [updateValidationCase(['services' => [['id' => 'service-one', 'file' => UploadedFile::fake()->image('service.jpg'), 'name' => 'Service', 'description' => ['Service']]]], 'services.0.description')],
 ]);

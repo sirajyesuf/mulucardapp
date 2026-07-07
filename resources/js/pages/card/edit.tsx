@@ -1065,13 +1065,10 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                 <Label htmlFor={`description-${item.id}`} className="mb-2 block">
                                                                     Description
                                                                 </Label>
-                                                                <Textarea
-                                                                    id={`description-${item.id}`}
-                                                                    placeholder="Enter a description for this service"
+                                                                <RichTextEditor
                                                                     value={item.description}
-                                                                    onChange={(e) => handleServiceDescriptionChange(item.id, e.target.value)}
-                                                                    className="min-h-24"
-                                                                    maxLength={500}
+                                                                    onChange={(html) => handleServiceDescriptionChange(item.id, html)}
+                                                                    placeholder="Enter a description for this service"
                                                                 />
                                                                 <InputError message={errors[`services.${index}.description`]} className="mt-2" />
                                                             </div>
@@ -1181,13 +1178,10 @@ export default function EditCard({ card }: { card: CardType }) {
                                                                 <Label htmlFor={`description-${item.id}`} className="mb-2 block">
                                                                     Description
                                                                 </Label>
-                                                                <Textarea
-                                                                    id={`description-${item.id}`}
-                                                                    placeholder="Enter a description for this image"
+                                                                <RichTextEditor
                                                                     value={item.description}
-                                                                    onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
-                                                                    className="min-h-24"
-                                                                    maxLength={500}
+                                                                    onChange={(html) => handleDescriptionChange(item.id, html)}
+                                                                    placeholder="Enter a description for this image"
                                                                 />
                                                                 <InputError message={errors[`galleries.${index}.description`]} className="mt-2" />
                                                             </div>

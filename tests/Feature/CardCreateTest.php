@@ -241,7 +241,7 @@ test('card creation validates each create request rule', function (array $case) 
     'gallery file may not exceed 2MB' => [createValidationCase(['galleries' => [['file' => UploadedFile::fake()->image('gallery.jpg')->size(2049), 'description' => 'Gallery']]], 'galleries.0.file')],
     'gallery path must be text when present' => [createValidationCase(['galleries' => [['file' => UploadedFile::fake()->image('gallery.jpg'), 'path' => ['blob'], 'description' => 'Gallery']]], 'galleries.0.path')],
     'gallery description is required' => [createValidationCase(['galleries' => [['file' => UploadedFile::fake()->image('gallery.jpg'), 'description' => null]]], 'galleries.0.description')],
-    'gallery description may not exceed 500 characters' => [createValidationCase(['galleries' => [['file' => UploadedFile::fake()->image('gallery.jpg'), 'description' => cardValidationLongText(501)]]], 'galleries.0.description')],
+
     'services must be an array' => [createValidationCase(['services' => 'service'], 'services')],
     'services may not exceed plan limit' => [createValidationCase(['services' => [
         ['file' => UploadedFile::fake()->image('service-1.jpg'), 'name' => 'One', 'description' => 'One'],
@@ -254,5 +254,5 @@ test('card creation validates each create request rule', function (array $case) 
     'service name is required' => [createValidationCase(['services' => [['file' => UploadedFile::fake()->image('service.jpg'), 'name' => null, 'description' => 'Service']]], 'services.0.name')],
     'service name must be text' => [createValidationCase(['services' => [['file' => UploadedFile::fake()->image('service.jpg'), 'name' => ['Service'], 'description' => 'Service']]], 'services.0.name')],
     'service description is required' => [createValidationCase(['services' => [['file' => UploadedFile::fake()->image('service.jpg'), 'name' => 'Service', 'description' => null]]], 'services.0.description')],
-    'service description may not exceed 500 characters' => [createValidationCase(['services' => [['file' => UploadedFile::fake()->image('service.jpg'), 'name' => 'Service', 'description' => cardValidationLongText(501)]]], 'services.0.description')],
+    'service description must be text' => [createValidationCase(['services' => [['file' => UploadedFile::fake()->image('service.jpg'), 'name' => 'Service', 'description' => ['Service']]]], 'services.0.description')],
 ]);

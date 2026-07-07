@@ -22,10 +22,10 @@ export function CardGalleriesSection({ galleries, className = 'border-none shado
                     {galleries.map((item) => (
                         <div key={item.id} className="space-y-2">
                             <div className="bg-card aspect-video w-full overflow-hidden rounded-lg border">
-                                {item.path && <img src={item.path} alt={item.description} className="h-full w-full object-contain" />}
+                                {item.path && <img src={item.path} alt={item.description.replace(/<[^>]*>/g, '')} className="h-full w-full object-contain" />}
                             </div>
                             <div className="mt-2">
-                                <p className="text-muted-foreground mt-1 text-sm">{item.description || 'No description provided'}</p>
+                                <div className="text-muted-foreground mt-1 text-sm [&_p]:m-0" dangerouslySetInnerHTML={{ __html: item.description || 'No description provided' }} />
                             </div>
                         </div>
                     ))}

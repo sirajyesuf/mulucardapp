@@ -114,7 +114,7 @@ class UpdateCardRequest extends FormRequest
                 },
             ],
             'galleries.*.path' => 'nullable|string',
-            'galleries.*.description' => 'required|string|max:500',
+            'galleries.*.description' => 'required|string',
 
             // validation for services
             'services' => [
@@ -174,7 +174,7 @@ class UpdateCardRequest extends FormRequest
             ],
             'services.*.path' => 'nullable|string',
             'services.*.name' => 'required|string',
-            'services.*.description' => 'required|string|max:500',
+            'services.*.description' => 'required|string',
         ];
 
     }
