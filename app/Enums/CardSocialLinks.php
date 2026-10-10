@@ -11,9 +11,11 @@ enum CardSocialLinks:string
     case TikTok = 'tiktok';
     case X = 'x';
     case snapchat = 'snapchat';
+    case Telegram = 'telegram';
+    case WhatsApp = 'whatsapp';
 
 
     public static function links(): array     {
-        return ['website', 'facebook', 'instagram', 'linkedin', 'youtube', 'tiktok', 'x', 'snapchat'];
+        return ['website', 'facebook', 'instagram', 'linkedin', 'youtube', 'tiktok', 'x', 'snapchat', 'telegram', 'whatsapp'];
     }
 }

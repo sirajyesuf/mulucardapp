@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { socialIconMap } from '@/lib/socialIcons';
+import { placeholderFor, socialIconMap } from '@/lib/socialIcons';
 import { buildCreatePreviewProps } from '@/pages/card/build-create-preview-props';
 import MuluCard from '@/pages/card/card';
 import { CardTemplateSelector } from '@/pages/card/card-template-selector';
@@ -63,7 +63,7 @@ export default function CreateCard() {
     const createLink = (name: string) => ({
         name,
         url: '',
-        placeholder: `https://${name.toLowerCase()}.com/your-profile`,
+        placeholder: placeholderFor(name),
     });
     const objectUrls = useRef<Set<string>>(new Set());
 

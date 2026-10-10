@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { socialIconMap } from '@/lib/socialIcons';
+import { placeholderFor, socialIconMap } from '@/lib/socialIcons';
 import MuluCard from '@/pages/card/card';
 import { CardTemplateSelector } from '@/pages/card/card-template-selector';
 import type { CardTemplateId } from '@/pages/card/mulu-card-props';
@@ -95,7 +95,7 @@ export default function EditCard({ card }: { card: CardType }) {
         const newLink = {
             name: name,
             url: '',
-            placeholder: `https://${name.toLowerCase()}.com/your-profile`,
+            placeholder: placeholderFor(name),
         };
         setData('links', [...data.links, newLink]);
         setRemovedLinks((prev) => prev.filter((link) => link !== name));
@@ -104,7 +104,7 @@ export default function EditCard({ card }: { card: CardType }) {
     const links = existingLinks.map((linkName) => ({
         name: linkName,
         url: existingLinksMap.get(linkName) || '',
-        placeholder: `https://${linkName.toLowerCase()}.com/your-profile`,
+        placeholder: placeholderFor(linkName),
     }));
 
     const colors = ['#3a59ae', '#a580e5', '#6dd3c7', '#3bb55d', '#ffc631', '#ff8c39', '#ea3a2e', '#ee85dd', '#4a4a4a'];
