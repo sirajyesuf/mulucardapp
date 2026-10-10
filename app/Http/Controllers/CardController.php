@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CardSocialLinks;
 use App\Http\Requests\Card\CardRequest as StoreRequest;
 use App\Http\Requests\Card\UpdateCardRequest as UpdateRequest;
 use App\Http\Resources\CardResource;
@@ -418,7 +419,12 @@ class CardController extends Controller
 
     protected function updateSocialLinks($card, $validated)
     {
-        $card->socialLinks()->delete();
+        // Preserve links whose platform was retired from the enum (e.g. "twitter", now
+        // superseded by "x"). They stay in the database so no URL is ever lost, but they
+        // are no longer submitted by the editor and are hidden when the card is rendered.
+        $card->socialLinks()
+            ->whereIn('name', CardSocialLinks::links())
+            ->delete();
 
         if (! empty($validated['links'])) {
             foreach ($validated['links'] as $link) {

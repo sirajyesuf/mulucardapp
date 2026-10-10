@@ -1,6 +1,6 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
-import { Link, useForm, Head, usePage, router, createInertiaApp } from "@inertiajs/react";
-import { LoaderCircle, CheckIcon, ChevronDownIcon, ChevronUpIcon, Clock, Phone, Mail, MapPin, Youtube, Linkedin, Instagram, Twitter, Facebook, Globe, XIcon, PanelLeftIcon, Settings, CircleDollarSign, CreditCard, LogOut, ChevronsUpDown, BadgeCheck, LayoutGrid, ChevronRight, Sun, Moon, Bell, X, Upload, Check, PlusCircle, Copy, ShieldAlert, Wifi, Download, Edit, ChevronUp, ChevronDown, ArrowLeft, Eye, MoreHorizontal, Trash2, CheckCircle2, CircleOff, TrendingUp, ArrowRight, CheckCircle, XCircle, Share2, LinkIcon, Contact, AlertCircle, Menu, QrCode, Smartphone, Shield, Users, Zap, Monitor, Sparkles, Repeat, BarChart3, Palette, LayoutTemplate } from "lucide-react";
+import { usePage, Link, useForm, Head, router, createInertiaApp } from "@inertiajs/react";
+import { LoaderCircle, CheckIcon, ChevronDownIcon, ChevronUpIcon, Clock, Phone, Mail, MapPin, Youtube, Linkedin, Instagram, Twitter, Facebook, Globe, Bold, Italic, Underline as Underline$1, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, XIcon as XIcon$1, PanelLeftIcon, Settings, CircleDollarSign, CreditCard, LogOut, ChevronsUpDown, BadgeCheck, LayoutGrid, ChevronRight, Sun, Moon, Bell, X, Upload, Check, PlusCircle, Copy, ShieldAlert, Wifi, Download, Edit, ChevronUp, ChevronDown, ArrowLeft, ClipboardCopy, Eye, MoreHorizontal, Trash2, CheckCircle2, CircleOff, TrendingUp, ArrowRight, CheckCircle, XCircle, Share2, LinkIcon, Contact, AlertCircle, Menu, QrCode, Smartphone, Shield, Users, Zap, Monitor, Sparkles, Repeat, BarChart3, Palette, LayoutTemplate } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Slot } from "@radix-ui/react-slot";
@@ -11,7 +11,13 @@ import { Toaster as Toaster$1, toast } from "sonner";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as React from "react";
-import { useId, useState, useEffect, useCallback, Fragment as Fragment$1, useRef } from "react";
+import { useId, useRef, useEffect, useCallback, useState, Fragment as Fragment$1 } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Placeholder from "@tiptap/extension-placeholder";
+import TextAlign from "@tiptap/extension-text-align";
+import * as TogglePrimitive from "@radix-ui/react-toggle";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
@@ -184,11 +190,9 @@ function AuthCardLayout({
   title,
   description
 }) {
+  const { logoUrl } = usePage().props;
   return /* @__PURE__ */ jsx("div", { className: "bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10", children: /* @__PURE__ */ jsxs("div", { className: "flex w-full max-w-md flex-col gap-6", children: [
-    /* @__PURE__ */ jsx(Link, { href: route("home"), className: "flex items-center gap-2 self-center font-medium", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-[1px] text-xl font-semibold", children: [
-      /* @__PURE__ */ jsx("span", { className: "text-primary", children: "Mulu" }),
-      /* @__PURE__ */ jsx("span", { children: "Card" })
-    ] }) }),
+    /* @__PURE__ */ jsx(Link, { href: route("home"), className: "flex items-center gap-2 self-center font-medium", children: /* @__PURE__ */ jsx("img", { src: logoUrl, alt: "MuluCard", className: "h-12 w-auto" }) }),
     /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-6", children: /* @__PURE__ */ jsxs(Card, { className: "rounded-xl", children: [
       /* @__PURE__ */ jsxs(CardHeader, { className: "px-10 pt-8 pb-0 text-center", children: [
         /* @__PURE__ */ jsx(CardTitle, { className: "text-xl", children: title }),
@@ -1010,8 +1014,8 @@ function CardGalleriesSection({ galleries, className = "border-none shadow-none"
   return /* @__PURE__ */ jsxs(Card, { className, children: [
     /* @__PURE__ */ jsx(CardHeader, { children: /* @__PURE__ */ jsx(CardTitle, { children: title }) }),
     /* @__PURE__ */ jsx(CardContent, { children: /* @__PURE__ */ jsx("div", { className: "space-y-6", children: galleries.map((item) => /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("div", { className: "bg-card aspect-video w-full overflow-hidden rounded-lg border", children: item.path && /* @__PURE__ */ jsx("img", { src: item.path, alt: item.description, className: "h-full w-full object-contain" }) }),
-      /* @__PURE__ */ jsx("div", { className: "mt-2", children: /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mt-1 text-sm", children: item.description || "No description provided" }) })
+      /* @__PURE__ */ jsx("div", { className: "bg-card aspect-video w-full overflow-hidden rounded-lg border", children: item.path && /* @__PURE__ */ jsx("img", { src: item.path, alt: item.description.replace(/<[^>]*>/g, ""), className: "h-full w-full object-contain" }) }),
+      /* @__PURE__ */ jsx("div", { className: "mt-2", children: /* @__PURE__ */ jsx("div", { className: "text-muted-foreground mt-1 text-sm [&_p]:m-0", dangerouslySetInnerHTML: { __html: item.description || "No description provided" } }) })
     ] }, item.id)) }) })
   ] });
 }
@@ -1072,7 +1076,7 @@ function CardServicesSection({ services, className = "border-none shadow-none", 
       /* @__PURE__ */ jsx("div", { className: "bg-card aspect-video w-full overflow-hidden rounded-lg border", children: item.path && /* @__PURE__ */ jsx("img", { src: item.path, alt: item.name, className: "h-full w-full object-contain" }) }),
       /* @__PURE__ */ jsxs("div", { className: "mt-2", children: [
         /* @__PURE__ */ jsx("h3", { className: "text-foreground font-medium", children: item.name }),
-        /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mt-1 text-sm", children: item.description || "No description provided" })
+        /* @__PURE__ */ jsx("div", { className: "text-muted-foreground mt-1 text-sm [&_p]:m-0", dangerouslySetInnerHTML: { __html: item.description || "No description provided" } })
       ] })
     ] }, item.id)) }) })
   ] });
@@ -1081,6 +1085,37 @@ const __vite_glob_0_19 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   CardServicesSection
 }, Symbol.toStringTag, { value: "Module" }));
+function brandIcon(displayName, path) {
+  function BrandIcon({ className, style, ...props }) {
+    return /* @__PURE__ */ jsx(
+      "svg",
+      {
+        role: "img",
+        "aria-label": displayName,
+        viewBox: "0 0 24 24",
+        xmlns: "http://www.w3.org/2000/svg",
+        className,
+        style,
+        fill: "currentColor",
+        ...props,
+        children: /* @__PURE__ */ jsx("path", { d: path })
+      }
+    );
+  }
+  return BrandIcon;
+}
+const XIcon = brandIcon(
+  "X",
+  "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"
+);
+const TikTokIcon = brandIcon(
+  "TikTok",
+  "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
+);
+const SnapchatIcon = brandIcon(
+  "Snapchat",
+  "M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.243.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z"
+);
 const socialIconMap = {
   email: Mail,
   phone: Phone,
@@ -1089,8 +1124,12 @@ const socialIconMap = {
   twitter: Twitter,
   instagram: Instagram,
   linkedin: Linkedin,
-  youtube: Youtube
+  youtube: Youtube,
+  x: XIcon,
+  tiktok: TikTokIcon,
+  snapchat: SnapchatIcon
 };
+const RETIRED_LINKS = /* @__PURE__ */ new Set(["twitter"]);
 function CardSocialLinks({
   links,
   banner_color,
@@ -1099,7 +1138,7 @@ function CardSocialLinks({
   variant = "solid"
 }) {
   const isOutline = variant === "outline";
-  return /* @__PURE__ */ jsx("div", { className, children: links == null ? void 0 : links.map((link, index) => {
+  return /* @__PURE__ */ jsx("div", { className, children: links == null ? void 0 : links.filter((link) => !RETIRED_LINKS.has(link.name.toLowerCase())).map((link, index) => {
     const Icon2 = socialIconMap[link.name.toLowerCase()] || Globe;
     return link.url && /* @__PURE__ */ jsx("div", { className: "flex flex-row flex-wrap items-center gap-2 rounded-lg border-none p-0", children: /* @__PURE__ */ jsx(
       "div",
@@ -1191,7 +1230,13 @@ function BoldCardTemplate(props) {
         {
           className: "mt-5 py-0 pl-3.5",
           style: { borderLeft: `3px solid ${banner_color}` },
-          children: /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-left text-xs leading-relaxed sm:text-[0.8125rem]", children: headline })
+          children: /* @__PURE__ */ jsx(
+            "div",
+            {
+              className: "text-muted-foreground text-left text-xs leading-relaxed sm:text-[0.8125rem] [&_p]:m-0",
+              dangerouslySetInnerHTML: { __html: headline }
+            }
+          )
         }
       ) : null,
       /* @__PURE__ */ jsxs("div", { className: "mt-6 space-y-5", children: [
@@ -1251,7 +1296,7 @@ const __vite_glob_0_22 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   BoldCardTemplate
 }, Symbol.toStringTag, { value: "Module" }));
 function CardHeadline({ headline, className = "text-muted-foreground p-2 text-center" }) {
-  return /* @__PURE__ */ jsx("div", { className, children: headline });
+  return /* @__PURE__ */ jsx("div", { className, dangerouslySetInnerHTML: { __html: headline } });
 }
 const __vite_glob_0_16 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
@@ -1413,6 +1458,118 @@ const __vite_glob_0_8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   __proto__: null,
   default: MuluCard
 }, Symbol.toStringTag, { value: "Module" }));
+const toggleVariants = cva(
+  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium hover:bg-muted hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none transition-[color,box-shadow] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default: "bg-transparent",
+        outline: "border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground"
+      },
+      size: {
+        default: "h-9 px-2 min-w-9",
+        sm: "h-8 px-1.5 min-w-8",
+        lg: "h-10 px-2.5 min-w-10"
+      }
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default"
+    }
+  }
+);
+function Toggle({
+  className,
+  variant,
+  size,
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    TogglePrimitive.Root,
+    {
+      "data-slot": "toggle",
+      className: cn(toggleVariants({ variant, size, className })),
+      ...props
+    }
+  );
+}
+function RichTextEditor({ value, onChange, placeholder, disabled, className }) {
+  const isExternalUpdate = useRef(false);
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        codeBlock: false,
+        blockquote: false,
+        horizontalRule: false,
+        code: false
+      }),
+      Underline,
+      TextAlign.configure({
+        types: ["paragraph", "listItem"]
+      }),
+      Placeholder.configure({
+        placeholder: placeholder ?? "Type something…",
+        emptyEditorClass: "is-editor-empty"
+      })
+    ],
+    editorProps: {
+      attributes: {
+        class: "tiptap prose prose-sm max-w-none p-3 focus:outline-none"
+      }
+    },
+    content: value,
+    editable: !disabled,
+    onUpdate: ({ editor: editor2 }) => {
+      if (!isExternalUpdate.current) {
+        const html = editor2.getHTML();
+        const text = html.replace(/<[^>]*>/g, "").trim();
+        onChange(text ? html : "");
+      }
+    }
+  });
+  useEffect(() => {
+    if (disabled !== void 0 && editor) {
+      editor.setEditable(!disabled);
+    }
+  }, [disabled, editor]);
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      isExternalUpdate.current = true;
+      editor.commands.setContent(value);
+      isExternalUpdate.current = false;
+    }
+  }, [value, editor]);
+  useEffect(() => {
+    return () => editor == null ? void 0 : editor.destroy();
+  }, [editor]);
+  const toggleBold = useCallback(() => editor == null ? void 0 : editor.chain().focus().toggleBold().run(), [editor]);
+  const toggleItalic = useCallback(() => editor == null ? void 0 : editor.chain().focus().toggleItalic().run(), [editor]);
+  const toggleUnderline = useCallback(() => editor == null ? void 0 : editor.chain().focus().toggleUnderline().run(), [editor]);
+  const toggleBulletList = useCallback(() => editor == null ? void 0 : editor.chain().focus().toggleBulletList().run(), [editor]);
+  const toggleOrderedList = useCallback(() => editor == null ? void 0 : editor.chain().focus().toggleOrderedList().run(), [editor]);
+  const setAlignLeft = useCallback(() => editor == null ? void 0 : editor.chain().focus().setTextAlign("left").run(), [editor]);
+  const setAlignCenter = useCallback(() => editor == null ? void 0 : editor.chain().focus().setTextAlign("center").run(), [editor]);
+  const setAlignRight = useCallback(() => editor == null ? void 0 : editor.chain().focus().setTextAlign("right").run(), [editor]);
+  const setAlignJustify = useCallback(() => editor == null ? void 0 : editor.chain().focus().setTextAlign("justify").run(), [editor]);
+  if (!editor) return null;
+  return /* @__PURE__ */ jsxs("div", { className: cn("border-input focus-within:border-ring focus-within:ring-ring/50 flex w-full flex-col rounded-md border shadow-xs transition-[color,box-shadow] focus-within:ring-[3px]", className), children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-center gap-0.5 border-b px-1 py-1", children: [
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive("bold"), onPressedChange: toggleBold, disabled, children: /* @__PURE__ */ jsx(Bold, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive("italic"), onPressedChange: toggleItalic, disabled, children: /* @__PURE__ */ jsx(Italic, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive("underline"), onPressedChange: toggleUnderline, disabled, children: /* @__PURE__ */ jsx(Underline$1, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx("div", { className: "bg-border mx-0.5 h-5 w-px" }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive("bulletList"), onPressedChange: toggleBulletList, disabled, children: /* @__PURE__ */ jsx(List, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive("orderedList"), onPressedChange: toggleOrderedList, disabled, children: /* @__PURE__ */ jsx(ListOrdered, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx("div", { className: "bg-border mx-0.5 h-5 w-px" }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive({ textAlign: "left" }), onPressedChange: setAlignLeft, disabled, children: /* @__PURE__ */ jsx(AlignLeft, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive({ textAlign: "center" }), onPressedChange: setAlignCenter, disabled, children: /* @__PURE__ */ jsx(AlignCenter, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive({ textAlign: "right" }), onPressedChange: setAlignRight, disabled, children: /* @__PURE__ */ jsx(AlignRight, { className: "h-3.5 w-3.5" }) }),
+      /* @__PURE__ */ jsx(Toggle, { size: "sm", pressed: editor.isActive({ textAlign: "justify" }), onPressedChange: setAlignJustify, disabled, children: /* @__PURE__ */ jsx(AlignJustify, { className: "h-3.5 w-3.5" }) })
+    ] }),
+    /* @__PURE__ */ jsx(EditorContent, { editor })
+  ] });
+}
 function ScrollArea({
   className,
   children,
@@ -1545,19 +1702,6 @@ function TabsContent({
     {
       "data-slot": "tabs-content",
       className: cn("flex-1 outline-none", className),
-      ...props
-    }
-  );
-}
-function Textarea({ className, ...props }) {
-  return /* @__PURE__ */ jsx(
-    "textarea",
-    {
-      "data-slot": "textarea",
-      className: cn(
-        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className
-      ),
       ...props
     }
   );
@@ -1695,7 +1839,7 @@ function SheetContent({
         children: [
           children,
           /* @__PURE__ */ jsxs(SheetPrimitive.Close, { className: "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none", children: [
-            /* @__PURE__ */ jsx(XIcon, { className: "size-4" }),
+            /* @__PURE__ */ jsx(XIcon$1, { className: "size-4" }),
             /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Close" })
           ] })
         ]
@@ -2394,10 +2538,14 @@ function NavUser() {
   ] }) }) });
 }
 function AppLogo() {
-  return /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-[1px] text-xl font-semibold", children: [
-    /* @__PURE__ */ jsx("span", { className: "text-primary", children: "Mulu" }),
-    /* @__PURE__ */ jsx("span", { children: "Card" })
-  ] }) });
+  const { logoUrl } = usePage().props;
+  return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+    /* @__PURE__ */ jsx("img", { src: logoUrl, alt: "MuluCard", className: "h-10 w-auto" }),
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-[1px] text-xl font-semibold text-[#148bfd]", children: [
+      /* @__PURE__ */ jsx("span", { children: "Mulu" }),
+      /* @__PURE__ */ jsx("span", { children: "Card" })
+    ] })
+  ] });
 }
 const mainNavItems = [
   {
@@ -2715,7 +2863,7 @@ const DEMO_MULU_CARD_PROPS = {
       placeholder: "https://linkedin.com/in/your-profile"
     },
     {
-      name: "twitter",
+      name: "x",
       url: "https://x.com/example",
       placeholder: "https://x.com/your-profile"
     },
@@ -2814,8 +2962,8 @@ function CreateCard() {
   var _a, _b;
   const auth = usePage().props.auth;
   const activePlan = auth.activePlan;
-  const serviceLimit = ((_a = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _a.number_of_service) ?? 0;
-  const galleryLimit = ((_b = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _b.number_of_gallery) ?? 0;
+  const serviceLimit = (_a = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _a.number_of_service;
+  const galleryLimit = (_b = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _b.number_of_gallery;
   const cardSocialLinks = usePage().props.cardSocialLinks;
   const createLink = (name) => ({
     name,
@@ -3417,13 +3565,11 @@ function CreateCard() {
               /* @__PURE__ */ jsxs("div", { className: "rounded-lg border-2 border-dashed p-2", children: [
                 /* @__PURE__ */ jsx(Label, { htmlFor: "headline", className: "flex items-center gap-1", children: /* @__PURE__ */ jsx("span", { children: "Headline" }) }),
                 /* @__PURE__ */ jsx(
-                  Textarea,
+                  RichTextEditor,
                   {
-                    className: "h-30 w-full",
-                    placeholder: "enter your headline text",
                     value: data.headline,
-                    onChange: (e) => setData("headline", e.target.value),
-                    maxLength: 255
+                    onChange: (html) => setData("headline", html),
+                    placeholder: "Enter your headline text"
                   }
                 ),
                 /* @__PURE__ */ jsx(InputError, { message: errors.headline, className: "mt-2" })
@@ -3654,14 +3800,14 @@ function CreateCard() {
                     variant: "outline",
                     onClick: addMoreServiceItem,
                     className: "mx-auto flex items-center gap-2",
-                    disabled: data.services.length >= serviceLimit,
+                    disabled: serviceLimit !== null && data.services.length >= serviceLimit,
                     children: [
                       /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
                       "Add Service"
                     ]
                   }
                 ),
-                data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
+                serviceLimit !== null && data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
                   /* @__PURE__ */ jsx(ShieldAlert, { className: "h-8 w-8" }),
                   /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
                 ] })
@@ -3791,14 +3937,11 @@ function CreateCard() {
                         }
                       ),
                       /* @__PURE__ */ jsx(
-                        Textarea,
+                        RichTextEditor,
                         {
-                          id: `description-${item.id}`,
-                          placeholder: "Enter a description for this image",
                           value: item.description,
-                          onChange: (e) => handleServiceDescriptionChange(item.id, e.target.value),
-                          className: "min-h-24",
-                          maxLength: 500
+                          onChange: (html) => handleServiceDescriptionChange(item.id, html),
+                          placeholder: "Enter a description for this service"
                         }
                       ),
                       /* @__PURE__ */ jsx(
@@ -3819,14 +3962,14 @@ function CreateCard() {
                       variant: "outline",
                       onClick: addMoreServiceItem,
                       className: "flex items-center gap-2",
-                      disabled: data.services.length >= serviceLimit,
+                      disabled: serviceLimit !== null && data.services.length >= serviceLimit,
                       children: [
                         /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
                         "Add Service"
                       ]
                     }
                   ),
-                  data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  serviceLimit !== null && data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
                     /* @__PURE__ */ jsx(ShieldAlert, { className: "h-8 w-8" }),
                     /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
                   ] })
@@ -3850,14 +3993,14 @@ function CreateCard() {
                     variant: "outline",
                     onClick: addMoreItem,
                     className: "mx-auto flex items-center gap-2",
-                    disabled: data.galleries.length >= galleryLimit,
+                    disabled: galleryLimit !== null && data.galleries.length >= galleryLimit,
                     children: [
                       /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
                       "Add Image"
                     ]
                   }
                 ),
-                data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
+                galleryLimit !== null && data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center gap-2 text-yellow-600", children: [
                   /* @__PURE__ */ jsx(ShieldAlert, { className: "h-6 w-6" }),
                   /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
                 ] })
@@ -3958,14 +4101,11 @@ function CreateCard() {
                         }
                       ),
                       /* @__PURE__ */ jsx(
-                        Textarea,
+                        RichTextEditor,
                         {
-                          id: `description-${item.id}`,
-                          placeholder: "Enter a description for this image",
                           value: item.description,
-                          onChange: (e) => handleDescriptionChange(item.id, e.target.value),
-                          className: "min-h-24",
-                          maxLength: 500
+                          onChange: (html) => handleDescriptionChange(item.id, html),
+                          placeholder: "Enter a description for this image"
                         }
                       ),
                       /* @__PURE__ */ jsx(
@@ -3986,14 +4126,14 @@ function CreateCard() {
                       variant: "outline",
                       onClick: addMoreItem,
                       className: "flex items-center gap-2",
-                      disabled: data.galleries.length >= galleryLimit,
+                      disabled: galleryLimit !== null && data.galleries.length >= galleryLimit,
                       children: [
                         /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
                         "Add Image"
                       ]
                     }
                   ),
-                  data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  galleryLimit !== null && data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
                     /* @__PURE__ */ jsx(ShieldAlert, { className: "h-6 w-6" }),
                     /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
                   ] })
@@ -4041,8 +4181,8 @@ function EditCard({ card }) {
   const props = usePage().props;
   const auth = props.auth;
   const activePlan = auth.activePlan;
-  const serviceLimit = ((_a = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _a.number_of_service) ?? 0;
-  const galleryLimit = ((_b = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _b.number_of_gallery) ?? 0;
+  const serviceLimit = (_a = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _a.number_of_service;
+  const galleryLimit = (_b = activePlan == null ? void 0 : activePlan.plan) == null ? void 0 : _b.number_of_gallery;
   const cardSocialLinks = props.cardSocialLinks;
   const existingLinksMap = new Map((card.links || []).map((link) => [link.name, link.url]));
   const existingLinks = cardSocialLinks.filter((linkName) => existingLinksMap.has(linkName));
@@ -4653,14 +4793,11 @@ function EditCard({ card }) {
               /* @__PURE__ */ jsxs("div", { children: [
                 /* @__PURE__ */ jsx(Label, { htmlFor: "headline", children: "Headline" }),
                 /* @__PURE__ */ jsx(
-                  Textarea,
+                  RichTextEditor,
                   {
-                    id: "headline",
-                    className: "h-30 w-full",
-                    placeholder: "Enter your headline text",
                     value: data.headline,
-                    onChange: (e) => setData("headline", e.target.value),
-                    maxLength: 255
+                    onChange: (html) => setData("headline", html),
+                    placeholder: "Enter your headline text"
                   }
                 ),
                 /* @__PURE__ */ jsx(InputError, { message: errors.headline, className: "mt-2" })
@@ -4972,14 +5109,11 @@ function EditCard({ card }) {
                     /* @__PURE__ */ jsxs("div", { children: [
                       /* @__PURE__ */ jsx(Label, { htmlFor: `description-${item.id}`, className: "mb-2 block", children: "Description" }),
                       /* @__PURE__ */ jsx(
-                        Textarea,
+                        RichTextEditor,
                         {
-                          id: `description-${item.id}`,
-                          placeholder: "Enter a description for this service",
                           value: item.description,
-                          onChange: (e) => handleServiceDescriptionChange(item.id, e.target.value),
-                          className: "min-h-24",
-                          maxLength: 500
+                          onChange: (html) => handleServiceDescriptionChange(item.id, html),
+                          placeholder: "Enter a description for this service"
                         }
                       ),
                       /* @__PURE__ */ jsx(InputError, { message: errors[`services.${index}.description`], className: "mt-2" })
@@ -4994,14 +5128,14 @@ function EditCard({ card }) {
                       variant: "outline",
                       onClick: addMoreServiceItem,
                       className: "flex items-center gap-2",
-                      disabled: data.services.length >= serviceLimit,
+                      disabled: serviceLimit !== null && data.services.length >= serviceLimit,
                       children: [
                         /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
                         "Add More"
                       ]
                     }
                   ),
-                  data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  serviceLimit !== null && data.services.length >= serviceLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
                     /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
                     /* @__PURE__ */ jsx("span", { children: "Service limit reached. Upgrade your plan to add more services." })
                   ] })
@@ -5096,14 +5230,11 @@ function EditCard({ card }) {
                     /* @__PURE__ */ jsxs("div", { children: [
                       /* @__PURE__ */ jsx(Label, { htmlFor: `description-${item.id}`, className: "mb-2 block", children: "Description" }),
                       /* @__PURE__ */ jsx(
-                        Textarea,
+                        RichTextEditor,
                         {
-                          id: `description-${item.id}`,
-                          placeholder: "Enter a description for this image",
                           value: item.description,
-                          onChange: (e) => handleDescriptionChange(item.id, e.target.value),
-                          className: "min-h-24",
-                          maxLength: 500
+                          onChange: (html) => handleDescriptionChange(item.id, html),
+                          placeholder: "Enter a description for this image"
                         }
                       ),
                       /* @__PURE__ */ jsx(InputError, { message: errors[`galleries.${index}.description`], className: "mt-2" })
@@ -5118,14 +5249,14 @@ function EditCard({ card }) {
                       variant: "outline",
                       onClick: addMoreItem,
                       className: "flex items-center gap-2",
-                      disabled: data.galleries.length >= galleryLimit,
+                      disabled: galleryLimit !== null && data.galleries.length >= galleryLimit,
                       children: [
                         /* @__PURE__ */ jsx(PlusCircle, { className: "h-5 w-5" }),
                         "Add More"
                       ]
                     }
                   ),
-                  data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
+                  galleryLimit !== null && data.galleries.length >= galleryLimit && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-yellow-600", children: [
                     /* @__PURE__ */ jsx(ShieldAlert, { className: "h-4 w-4" }),
                     /* @__PURE__ */ jsx("span", { children: "Gallery limit reached. Upgrade your plan to add more images." })
                   ] })
@@ -5463,7 +5594,7 @@ const __vite_glob_0_21 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: ShowCard
 }, Symbol.toStringTag, { value: "Module" }));
-const BankLogo = ({ bankName }) => {
+const PaymentMethodLogo = ({ bankName, logoUrl }) => {
   const getBankColor = (name) => {
     const banks = {
       Chase: "bg-blue-500",
@@ -5479,9 +5610,13 @@ const BankLogo = ({ bankName }) => {
   const getInitials = (name) => {
     return name.split(" ").map((word) => word[0]).join("").toUpperCase().slice(0, 2);
   };
+  if (logoUrl) {
+    return /* @__PURE__ */ jsx("img", { src: logoUrl, alt: bankName, className: "h-10 w-10 rounded-md object-cover" });
+  }
   return /* @__PURE__ */ jsx("div", { className: `${getBankColor(bankName)} flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium text-white`, children: getInitials(bankName) });
 };
 const BankSelector = ({ banks, selectedBank, onSelectBank }) => {
+  var _a, _b;
   const [isOpen, setIsOpen] = useState(false);
   const toggleDropdown = () => setIsOpen(!isOpen);
   return /* @__PURE__ */ jsxs("div", { className: "relative", children: [
@@ -5493,98 +5628,88 @@ const BankSelector = ({ banks, selectedBank, onSelectBank }) => {
         className: "border-border/60 hover:border-border focus:ring-primary/20 flex w-full items-center justify-between rounded-xl border bg-white p-4 text-left transition-all focus:ring-2 focus:outline-none",
         children: [
           selectedBank ? /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-3", children: [
-            /* @__PURE__ */ jsx(BankLogo, { bankName: selectedBank.name }),
+            /* @__PURE__ */ jsx(PaymentMethodLogo, { bankName: selectedBank.name, logoUrl: selectedBank.logo_url }),
             /* @__PURE__ */ jsxs("div", { children: [
               /* @__PURE__ */ jsx("p", { className: "font-medium", children: selectedBank.name }),
-              /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground text-sm", children: [
-                "Account ending in ",
-                selectedBank.account_number.slice(-4)
-              ] })
+              /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-sm", children: selectedBank.type === "bank" ? `Bank • Account ending in ${((_a = selectedBank.account_number) == null ? void 0 : _a.slice(-4)) ?? "N/A"}` : `Wallet • Phone ending in ${((_b = selectedBank.phone_number) == null ? void 0 : _b.slice(-4)) ?? "N/A"}` })
             ] })
-          ] }) : /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: "Select your bank" }),
+          ] }) : /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: "Select payment method" }),
           isOpen ? /* @__PURE__ */ jsx(ChevronUp, { className: "text-muted-foreground h-5 w-5" }) : /* @__PURE__ */ jsx(ChevronDown, { className: "text-muted-foreground h-5 w-5" })
         ]
       }
     ),
-    isOpen && /* @__PURE__ */ jsx("div", { className: "soft-shadow border-border/60 animate-fade-in absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl border bg-white shadow-lg", children: /* @__PURE__ */ jsx("div", { className: "py-1", children: banks.map((bank) => /* @__PURE__ */ jsxs(
-      "button",
-      {
-        className: cn(
-          "hover:bg-muted flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors",
-          (selectedBank == null ? void 0 : selectedBank.account_number) === bank.account_number ? "bg-primary/5" : ""
-        ),
-        onClick: () => {
-          onSelectBank(bank);
-          setIsOpen(false);
+    isOpen && /* @__PURE__ */ jsx("div", { className: "soft-shadow border-border/60 animate-fade-in absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl border bg-white shadow-lg", children: /* @__PURE__ */ jsx("div", { className: "py-1", children: banks.map((bank) => {
+      var _a2, _b2;
+      return /* @__PURE__ */ jsxs(
+        "button",
+        {
+          className: cn(
+            "hover:bg-muted flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors",
+            (selectedBank == null ? void 0 : selectedBank.id) === bank.id ? "bg-primary/5" : ""
+          ),
+          onClick: () => {
+            onSelectBank(bank);
+            setIsOpen(false);
+          },
+          children: [
+            /* @__PURE__ */ jsx(PaymentMethodLogo, { bankName: bank.name, logoUrl: bank.logo_url }),
+            /* @__PURE__ */ jsxs("div", { className: "flex-1", children: [
+              /* @__PURE__ */ jsx("p", { className: "font-medium", children: bank.name }),
+              /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-sm", children: bank.type === "bank" ? `Bank • Account ending in ${((_a2 = bank.account_number) == null ? void 0 : _a2.slice(-4)) ?? "N/A"}` : `Wallet • Phone ending in ${((_b2 = bank.phone_number) == null ? void 0 : _b2.slice(-4)) ?? "N/A"}` })
+            ] }),
+            (selectedBank == null ? void 0 : selectedBank.id) === bank.id && /* @__PURE__ */ jsx(Check, { className: "text-primary h-5 w-5" })
+          ]
         },
-        children: [
-          /* @__PURE__ */ jsx(BankLogo, { bankName: bank.name }),
-          /* @__PURE__ */ jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsx("p", { className: "font-medium", children: bank.name }),
-            /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground text-sm", children: [
-              "Account ending in ",
-              bank.account_number.slice(-4)
-            ] })
-          ] }),
-          (selectedBank == null ? void 0 : selectedBank.account_number) === bank.account_number && /* @__PURE__ */ jsx(Check, { className: "text-primary h-5 w-5" })
-        ]
-      },
-      bank.id
-    )) }) })
-  ] });
-};
-const PaymentLayout = ({ children, className }) => {
-  return /* @__PURE__ */ jsx("div", { className: "from-background to-secondary/50 flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br p-4 md:p-8", children: /* @__PURE__ */ jsx("div", { className: cn("glass-card animate-scale-in w-full max-w-lg rounded-2xl p-6 md:p-8", className), children }) });
-};
-const TransactionCodeInput = ({ value, onChange, onComplete, className }) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const handleChange = (e) => {
-    const newValue = e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-    onChange(newValue);
-    if (newValue.length >= 8 && onComplete) {
-      onComplete();
-    }
-  };
-  return /* @__PURE__ */ jsxs("div", { className: cn("space-y-2", className), children: [
-    /* @__PURE__ */ jsx(Label, { htmlFor: "transaction-code", className: "text-foreground/90 text-sm font-medium", children: "Transaction Reference Code" }),
-    /* @__PURE__ */ jsx(
-      Input,
-      {
-        id: "transaction-code",
-        value,
-        onChange: handleChange,
-        onFocus: () => setIsFocused(true),
-        onBlur: () => setIsFocused(false),
-        placeholder: "Enter reference code (e.g., TXN12345678)",
-        className: cn("input-highlight py-6 text-base font-medium tracking-wide transition-all", isFocused ? "scale-[1.01]" : "", className),
-        maxLength: 16
-      }
-    ),
-    /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-xs", children: "Enter the transaction reference code from your bank transfer" })
+        bank.id
+      );
+    }) }) })
   ] });
 };
 const Index$1 = () => {
+  var _a;
   const { props } = usePage();
   const { auth } = usePage().props;
   const banks = props.banks;
   const plan = props.plan;
-  const { data, setData, post, errors } = useForm({
-    bank: banks[0],
+  const { data, setData, post, errors, processing } = useForm({
+    payment_method_id: ((_a = banks[0]) == null ? void 0 : _a.id) ?? null,
     transactionCode: "",
     email: auth.user.email
   });
+  const [copiedKey, setCopiedKey] = useState(null);
+  const selectedPaymentMethod = banks.find((method) => method.id === data.payment_method_id) ?? null;
+  const canSubmit = Boolean(data.payment_method_id && data.transactionCode.trim()) && !processing;
+  const identifierLabel = (selectedPaymentMethod == null ? void 0 : selectedPaymentMethod.type) === "wallet" ? "Phone Number" : "Account Number";
+  const identifierValue = (selectedPaymentMethod == null ? void 0 : selectedPaymentMethod.type) === "wallet" ? selectedPaymentMethod.phone_number : selectedPaymentMethod == null ? void 0 : selectedPaymentMethod.account_number;
   function onSelectBank(bank) {
-    setData("bank", bank);
+    setData("payment_method_id", bank.id);
   }
   const baseAmount = plan.price;
   const paymentAmount = baseAmount;
+  const copyValue = (value, label, key) => {
+    if (!value) return;
+    navigator.clipboard.writeText(value).then(() => {
+      setCopiedKey(key);
+      toast.success(`${label} copied`);
+      setTimeout(() => setCopiedKey(null), 1500);
+    });
+  };
   const handlePayment = () => {
+    if (!data.payment_method_id) {
+      toast.error("Please select a payment method.");
+      return;
+    }
+    if (!data.transactionCode.trim()) {
+      toast.error("Please enter your transaction reference code.");
+      return;
+    }
     post(route("checkout.order", { plan }), {
       onSuccess: () => {
-        toast.success("Your order has been placed successfully! Your subscription will be activated shortly after approval. Thank you for choosing MuluCard!");
+        toast.success("Order submitted. Your subscription will be activated after approval.");
       },
-      onError: (error) => {
-        toast.error(error.message);
+      onError: (formErrors) => {
+        const firstError = Object.values(formErrors)[0];
+        toast.error(firstError ?? "Please review the form and try again.");
       }
     });
   };
@@ -5628,11 +5753,25 @@ const Index$1 = () => {
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ jsxs("div", { className: "flex flex-col bg-gray-50 p-6 md:w-1/2 md:p-12 border-none", children: [
-      /* @__PURE__ */ jsx("h1", { className: "mb-6 text-xl font-semibold", children: "Pay with Bank Transfer" }),
+    /* @__PURE__ */ jsxs("div", { className: "flex flex-col border-none bg-gray-50 p-6 md:w-1/2 md:p-12", children: [
+      /* @__PURE__ */ jsx("h1", { className: "mb-3 text-xl font-semibold", children: "Pay by Transfer" }),
+      /* @__PURE__ */ jsxs("div", { className: "mb-6 grid gap-2 rounded-md border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900", children: [
+        /* @__PURE__ */ jsxs("p", { children: [
+          /* @__PURE__ */ jsx("span", { className: "font-medium", children: "1." }),
+          " Choose a payment method"
+        ] }),
+        /* @__PURE__ */ jsxs("p", { children: [
+          /* @__PURE__ */ jsx("span", { className: "font-medium", children: "2." }),
+          " Send the transfer"
+        ] }),
+        /* @__PURE__ */ jsxs("p", { children: [
+          /* @__PURE__ */ jsx("span", { className: "font-medium", children: "3." }),
+          " Enter your transaction reference code"
+        ] })
+      ] }),
       /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
-        /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ jsx(Label, { htmlFor: "email", children: "Email Address" }),
+        /* @__PURE__ */ jsxs("div", { className: "space-y-2 rounded-md border border-gray-200 bg-white p-3", children: [
+          /* @__PURE__ */ jsx(Label, { htmlFor: "email", className: "text-xs uppercase tracking-wide text-gray-500", children: "Account Email" }),
           /* @__PURE__ */ jsx(
             Input,
             {
@@ -5640,26 +5779,52 @@ const Index$1 = () => {
               type: "email",
               value: data.email,
               onChange: (e) => setData("email", e.target.value),
-              disabled: true
+              disabled: true,
+              className: "bg-gray-100 text-gray-600"
             }
           )
         ] }),
         /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ jsx(Label, { children: "Bank Information" }),
-          /* @__PURE__ */ jsx(BankSelector, { banks, selectedBank: data.bank, onSelectBank })
+          /* @__PURE__ */ jsx(Label, { children: "Payment Method" }),
+          /* @__PURE__ */ jsx(BankSelector, { banks, selectedBank: selectedPaymentMethod, onSelectBank }),
+          /* @__PURE__ */ jsx(InputError, { className: "mt-2", message: errors.payment_method_id })
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "space-y-2 rounded-md border bg-white p-4", children: [
-          /* @__PURE__ */ jsxs("div", { className: "flex justify-between", children: [
-            /* @__PURE__ */ jsx("span", { className: "text-sm text-gray-500", children: "Account Number" }),
-            /* @__PURE__ */ jsx("span", { className: "text-sm font-medium", children: data.bank.account_number })
+        selectedPaymentMethod && /* @__PURE__ */ jsxs("div", { className: "space-y-3 rounded-md border bg-white p-4", children: [
+          /* @__PURE__ */ jsxs("div", { className: "rounded-md border border-dashed border-gray-200 bg-gray-50 p-3", children: [
+            /* @__PURE__ */ jsxs("div", { className: "mb-1 flex items-center justify-between", children: [
+              /* @__PURE__ */ jsx("span", { className: "text-xs text-gray-500", children: identifierLabel }),
+              /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => copyValue(identifierValue, identifierLabel, "identifier"),
+                  className: "rounded p-1 hover:bg-gray-200",
+                  "aria-label": `Copy ${identifierLabel}`,
+                  children: copiedKey === "identifier" ? /* @__PURE__ */ jsx(Check, { className: "h-4 w-4 text-green-600" }) : /* @__PURE__ */ jsx(ClipboardCopy, { className: "h-4 w-4 text-gray-500" })
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsx("p", { className: "text-lg font-semibold tracking-wide", children: identifierValue ?? "-" })
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsx("span", { className: "text-sm text-gray-500", children: selectedPaymentMethod.type === "wallet" ? "Recipient Name" : "Account Holder" }),
+            /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsx("span", { className: "text-sm font-medium", children: selectedPaymentMethod.account_holder }),
+              /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => copyValue(selectedPaymentMethod.account_holder, "Recipient name", "holder"),
+                  className: "rounded p-1 hover:bg-gray-100",
+                  "aria-label": "Copy recipient name",
+                  children: copiedKey === "holder" ? /* @__PURE__ */ jsx(Check, { className: "h-4 w-4 text-green-600" }) : /* @__PURE__ */ jsx(ClipboardCopy, { className: "h-4 w-4 text-gray-500" })
+                }
+              )
+            ] })
           ] }),
           /* @__PURE__ */ jsxs("div", { className: "flex justify-between", children: [
-            /* @__PURE__ */ jsx("span", { className: "text-sm text-gray-500", children: "Account Holder" }),
-            /* @__PURE__ */ jsx("span", { className: "text-sm font-medium", children: data.bank.account_holder })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "flex justify-between", children: [
-            /* @__PURE__ */ jsx("span", { className: "text-sm text-gray-500", children: "Bank Name" }),
-            /* @__PURE__ */ jsx("span", { className: "text-sm font-medium", children: data.bank.name })
+            /* @__PURE__ */ jsx("span", { className: "text-sm text-gray-500", children: "Payment Method" }),
+            /* @__PURE__ */ jsx("span", { className: "text-sm font-medium", children: selectedPaymentMethod.name })
           ] })
         ] }),
         /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
@@ -5670,19 +5835,42 @@ const Index$1 = () => {
               id: "transactionCode",
               value: data.transactionCode,
               onChange: (e) => setData("transactionCode", e.target.value),
-              placeholder: "Enter your transaction reference code"
+              placeholder: "Use the exact transfer reference from your bank or wallet receipt"
             }
           ),
-          /* @__PURE__ */ jsx("p", { className: "text-xs text-gray-500", children: "Enter the transaction reference code from your bank transfer." }),
+          /* @__PURE__ */ jsx("p", { className: "text-xs text-gray-500", children: "Use the exact transfer reference from your receipt or wallet app." }),
           /* @__PURE__ */ jsx(InputError, { className: "mt-2", message: errors.transactionCode })
         ] }),
-        /* @__PURE__ */ jsx(Button$1, { onClick: handlePayment, className: "mt-4 w-full rounded-md bg-blue-400 py-4 text-white hover:bg-blue-500", children: "Subscribe" }),
+        /* @__PURE__ */ jsxs("div", { className: "space-y-3 rounded-md bg-white/80 p-3 md:p-0 md:bg-transparent md:sticky md:bottom-0", children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between border-b border-gray-200 pb-2 text-sm font-medium md:hidden", children: [
+            /* @__PURE__ */ jsx("span", { children: "Total due today" }),
+            /* @__PURE__ */ jsxs("span", { children: [
+              "Birr ",
+              paymentAmount
+            ] })
+          ] }),
+          /* @__PURE__ */ jsx(
+            Button$1,
+            {
+              onClick: handlePayment,
+              disabled: !canSubmit,
+              className: cn(
+                "mt-1 w-full rounded-md py-4 text-white",
+                canSubmit ? "bg-blue-500 hover:bg-blue-600" : "cursor-not-allowed bg-blue-300"
+              ),
+              children: processing ? "Submitting..." : "Subscribe"
+            }
+          ),
+          /* @__PURE__ */ jsx("p", { className: "text-center text-xs text-gray-500", children: "Your order will be reviewed after payment confirmation." })
+        ] }),
         /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center justify-center space-x-2 text-xs text-gray-400", children: [
           /* @__PURE__ */ jsx("span", { children: "Powered by Mulucard" }),
           /* @__PURE__ */ jsx("span", { children: "•" }),
           /* @__PURE__ */ jsx("button", { className: "hover:text-gray-600", children: "Terms" }),
           /* @__PURE__ */ jsx("span", { children: "•" }),
-          /* @__PURE__ */ jsx("button", { className: "hover:text-gray-600", children: "Privacy" })
+          /* @__PURE__ */ jsx("button", { className: "hover:text-gray-600", children: "Privacy" }),
+          /* @__PURE__ */ jsx("span", { children: "•" }),
+          /* @__PURE__ */ jsx("button", { className: "hover:text-gray-600", children: "Support" })
         ] })
       ] })
     ] })
@@ -5691,8 +5879,6 @@ const Index$1 = () => {
 const __vite_glob_0_25 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   BankSelector,
-  PaymentLayout,
-  TransactionCodeInput,
   default: Index$1
 }, Symbol.toStringTag, { value: "Module" }));
 function CardPreview({
@@ -6288,7 +6474,10 @@ function Hello() {
     } else if (cardData.url) {
       lines.push(`URL:${cardData.url}`);
     }
-    if (cardData.headline) lines.push(`NOTE:${cardData.headline.replace(/\n/g, "\\n")}`);
+    if (cardData.headline) {
+      const plainText = cardData.headline.replace(/<[^>]*>/g, "");
+      lines.push(`NOTE:${plainText.replace(/\n/g, "\\n")}`);
+    }
     if (cardData.avatar && cardData.avatar.path) {
       lines.push(`PHOTO;VALUE=URI:${cardData.avatar.path}`);
     }
@@ -6409,14 +6598,18 @@ function Footer() {
           ] }) }),
           /* @__PURE__ */ jsx("p", { className: "text-foreground mb-4 text-sm", children: "Modern digital business cards for professionals." }),
           /* @__PURE__ */ jsxs("div", { className: "flex space-x-1", children: [
-            /* @__PURE__ */ jsxs(Button, { variant: "secondary", size: "icon", className: "h-8 w-8 rounded-full", children: [
+            /* @__PURE__ */ jsx("a", { href: "https://web.facebook.com/profile.php?id=61570763007664", target: "_blank", rel: "noopener noreferrer", children: /* @__PURE__ */ jsxs(Button, { variant: "secondary", size: "icon", className: "h-8 w-8 rounded-full", children: [
+              /* @__PURE__ */ jsx("svg", { className: "h-4 w-4", fill: "currentColor", viewBox: "0 0 24 24", "aria-hidden": "true", children: /* @__PURE__ */ jsx("path", { fillRule: "evenodd", d: "M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z", clipRule: "evenodd" }) }),
+              /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Facebook" })
+            ] }) }),
+            /* @__PURE__ */ jsx("a", { href: "https://twitter.com", target: "_blank", rel: "noopener noreferrer", children: /* @__PURE__ */ jsxs(Button, { variant: "secondary", size: "icon", className: "h-8 w-8 rounded-full", children: [
               /* @__PURE__ */ jsx(Twitter, { className: "h-4 w-4" }),
               /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Twitter" })
-            ] }),
-            /* @__PURE__ */ jsxs(Button, { variant: "secondary", size: "icon", className: "h-8 w-8 rounded-full", children: [
+            ] }) }),
+            /* @__PURE__ */ jsx("a", { href: "https://instagram.com", target: "_blank", rel: "noopener noreferrer", children: /* @__PURE__ */ jsxs(Button, { variant: "secondary", size: "icon", className: "h-8 w-8 rounded-full", children: [
               /* @__PURE__ */ jsx(Instagram, { className: "h-4 w-4" }),
               /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Instagram" })
-            ] })
+            ] }) })
           ] })
         ] }),
         /* @__PURE__ */ jsxs("div", { children: [
@@ -6448,7 +6641,7 @@ function Footer() {
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { auth } = usePage().props;
+  const { auth, logoUrl } = usePage().props;
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -6469,10 +6662,7 @@ function Navbar() {
       ),
       children: [
         /* @__PURE__ */ jsx("div", { className: "container mx-auto max-w-7xl", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
-          /* @__PURE__ */ jsxs("a", { href: "/", className: "flex items-center gap-[1px] text-xl font-semibold", children: [
-            /* @__PURE__ */ jsx("span", { className: "text-primary", children: "Mulu" }),
-            /* @__PURE__ */ jsx("span", { className: "text-foreground", children: "Card" })
-          ] }),
+          /* @__PURE__ */ jsx("a", { href: "/", className: "flex items-center", children: /* @__PURE__ */ jsx("img", { src: logoUrl, alt: "MuluCard", className: "h-10 w-auto md:h-12" }) }),
           /* @__PURE__ */ jsxs("nav", { className: "hidden items-center gap-8 md:flex", children: [
             /* @__PURE__ */ jsx("a", { href: "#features", className: "text-foreground text-sm font-medium transition-colors", children: "Features" }),
             /* @__PURE__ */ jsx("a", { href: "#how-it-works", className: "text-foreground text-sm font-medium transition-colors", children: "How It Works" }),
@@ -7359,7 +7549,7 @@ function DialogContent({
         children: [
           children,
           /* @__PURE__ */ jsxs(SheetPrimitive.Close, { className: "ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", children: [
-            /* @__PURE__ */ jsx(XIcon, {}),
+            /* @__PURE__ */ jsx(XIcon$1, {}),
             /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Close" })
           ] })
         ]

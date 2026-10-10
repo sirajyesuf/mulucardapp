@@ -1,4 +1,4 @@
-import { socialIconMap } from '@/lib/socialIcons';
+import { RETIRED_LINKS, socialIconMap } from '@/lib/socialIcons';
 import { cn } from '@/lib/utils';
 import { Globe } from 'lucide-react';
 import type { MuluCardProps } from '@/pages/card/mulu-card-props';
@@ -23,7 +23,7 @@ export function CardSocialLinks({
 
     return (
         <div className={className}>
-            {links?.map((link, index) => {
+            {links?.filter((link) => !RETIRED_LINKS.has(link.name.toLowerCase())).map((link, index) => {
                 const Icon = socialIconMap[link.name.toLowerCase()] || Globe;
                 return (
                     link.url && (

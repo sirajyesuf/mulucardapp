@@ -30,7 +30,7 @@ export const DEMO_MULU_CARD_PROPS: MuluCardProps = {
             placeholder: 'https://linkedin.com/in/your-profile',
         },
         {
-            name: 'twitter',
+            name: 'x',
             url: 'https://x.com/example',
             placeholder: 'https://x.com/your-profile',
         },
